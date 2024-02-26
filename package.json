@@ -14,7 +14,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "tide-vscode.helloWorld",
+        "command": "tide.hello-world",
         "title": "Hello World"
       }
     ]
