@@ -10,66 +10,57 @@ export default class Tide {
     }
 
     public static async login() {
-        Logger.info('Running cli login.');
         const res = await this._spawnTideProcess('login');
         Logger.info(res);
     }
 
     public static async logout() {
-        Logger.info('Running cli logout');
         const res = await this._spawnTideProcess('logout');
         Logger.info(res);
     }
 
     public static async listCourses() {
-        Logger.info(`Running cli list`);
         const res = await this._spawnTideProcess('list');
         Logger.info(res);
     }
 
     public static async listCourseTasks(courseName: string) {
-        Logger.info(`Running cli list ${courseName}`);
         const res = await this._spawnTideProcess('list', courseName);
         Logger.info(res);
     }
 
     public static async pullAllTasks() {
-        Logger.info(`Running cli pull`);
         const res = await this._spawnTideProcess('pull');
         Logger.info(res);
     }
 
     public static async pullCourseTasks(courseName: string) {
-        Logger.info(`Running cli pull ${courseName}`);
         const res = await this._spawnTideProcess('pull', courseName);
         Logger.info(res);
     }
 
     public static async pullSpecificTask(courseName: string, taskId: string) {
-        Logger.info(`Running cli pull ${courseName} ${taskId}`);
-        const res = await this._spawnTideProcess('pull', courseName, taskId);
+        const res = await this._spawnTideProcess('pull', courseName,'--task', taskId);
         Logger.info(res);
     }
 
     public static async pushAllTasks() {
-        Logger.info(`Running cli push`);
         const res = await this._spawnTideProcess('push');
         Logger.info(res);
     }
 
     public static async pushCourseTasks(courseName: string) {
-        Logger.info(`Running cli push ${courseName}`);
         const res = await this._spawnTideProcess('push', courseName);
         Logger.info(res);
     }
 
     public static async pushSpecificTask(courseName: string, taskId: string) {
-        Logger.info(`Running cli push ${courseName} ${taskId}`);
-        const res = await this._spawnTideProcess('push', courseName, taskId);
+        const res = await this._spawnTideProcess('push', courseName, '--task', taskId);
         Logger.info(res);
     }
 
     private static async _spawnTideProcess(...args: Array<string>): Promise<string> {
+        Logger.info(`Running cli with args "${args}"`);
         let buffer = '';
         const childProcess = cp.spawn(this.cliPath, args);
         
