@@ -14,8 +14,24 @@
   "contributes": {
     "commands": [
       {
-        "command": "tide.hello-world",
-        "title": "Hello World"
+        "command": "tide.login",
+        "title": "Login"
+      },
+      {
+        "command": "tide.logout",
+        "title": "Log out"
+      },
+      {
+        "command": "tide.list",
+        "title": "List Available Courses"
+      },
+      {
+        "command": "tide.pull",
+        "title": "Pull either all tasks for a course or a specific task."
+      },
+      {
+        "command": "tide.push",
+        "title": "Push either all tasks for a course or a specific task."
       }
     ]
   },
