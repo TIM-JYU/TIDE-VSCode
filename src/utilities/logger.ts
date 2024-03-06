@@ -7,7 +7,7 @@ enum LogLevel {
     Debug = 'Debug',
 }
 
-export class Logger {
+export default class Logger {
     private static _outputChannel: vscode.OutputChannel;
 
     private static getTimeStamp(): string {
@@ -22,7 +22,6 @@ export class Logger {
         if (!this._outputChannel) {
             this._outputChannel = vscode.window.createOutputChannel(outputChannelName);
         }
-        this.show();
     }
 
     static show() {
