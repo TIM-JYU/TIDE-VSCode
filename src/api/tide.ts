@@ -23,12 +23,7 @@ export default class Tide {
     }
 
     public static async listCourses() {
-        const res = await this._spawnTideProcess('list');
-        Logger.info(res);
-    }
-
-    public static async listCourseTasks(courseName: string) {
-        const res = await this._spawnTideProcess('list', courseName);
+        const res = await this._spawnTideProcess('list-courses');
         Logger.info(res);
     }
 
@@ -38,12 +33,12 @@ export default class Tide {
     }
 
     public static async pullCourseTasks(courseName: string) {
-        const res = await this._spawnTideProcess('pull', courseName);
+        const res = await this._spawnTideProcess('pull', '--course', courseName);
         Logger.info(res);
     }
 
     public static async pullSpecificTask(courseName: string, taskId: string) {
-        const res = await this._spawnTideProcess('pull', courseName,'--task', taskId);
+        const res = await this._spawnTideProcess('pull', '--course', courseName,'--task', taskId);
         Logger.info(res);
     }
 
@@ -53,12 +48,12 @@ export default class Tide {
     }
 
     public static async pushCourseTasks(courseName: string) {
-        const res = await this._spawnTideProcess('push', courseName);
+        const res = await this._spawnTideProcess('push', '--course', courseName);
         Logger.info(res);
     }
 
     public static async pushSpecificTask(courseName: string, taskId: string) {
-        const res = await this._spawnTideProcess('push', courseName, '--task', taskId);
+        const res = await this._spawnTideProcess('push', '--course', courseName, '--task', taskId);
         Logger.info(res);
     }
 
