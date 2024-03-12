@@ -1,12 +1,14 @@
 import * as vscode from 'vscode';
 import Logger from '../utilities/logger';
 import Tide from '../api/tide';
+import TestPanel from '../panels/TestPanel';
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
     Logger.info('Registering commands.');
     ctx.subscriptions.push(
         vscode.commands.registerCommand('tide.hello-world', () => {
             vscode.window.setStatusBarMessage('Hello TIDE!');
+            TestPanel.createOrShow(ctx.extensionUri);
         })
     );
 
