@@ -59,11 +59,10 @@
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
-        "watch": "concurrently \"rollup -c -w\" \"tsc -watch -p ./\"",
+        "watch": "concurrently \"rollup -c -w --bundleConfigAsCjs\" \"tsc -watch -p ./\"",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
-        "test": "vscode-test",
-        "asd": "rollup -c -w --bundleConfigAsCjs"
+        "test": "vscode-test"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^25.0.7",
