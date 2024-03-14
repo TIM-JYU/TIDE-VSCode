@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-
-    onMount(() => {console.log('kissa istuu')});
     const a = "kissa"
+    const b = "koira"
 </script>
 
-<p>Hello {a}</p>
+<p>{a} istuu</p>
+<p>{b} haukkuu</p>
 

@@ -62,7 +62,8 @@
         "watch": "concurrently \"rollup -c -w\" \"tsc -watch -p ./\"",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
-        "test": "vscode-test"
+        "test": "vscode-test",
+        "asd": "rollup -c -w --bundleConfigAsCjs"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^25.0.7",
