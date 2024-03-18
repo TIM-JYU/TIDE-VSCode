@@ -7,7 +7,7 @@
 To automatically compile Svelte components along with extension code, run
 
 ```
-npm run watch
+npm run watch-svelte
 ```
 
 To create a new Svelte component run the following at project root folder (where the script is located)
