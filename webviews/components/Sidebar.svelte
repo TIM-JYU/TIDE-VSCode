@@ -37,3 +37,11 @@
       </ul>
     </nav>
   {/if}
+
+  <!-- 'Example of how sending a message from webview to VS Code api works' -->
+  <button on:click={() => {
+      tsvscode.postMessage({
+        type: 'onInfo',
+        value: 'This is example of an info message'
+      })
+  }}>click me</button>
