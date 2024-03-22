@@ -39,7 +39,13 @@
 			},
 			{
 				"command": "tide.showCourses",
-				"title": "Show My Courses"
+				"title": "Show My Courses",
+				"category": "TIDE"
+			},
+			{
+				"command": "tide.openSettings",
+				"title": "Open Settings",
+				"category": "TIDE"
 			}
 		],
 		"viewsContainers": {
@@ -61,6 +67,16 @@
 					"contextualTitle": "TIDE"
 				}
 			]
+		},
+		"configuration": {
+			"title": "TIDE",
+			"properties": {
+				"tide.sidebar.showSidebarWelcomeMessage": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show welcome message in sidebar"
+				}
+			}
 		}
 	},
 	"scripts": {

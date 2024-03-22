@@ -5,7 +5,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;
 	_doc?: vscode.TextDocument;
 
-	constructor(private readonly _extensionUri: vscode.Uri) {}
+	constructor(private readonly _extensionUri: vscode.Uri) {
+		vscode.workspace.onDidChangeConfiguration((event) => {
+			if (event.affectsConfiguration("tide.sidebar.showSidebarWelcomeMessage")) {
+				// Call a method to update the view with the new setting value
+				this.updateWebview();
+			}
+		});
+	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView) {
 		this._view = webviewView;
@@ -39,12 +46,23 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand("tide.showCourses");
 					break;
 				}
+				case "openSettings": {
+					vscode.commands.executeCommand("tide.openSettings");
+					break;
+				}
 			}
 		});
 	}
 
 	public revive(panel: vscode.WebviewView) {
 		this._view = panel;
+	}
+
+	private updateWebview() {
+		if (this._view) {
+			const showSidebarWelcome = vscode.workspace.getConfiguration().get("tide.sidebar.showSidebarWelcomeMessage");
+			this._view.webview.postMessage({ type: "settingValue", value: showSidebarWelcome });
+		}
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {

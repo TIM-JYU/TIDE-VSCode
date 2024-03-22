@@ -14,6 +14,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	);
 
 	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.openSettings", () => {
+			vscode.commands.executeCommand("workbench.action.openSettings", "TIDE-extension");
+		})
+	);
+
+	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.showCourses", () => {
 			CoursePanel.createOrShow(ctx.extensionUri);
 		})
