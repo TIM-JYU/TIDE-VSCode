@@ -35,6 +35,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.window.showErrorMessage(data.value);
 					break;
 				}
+				case "showCourses": {
+					vscode.commands.executeCommand("tide.showCourses");
+					break;
+				}
 			}
 		});
 	}
