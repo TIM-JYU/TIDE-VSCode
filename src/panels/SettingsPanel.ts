@@ -74,6 +74,10 @@ export default class SettingsPanel {
                         Logger.debug('Saving settings.');
                         ExtensionStateManager.setSettings(message.value);
                         return;
+                    case "fetchCurrentCliPath":
+                        const cliPath = ExtensionStateManager.getCliPath();
+                        this._panel.webview.postMessage({"cliPath": cliPath});
+                        return;
                     default:
                         Logger.debug(`Message of type ${message.type} slipped through the cracks...`);
 				}
