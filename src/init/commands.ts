@@ -3,6 +3,8 @@ import Logger from "../utilities/logger";
 import Tide from "../api/tide";
 import TestPanel from "../panels/TestPanel";
 import CoursePanel from "../panels/CoursePanel";
+import SettingsPanel from "../panels/SettingsPanel";
+import ExtensionStateManager from "../api/ExtensionStateManager";
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
 	Logger.info("Registering commands.");
@@ -19,6 +21,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		})
 	);
 
+    ctx.subscriptions.push(
+        vscode.commands.registerCommand("tide.showSettings", () => {
+            SettingsPanel.createOrShow(ctx.extensionUri);
+        })
+    );
+
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.login", () => {
 			Tide.login();
@@ -31,6 +39,11 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		})
 	);
 
+    ctx.subscriptions.push(
+        vscode.commands.registerCommand('tide.debug', () => {
+            Logger.debug(ExtensionStateManager.getCliPath());
+        })
+    );
 	// "commands": [
 	//   {
 	//     "command": "tide.login",
