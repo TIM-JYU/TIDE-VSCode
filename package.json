@@ -40,7 +40,15 @@
 			{
 				"command": "tide.showCourses",
 				"title": "Show My Courses"
-			}
+			},
+            {
+                "command": "tide.showSettings",
+                "title": "TIDE Settings"
+            },
+            {
+                "command": "tide.debug",
+                "title": "Magic Button"
+            }
 		],
 		"viewsContainers": {
 			"activitybar": [
