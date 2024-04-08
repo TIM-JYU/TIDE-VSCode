@@ -39,6 +39,7 @@
 			},
 			{
 				"command": "tide.showCourses",
+<<<<<<< HEAD
 				"title": "Show My Courses"
 			},
             {
@@ -49,6 +50,16 @@
                 "command": "tide.debug",
                 "title": "Magic Button"
             }
+=======
+				"title": "Show My Courses",
+				"category": "TIDE"
+			},
+			{
+				"command": "tide.openSettings",
+				"title": "Open Settings",
+				"category": "TIDE"
+			}
+>>>>>>> views
 		],
 		"viewsContainers": {
 			"activitybar": [
@@ -69,6 +80,19 @@
 					"contextualTitle": "TIDE"
 				}
 			]
+<<<<<<< HEAD
+=======
+		},
+		"configuration": {
+			"title": "TIDE",
+			"properties": {
+				"tide.sidebar.showSidebarWelcomeMessage": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show welcome message in sidebar"
+				}
+			}
+>>>>>>> views
 		}
 	},
 	"scripts": {

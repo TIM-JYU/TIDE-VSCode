@@ -1,5 +1,16 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    let showSidebarWelcome = false;
+    
+    // Listen for messages from the extension
+    onMount(() => {
+        window.addEventListener('message', (event) => {
+            const message = event.data;
+            if (message && message.type === 'settingValue') {
+                showSidebarWelcome = message.value;
+            }
+        });
+    });
     let isLoggedIn = false;
 
     function handleLogin() {
@@ -21,7 +32,9 @@
 </style>
   
   {#if !isLoggedIn}
-    <div>Welcome to TIDE-extension! Start by logging in.</div>
+    {#if showSidebarWelcome}
+      <div>Welcome to TIDE-extension! Start by logging in.</div>
+    {/if}
     <button on:click={handleLogin} style="background: none; border: none; cursor: pointer;">Login</button>
   {:else}
     <nav>
@@ -34,8 +47,8 @@
         </li>
         <li style="list-style-type: none;">
           <button on:click={() => { tsvscode.postMessage({
-            type: 'onError',
-            value: 'Settings are not done yet'
+            type: 'openSettings',
+            value: ''
           }) }} style="background: none; border: none; cursor: pointer;">Settings</button>
         </li>
         <li style="list-style-type: none;">
