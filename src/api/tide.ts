@@ -17,43 +17,60 @@ export default class Tide {
     }
 
     public static async listCourses() {
-        const res = await this._spawnTideProcess('list-courses');
+        const res = await this._spawnTideProcess('courses');
         Logger.info(res);
     }
 
-    public static async pullAllTasks() {
-        const res = await this._spawnTideProcess('pull');
+    // tide task list /polku/jne/yms
+    // TODO: Mieti parempi nimi
+    /**
+     * listaa setin taskit timista
+     */
+    public static async listSetTasks(taskSetPath: string) {
+        const res = await this._spawnTideProcess(`task list ${taskSetPath}`);
         Logger.info(res);
     }
 
-    public static async pullCourseTasks(courseName: string) {
-        const res = await this._spawnTideProcess('pull', '--course', courseName);
+    /**
+     * luo task setin taskit lokaalisti
+     *
+     * @param {string} taskSetPath - task setin kansio
+     */
+    public static async createSetTasks(taskSetPath: string) {
+        // TODO: asetuksista tms taskin polku
+        const res = await this._spawnTideProcess(`task create -a ${taskSetPath}`);
+        // const res = await this._spawnTideProcess(`task create -a ${taskSetPath} -d ${asetukset.haepolkux}`);
         Logger.info(res);
     }
 
-    public static async pullSpecificTask(courseName: string, taskId: string) {
-        const res = await this._spawnTideProcess('pull', '--course', courseName,'--task', taskId);
+    /**
+     * korvaa lokaalin set taskin
+     *
+     * @param {string} taskSetPath - task setin kansio
+     */
+    public static async overwriteSetTasks(taskSetPath: string) {
+        // TODO: asetuksista tms taskin polku (kts. createSetTasks())
+        const res = await this._spawnTideProcess(`task create -a -f ${taskSetPath}`);
         Logger.info(res);
     }
 
-    public static async pushAllTasks() {
-        const res = await this._spawnTideProcess('push');
+    /**
+     * palauta taski
+     *
+     * @param {string} taskPath - yksittaisen tehtavan kansio
+     */
+    public static async submitTask(taskPath: string) {
+        // TODO: asetuksista tms taskin polku (kts. createSetTasks())
+        const res = await this._spawnTideProcess(`submit ${taskPath}`);
         Logger.info(res);
     }
 
-    public static async pushCourseTasks(courseName: string) {
-        const res = await this._spawnTideProcess('push', '--course', courseName);
-        Logger.info(res);
-    }
-
-    public static async pushSpecificTask(courseName: string, taskId: string) {
-        const res = await this._spawnTideProcess('push', '--course', courseName, '--task', taskId);
-        Logger.info(res);
-    }
+    // TODO: wrapperifunktio tide-prosessin tulosteen parsimiselle
 
     private static async _spawnTideProcess(...args: Array<string>): Promise<string> {
         Logger.info(`Running cli with args "${args}"`);
         let buffer = '';
+        // TODO: ExtensionStateManagerin sijaan asetuksista
         const childProcess = cp.spawn(ExtensionStateManager.getCliPath(), args);
         
         childProcess.stdout.on('data', data => {
