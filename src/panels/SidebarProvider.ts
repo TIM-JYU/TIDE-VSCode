@@ -50,6 +50,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand("tide.openSettings");
 					break;
 				}
+				case "showTaskPanel": {
+					vscode.commands.executeCommand("tide.showTaskPanel");
+					break;
+				}
 			}
 		});
 	}

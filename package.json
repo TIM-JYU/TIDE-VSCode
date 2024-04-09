@@ -46,6 +46,11 @@
 				"command": "tide.openSettings",
 				"title": "Open Settings",
 				"category": "TIDE"
+			},
+			{
+				"command": "tide.showTaskPanel",
+				"title": "Show Task Panel",
+				"category": "TIDE"
 			}
 		],
 		"viewsContainers": {

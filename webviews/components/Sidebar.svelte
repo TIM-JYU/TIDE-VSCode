@@ -61,7 +61,7 @@
   <!-- 'Example of how sending a message from webview to VS Code api works' -->
   <button on:click={() => {
       tsvscode.postMessage({
-        type: 'onInfo',
-        value: 'This is example of an info message'
+        type: 'showTaskPanel',
+        value: ''
       })
-  }}>click me</button>
+  }}>Show task panel</button>

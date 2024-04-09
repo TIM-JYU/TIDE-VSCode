@@ -3,6 +3,7 @@ import Logger from "../utilities/logger";
 import Tide from "../api/tide";
 import TestPanel from "../panels/TestPanel";
 import CoursePanel from "../panels/CoursePanel";
+import TaskPanel from "../panels/TaskPanel";
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
 	Logger.info("Registering commands.");
@@ -16,6 +17,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.openSettings", () => {
 			vscode.commands.executeCommand("workbench.action.openSettings", "TIDE-extension");
+		})
+	);
+
+	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.showTaskPanel", () => {
+			TaskPanel.createOrShow(ctx.extensionUri);
 		})
 	);
 

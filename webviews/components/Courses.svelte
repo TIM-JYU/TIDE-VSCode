@@ -3,14 +3,14 @@
   import MenuItem from './MenuItem.svelte'
 
   let activeCoursesExpanded = true;
-  let archivedCoursesExpanded = false;
+  let hiddenCoursesExpanded = false;
 
   function toggleActive() {
     activeCoursesExpanded = !activeCoursesExpanded;
   }
 
   function toggleArchived() {
-    archivedCoursesExpanded = !archivedCoursesExpanded;
+    hiddenCoursesExpanded = !hiddenCoursesExpanded;
   }
 
   // Arrays that store course data
@@ -154,13 +154,13 @@
   {/each}
 {/if}
 
-<!-- Archived Courses Section -->
+<!-- Hidden Courses Section -->
 <button class="button-header" on:click={toggleArchived}>
-  Archived Courses
-  <span class="arrow {!archivedCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
+  Hidden Courses
+  <span class="arrow {!hiddenCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
 </button>
 
-{#if archivedCoursesExpanded}
+{#if hiddenCoursesExpanded}
   {#each archivedCourses as course}
     <div class="course-box">
       <header>
