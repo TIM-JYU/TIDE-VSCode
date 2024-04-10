@@ -89,9 +89,6 @@ export default class Tide {
     // TODO: asetuksista tms taskin polku (kts. createSetTasks())
   }
 
-  // TODO: wrapperifunktio tide-prosessin tulosteen parsimiselle
-
-
   // TODO: Keksi parempi nimi
   private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
     const data = await this.spawnTideProcess(...args);
