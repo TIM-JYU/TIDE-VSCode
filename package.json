@@ -80,6 +80,10 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Show welcome message in sidebar"
+				},
+				"tide.fileDownloadPath": {
+					"type": "string",
+					"description": "The location where the exercise folders will be downloaded."
 				}
 			}
 		}

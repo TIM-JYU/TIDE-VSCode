@@ -1,6 +1,22 @@
 <script>
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
+  import { onMount } from 'svelte';
+
+  let downloadPath = '';
+
+  onMount(() => {
+    // Listen for messages from the extension
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+      if (message && message.command === 'setPathResult') {
+        downloadPath = message.path;
+      }
+      if (message && message.command === 'updatePath') {
+        downloadPath = message.path || ''; // Update the downloadPath with the received path
+      }
+    });
+  });
 
   let activeCoursesExpanded = true;
   let hiddenCoursesExpanded = false;
@@ -9,34 +25,200 @@
     activeCoursesExpanded = !activeCoursesExpanded;
   }
 
-  function toggleArchived() {
+  function toggleHidden() {
     hiddenCoursesExpanded = !hiddenCoursesExpanded;
   }
 
   // Arrays that store course data
-  let activeCourses = [
-    { title: "Course 1" },
-    { title: "Course 2" },
-    { title: "Course 5" }
-  ];
-
-  let archivedCourses = [
-    { title: "Course 3" },
-    { title: "Course 4" },
+  let courses = [
+    {
+      "id": "1001",
+      "name": "Course1",
+      "exerciseWeeks": [
+        { "week": 1, "exercises": ["Exercise 1", "Exercise 2", "Exercise 3"] },
+        { "week": 2, "exercises": ["Exercise 4", "Exercise 5"] },
+        { "week": 3, "exercises": ["Exercise 6", "Exercise 7", "Exercise 8"] }
+      ],
+      "status": "active"
+    },
+    {
+      "id": "1002",
+      "name": "Course2",
+      "exerciseWeeks": [
+        { "week": 1, "exercises": ["Exercise 1", "Exercise 2"] },
+        { "week": 2, "exercises": ["Exercise 3", "Exercise 4"] }
+      ],
+      "status": "active"
+    },
+    {
+      "id": "1003",
+      "name": "Course3",
+      "exerciseWeeks": [
+        { "week": 1, "exercises": ["Exercise 1", "Exercise 2", "Exercise 3"] },
+        { "week": 2, "exercises": ["Exercise 4", "Exercise 5", "Exercise 6"] },
+        { "week": 3, "exercises": ["Exercise 7", "Exercise 8"] }
+      ],
+      "status": "hidden"
+    }
   ];
 
   function moveToActive(course) {
-    archivedCourses = archivedCourses.filter(c => c !== course);
-    activeCourses = [...activeCourses, course];
+    course.status = "active";
+    courses = [...courses]; // Ensure Svelte reacts to the change in course status
   }
 
-  function moveToArchived(course) {
-    activeCourses = activeCourses.filter(c => c !== course);
-    archivedCourses = [...archivedCourses, course];
+  function moveToHidden(course) {
+    course.status = "hidden";
+    courses = [...courses]; // Ensure Svelte reacts to the change in course status
+  }
+
+  // Array to keep track of expanded/collapsed state of each course
+  let courseExpanded = new Array(courses.length).fill(false);
+
+  function toggleCourse(index) {
+    courseExpanded[index] = !courseExpanded[index];
   }
 </script>
 
+<h1>My Courses</h1>
+
+<p>Current download folder: {downloadPath}</p>
+
+<button on:click={() => {
+  tsvscode.postMessage({
+    type: 'setPath',
+    value: ''
+  })
+}}>Set file download folder</button>
+
+<!-- Active Courses Section -->
+<button class="button-header" on:click={toggleActive}>
+  Active Courses
+  <span class="arrow {!activeCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
+</button>
+
+{#if activeCoursesExpanded}
+  {#each courses.filter(course => course.status === 'active') as course, index}
+      <div class="course-box">
+          <header>
+              <p class="courseTitle">{course.name}</p>
+              <nav>
+                  <ul>
+                      <li>
+                          <Menu>
+                              <span slot='toggle'>&#8942;</span>
+                              <MenuItem>
+                                  <a href="#?" on:click={() => moveToHidden(course)}>Move to hidden courses</a>
+                              </MenuItem>
+                          </Menu>
+                      </li>
+                  </ul>
+              </nav>
+          </header>
+          <button class="download-button">Download</button>
+          <button
+              class="expand-collapse-button"
+              aria-expanded={courseExpanded[index]}
+              on:click={() => toggleCourse(index)}
+          >
+              <span class="arrow {!courseExpanded[index] ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
+          </button>
+          {#if courseExpanded[index]}
+              <!-- Content to show when course is expanded -->
+              <div class="course-content">
+                  <table>
+                      <thead>
+                          <tr>
+                              <th>Task set</th>
+                              <th>Total exercises</th>
+                              <th>Points</th>
+                              <th></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {#each course.exerciseWeeks as { week, exercises }}
+                              <tr>
+                                  <td>{week}</td>
+                                  <td>{exercises.length}</td>
+                                  <td>6/8</td> <!-- Example user points -->
+                                  <td><button class="download-all-button">Download All</button></td>
+                              </tr>
+                          {/each}
+                      </tbody>
+                  </table>
+              </div>
+          {/if}
+      </div>
+  {/each}
+{/if}
+
+<!-- Hidden Courses Section -->
+<button class="button-header" on:click={toggleHidden}>
+  Hidden Courses
+  <span class="arrow {!hiddenCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
+</button>
+
+{#if hiddenCoursesExpanded}
+  {#each courses.filter(course => course.status === 'hidden') as course, index}
+    <div class="course-box">
+      <header>
+        <p class="courseTitle">{course.name}</p>
+        <nav>
+          <ul>
+            <li>
+              <Menu>
+                <span slot='toggle'>&#8942;</span>
+                <MenuItem>
+                  <a href="#?" on:click={() => moveToActive(course)}>Move to active courses</a>
+                </MenuItem>
+              </Menu>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <button class="download-button">Download</button>
+      <button
+      class="expand-collapse-button"
+      aria-expanded={courseExpanded[index]}
+      on:click={() => toggleCourse(index)}
+  >
+      <span class="arrow {!courseExpanded[index] ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
+  </button>
+  {#if courseExpanded[index]}
+      <!-- Content to show when course is expanded -->
+      <div class="course-content">
+          <table>
+              <thead>
+                  <tr>
+                      <th>Exercise week</th>
+                      <th>Amount of exercises</th>
+                      <th>User points</th>
+                      <th>Download all button</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {#each course.exerciseWeeks as { week, exercises }}
+                      <tr>
+                          <td>{week}</td>
+                          <td>{exercises.length}</td>
+                          <td>6/8</td> <!-- Example user points -->
+                          <td><button class="download-all-button">Download All</button></td>
+                      </tr>
+                  {/each}
+              </tbody>
+          </table>
+      </div>
+  {/if}
+    </div>
+  {/each}
+{/if}
+
+
 <style>
+  :global(body) {
+    margin-bottom: 2.5rem;
+  }
+
   h1 {
     margin-bottom: 2rem;
     font-size: 2rem;
@@ -71,7 +253,7 @@
   .course-box {
     position: relative;
     background-color: #000000;
-    padding: 1rem;
+    padding-bottom: 3rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
     border-radius: 8px;
@@ -81,9 +263,9 @@
     box-sizing: border-box;
   }
 
-  .course-box p {
-  margin-top: 0;
-  padding-top: 0.3rem;
+  .courseTitle {
+    margin-left: 1.5rem;
+    margin-top: 1.5rem;
   }
 
   .download-button {
@@ -94,7 +276,19 @@
     border-radius: 4px;
     font-size: medium;
     cursor: pointer;
+    margin-bottom: 1.5rem;
+        margin-left: 1.5rem;
   }
+
+  .download-all-button {
+    background-color: #007acc;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: small;
+    cursor: pointer;
+}
   
   *,
 	*::before,
@@ -121,64 +315,68 @@
     color: inherit;
     text-decoration: none;
   }
+
+  .expand-collapse-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: transparent;
+    border: none;
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    bottom: 0rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.arrow {
+  transition: transform 0.5s ease;
+}
+
+.down-arrow {
+  transform: rotate(0deg);
+}
+
+.up-arrow {
+  transform: rotate(-180deg);
+}
+
+.download-button::after {
+  content: '';
+  position: absolute;
+  bottom: 2rem; /* Adjust as needed */
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: gray; /* Grey color */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: none;
+  text-align: center;
+  padding: 8px;
+}
+
+th {
+  background-color: black;
+  font-weight: normal;
+  font-size: smaller;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #222222;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #444444;
+}
+
 </style>
-
-<h1>My Courses</h1>
-
-<!-- Active Courses Section -->
-<button class="button-header" on:click={toggleActive}>
-  Active Courses
-  <span class="arrow {!activeCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
-</button>
-
-{#if activeCoursesExpanded}
-  {#each activeCourses as course}
-    <div class="course-box">
-      <header>
-        <p>{course.title}</p>
-        <nav>
-          <ul>
-            <li>
-              <Menu>
-                <span slot='toggle'>&#8942;</span>
-                <MenuItem>
-                  <a href="#?" on:click={() => moveToArchived(course)}>Move to archived courses</a>
-                </MenuItem>
-              </Menu>
-            </li>
-          </ul>
-        </nav>
-      </header>
-      <button class="download-button">Download</button>
-    </div>
-  {/each}
-{/if}
-
-<!-- Hidden Courses Section -->
-<button class="button-header" on:click={toggleArchived}>
-  Hidden Courses
-  <span class="arrow {!hiddenCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
-</button>
-
-{#if hiddenCoursesExpanded}
-  {#each archivedCourses as course}
-    <div class="course-box">
-      <header>
-        <p>{course.title}</p>
-        <nav>
-          <ul>
-            <li>
-              <Menu>
-                <span slot='toggle'>&#8942;</span>
-                <MenuItem>
-                  <a href="#?" on:click={() => moveToActive(course)}>Move to active courses</a>
-                </MenuItem>
-              </Menu>
-            </li>
-          </ul>
-        </nav>
-      </header>
-      <button class="download-button">Download</button>
-    </div>
-  {/each}
-{/if}
