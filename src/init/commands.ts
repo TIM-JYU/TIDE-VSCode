@@ -44,26 +44,15 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		})
 	);
 
-	// "commands": [
-	//   {
-	//     "command": "tide.login",
-	//     "title": "Login"
-	//   },
-	//   {
-	//     "command": "tide.logout",
-	//     "title": "Log out"
-	//   },
-	//   {
-	//     "command": "tide.list",
-	//     "title": "List Available Courses"
-	//   },
-	//   {
-	//     "command": "tide.pull",
-	//     "title": "Pull either all tasks for a course or a specific task."
-	//   },
-	//   {
-	//     "command": "tide.push",
-	//     "title": "Push either all tasks for a course or a specific task."
-	//   }
-	// ]
+	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.listCourses", () => {
+			Tide.listCourses();
+		})
+	);
+
+	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.debug", () => {
+			Tide.debug();
+		})
+	);
 }

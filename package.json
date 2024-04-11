@@ -26,7 +26,7 @@
 				"title": "Log out"
 			},
 			{
-				"command": "tide.list",
+				"command": "tide.listCourses",
 				"title": "List Available Courses"
 			},
 			{
@@ -51,7 +51,11 @@
 				"command": "tide.showTaskPanel",
 				"title": "Show Task Panel",
 				"category": "TIDE"
-			}
+			},
+            {
+                "command": "tide.debug",
+                "title": "Magic Button"
+            }
 		],
 		"viewsContainers": {
 			"activitybar": [
@@ -84,7 +88,11 @@
 				"tide.fileDownloadPath": {
 					"type": "string",
 					"description": "The location where the exercise folders will be downloaded."
-				}
+				},
+                "tide.cliPath": {
+                    "type": "string",
+                    "description": "Path to CLI tool"
+                }
 			}
 		}
 	},
