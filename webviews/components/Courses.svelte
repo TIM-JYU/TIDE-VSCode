@@ -44,7 +44,8 @@
         { "week": 2, "exercises": ["Exercise 4", "Exercise 5"] },
         { "week": 3, "exercises": ["Exercise 6", "Exercise 7", "Exercise 8"] }
       ],
-      "status": "active"
+      "status": "active",
+      "expanded": "false"
     },
     {
       "id": "1002",
@@ -53,7 +54,8 @@
         { "week": 1, "exercises": ["Exercise 1", "Exercise 2"] },
         { "week": 2, "exercises": ["Exercise 3", "Exercise 4"] }
       ],
-      "status": "active"
+      "status": "active",
+      "expanded": "false"
     },
     {
       "id": "1003",
@@ -63,7 +65,8 @@
         { "week": 2, "exercises": ["Exercise 4", "Exercise 5", "Exercise 6"] },
         { "week": 3, "exercises": ["Exercise 7", "Exercise 8"] }
       ],
-      "status": "hidden"
+      "status": "hidden",
+      "expanded": "false"
     }
   ];
 
@@ -77,11 +80,15 @@
     courses = [...courses];
   }
 
-  let courseExpanded = new Array(courses.length).fill(false);
+  //let courseExpanded = new Array(courses.length).fill(false);
 
-  function toggleCourse(index) {
-    courseExpanded[index] = !courseExpanded[index];
+  function toggleCourse(courseId) {
+  const courseIndex = courses.findIndex(course => course.id === courseId);
+  if (courseIndex !== -1) {
+    courses[courseIndex].expanded = !courses[courseIndex].expanded;
   }
+}
+  
 </script>
 
 <h1>My Courses</h1>
@@ -102,7 +109,7 @@
 </button>
 
 {#if activeCoursesExpanded}
-  {#each courses.filter(course => course.status === 'active') as course, index}
+  {#each courses.filter(course => course.status === 'active') as course, i}
       <div class="course-box">
           <header>
               <p class="courseTitle">{course.name}</p>
@@ -122,12 +129,12 @@
           <button class="download-button">Download</button>
           <button
               class="expand-collapse-button"
-              aria-expanded={courseExpanded[index]}
-              on:click={() => toggleCourse(index)}
+              aria-expanded={course.expanded}
+              on:click={() => toggleCourse(course.id)}
           >
-              <span class="arrow {!courseExpanded[index] ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
+              <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
           </button>
-          {#if courseExpanded[index]}
+          {#if course.expanded}
               <div class="course-content">
                   <table>
                       <thead>
@@ -162,7 +169,7 @@
 </button>
 
 {#if hiddenCoursesExpanded}
-  {#each courses.filter(course => course.status === 'hidden') as course, index}
+  {#each courses.filter(course => course.status === 'hidden') as course, i}
     <div class="course-box">
       <header>
         <p class="courseTitle">{course.name}</p>
@@ -182,12 +189,12 @@
       <button class="download-button">Download</button>
       <button
       class="expand-collapse-button"
-      aria-expanded={courseExpanded[index]}
-      on:click={() => toggleCourse(index)}
+      aria-expanded={course.expanded}
+      on:click={() => toggleCourse(course.id)}
   >
-      <span class="arrow {!courseExpanded[index] ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
+      <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
   </button>
-  {#if courseExpanded[index]}
+  {#if course.expanded}
       <div class="course-content">
           <table>
               <thead>
