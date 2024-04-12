@@ -5,15 +5,21 @@
 
   let downloadPath = '';
 
+  $: if (downloadPath== null) {
+    tsvscode.postMessage({
+    type: 'onError',
+    value: 'Folder for downloading tasks must be set'
+  })
+	}
+
   onMount(() => {
-    // Listen for messages from the extension
     window.addEventListener('message', (event) => {
       const message = event.data;
       if (message && message.command === 'setPathResult') {
         downloadPath = message.path;
       }
       if (message && message.command === 'updatePath') {
-        downloadPath = message.path || ''; // Update the downloadPath with the received path
+        downloadPath = message.path || '';
       }
     });
   });
@@ -29,7 +35,6 @@
     hiddenCoursesExpanded = !hiddenCoursesExpanded;
   }
 
-  // Arrays that store course data
   let courses = [
     {
       "id": "1001",
@@ -64,15 +69,14 @@
 
   function moveToActive(course) {
     course.status = "active";
-    courses = [...courses]; // Ensure Svelte reacts to the change in course status
+    courses = [...courses];
   }
 
   function moveToHidden(course) {
     course.status = "hidden";
-    courses = [...courses]; // Ensure Svelte reacts to the change in course status
+    courses = [...courses];
   }
 
-  // Array to keep track of expanded/collapsed state of each course
   let courseExpanded = new Array(courses.length).fill(false);
 
   function toggleCourse(index) {
@@ -124,7 +128,6 @@
               <span class="arrow {!courseExpanded[index] ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
           </button>
           {#if courseExpanded[index]}
-              <!-- Content to show when course is expanded -->
               <div class="course-content">
                   <table>
                       <thead>
@@ -141,7 +144,7 @@
                                   <td>{week}</td>
                                   <td>{exercises.length}</td>
                                   <td>6/8</td> <!-- Example user points -->
-                                  <td><button class="download-all-button">Download All</button></td>
+                                  <td><button class="download-all-button">Download</button></td>
                               </tr>
                           {/each}
                       </tbody>
@@ -185,15 +188,14 @@
       <span class="arrow {!courseExpanded[index] ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
   </button>
   {#if courseExpanded[index]}
-      <!-- Content to show when course is expanded -->
       <div class="course-content">
           <table>
               <thead>
                   <tr>
-                      <th>Exercise week</th>
-                      <th>Amount of exercises</th>
-                      <th>User points</th>
-                      <th>Download all button</th>
+                    <th>Task set</th>
+                    <th>Total exercises</th>
+                    <th>Points</th>
+                    <th></th>
                   </tr>
               </thead>
               <tbody>
@@ -202,7 +204,7 @@
                           <td>{week}</td>
                           <td>{exercises.length}</td>
                           <td>6/8</td> <!-- Example user points -->
-                          <td><button class="download-all-button">Download All</button></td>
+                          <td><button class="download-all-button">Download</button></td>
                       </tr>
                   {/each}
               </tbody>
@@ -347,11 +349,11 @@
 .download-button::after {
   content: '';
   position: absolute;
-  bottom: 2rem; /* Adjust as needed */
+  bottom: 2rem;
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: gray; /* Grey color */
+  background-color: gray;
 }
 
 table {

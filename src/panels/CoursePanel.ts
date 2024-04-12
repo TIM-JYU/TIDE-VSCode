@@ -108,6 +108,13 @@ export default class CoursePanel {
 		this._panel.webview.onDidReceiveMessage(async (data) => {
 			console.log("käy OnDIdReceiveMEssagessa");
 			switch (data.type) {
+				case "onError": {
+					if (!data.value) {
+						return;
+					}
+					vscode.window.showErrorMessage(data.value);
+					break;
+				}
 				case "setPath": {
 					const newPath = await vscode.window.showOpenDialog({
 						canSelectFiles: false,
