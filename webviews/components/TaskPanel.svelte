@@ -26,7 +26,7 @@
     <hr />
 
     <div class="reset-section">
-        <button>Reset exercise</button>
+        <button>Reset Exercise</button>
         <button>Fetch Latest Answer</button>
     </div>
 </div>
