@@ -140,7 +140,7 @@
                       <thead>
                           <tr>
                               <th>Task set</th>
-                              <th>Total exercises</th>
+                              <th>Number of exercises</th>
                               <th>Points</th>
                               <th></th>
                           </tr>
@@ -200,7 +200,7 @@
               <thead>
                   <tr>
                     <th>Task set</th>
-                    <th>Total exercises</th>
+                    <th>Number of exercises</th>
                     <th>Points</th>
                     <th></th>
                   </tr>
