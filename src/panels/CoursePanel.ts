@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
-	console.log("Käy getWebviewoptionsissa");
 	return {
 		// Enable javascript in the webview
 		enableScripts: true,
@@ -22,7 +21,6 @@ export default class CoursePanel {
 	private _disposables: vscode.Disposable[] = [];
 
 	public static createOrShow(extensionUri: vscode.Uri) {
-		console.log("Käy CreateOrShowssa");
 		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
 		// If we already have a panel, show it.
@@ -38,43 +36,32 @@ export default class CoursePanel {
 
 		// Send initial file download folder to the webview
 		CoursePanel.currentPanel.sendInitialPath();
-		console.log("vaihtuu 1");
 
 		return CoursePanel.currentPanel;
 	}
 
 	private sendInitialPath() {
-		console.log("käy sendInitialPath");
 		const initialPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
-		console.log(initialPath);
 		this._panel.webview.postMessage({
 			command: "setPathResult",
 			path: initialPath ? initialPath : null,
 		});
-		console.log("vaihtuu 2");
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-		console.log("käy revivessä");
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
 
 		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
-		console.log(path);
 		CoursePanel.currentPanel.sendInitialPath();
-		console.log("vaihtuukoRevive1");
 
 		vscode.workspace.onDidChangeConfiguration(() => {
 			CoursePanel.currentPanel?._updateFolderPath();
-			console.log("vaihtuuRevive2");
 		});
 	}
 
 	private async _updateFolderPath() {
-		console.log("käy updateFolderPathissa");
 		const configuration = vscode.workspace.getConfiguration();
 		const newPath = configuration.get("tide.fileDownloadPath");
-		console.log(newPath);
-		console.log("Vaihtuuko _updateFolderPath");
 		await this._panel.webview.postMessage({
 			command: "updatePath",
 			path: newPath,
@@ -82,7 +69,6 @@ export default class CoursePanel {
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-		console.log("käy constructorissa");
 		this._panel = panel;
 		this._extensionUri = extensionUri;
 
@@ -106,7 +92,6 @@ export default class CoursePanel {
 
 		// Handle messages from the webview
 		this._panel.webview.onDidReceiveMessage(async (data) => {
-			console.log("käy OnDIdReceiveMEssagessa");
 			switch (data.type) {
 				case "onError": {
 					if (!data.value) {
@@ -135,14 +120,12 @@ export default class CoursePanel {
 	}
 
 	public doRefactor() {
-		console.log("käy doRefactorissa");
 		// Send a message to the webview webview.
 		// You can send any JSON serializable data.
 		this._panel.webview.postMessage({ command: "refactor" });
 	}
 
 	public dispose() {
-		console.log("käy disposessa");
 		CoursePanel.currentPanel = undefined;
 
 		// Clean up our resources
@@ -157,16 +140,13 @@ export default class CoursePanel {
 	}
 
 	private _update() {
-		console.log("käy disposessa");
 		const webview = this._panel.webview;
 		this._panel.webview.html = this._getHtmlForWebview(webview);
 		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
-		console.log(path);
 		this._panel.webview.postMessage({
 			command: "setPathResult",
 			path: path ? path : null,
 		});
-		console.log("Vaihtuuko _updatessa");
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
