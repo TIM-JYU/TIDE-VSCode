@@ -52,10 +52,10 @@
 				"title": "Show Task Panel",
 				"category": "TIDE"
 			},
-            {
-                "command": "tide.debug",
-                "title": "Magic Button"
-            }
+			{
+				"command": "tide.debug",
+				"title": "Magic Button"
+			}
 		],
 		"viewsContainers": {
 			"activitybar": [
@@ -85,10 +85,14 @@
 					"default": true,
 					"description": "Show welcome message in sidebar"
 				},
-                "tide.cliPath": {
-                    "type": "string",
-                    "description": "Path to CLI tool"
-                }
+				"tide.fileDownloadPath": {
+					"type": "string",
+					"description": "The location where the exercise folders will be downloaded."
+				},
+				"tide.cliPath": {
+					"type": "string",
+					"description": "Path to CLI tool"
+				}
 			}
 		}
 	},

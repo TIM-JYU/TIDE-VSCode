@@ -33,10 +33,39 @@ export default class CoursePanel {
 		const panel = vscode.window.createWebviewPanel(CoursePanel.viewType, "My Courses", column || vscode.ViewColumn.One, getWebviewOptions(extensionUri));
 
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
+
+		// Send initial file download folder to the webview
+		CoursePanel.currentPanel.sendInitialPath();
+
+		return CoursePanel.currentPanel;
+	}
+
+	private sendInitialPath() {
+		const initialPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		this._panel.webview.postMessage({
+			command: "setPathResult",
+			path: initialPath ? initialPath : null,
+		});
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
+
+		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		CoursePanel.currentPanel.sendInitialPath();
+
+		vscode.workspace.onDidChangeConfiguration(() => {
+			CoursePanel.currentPanel?._updateFolderPath();
+		});
+	}
+
+	private async _updateFolderPath() {
+		const configuration = vscode.workspace.getConfiguration();
+		const newPath = configuration.get("tide.fileDownloadPath");
+		await this._panel.webview.postMessage({
+			command: "updatePath",
+			path: newPath,
+		});
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -62,17 +91,32 @@ export default class CoursePanel {
 		);
 
 		// Handle messages from the webview
-		this._panel.webview.onDidReceiveMessage(
-			(message) => {
-				switch (message.command) {
-					case "alert":
-						vscode.window.showErrorMessage(message.text);
+		this._panel.webview.onDidReceiveMessage(async (data) => {
+			switch (data.type) {
+				case "onError": {
+					if (!data.value) {
 						return;
+					}
+					vscode.window.showErrorMessage(data.value);
+					break;
 				}
-			},
-			null,
-			this._disposables
-		);
+				case "setPath": {
+					const newPath = await vscode.window.showOpenDialog({
+						canSelectFiles: false,
+						canSelectFolders: true,
+						canSelectMany: false,
+						openLabel: "Select folder",
+					});
+					// Send the selected path back to the webview
+					this._panel.webview.postMessage({
+						command: "setPathResult",
+						path: newPath ? newPath[0].fsPath : null,
+					});
+					vscode.workspace.getConfiguration().update("tide.fileDownloadPath", newPath ? newPath[0].fsPath : null, vscode.ConfigurationTarget.Global);
+					return;
+				}
+			}
+		});
 	}
 
 	public doRefactor() {
@@ -98,6 +142,11 @@ export default class CoursePanel {
 	private _update() {
 		const webview = this._panel.webview;
 		this._panel.webview.html = this._getHtmlForWebview(webview);
+		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		this._panel.webview.postMessage({
+			command: "setPathResult",
+			path: path ? path : null,
+		});
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {

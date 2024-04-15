@@ -16,7 +16,7 @@
 
     <div class="points-section">
         <p>Points: Number of points user has</p>
-        <button class="return-exercise">Return Exercise</button>
+        <button class="submit-exercise">Submit Exercise</button>
         <p>Passed Tests</p>
         <div class="progress-bar">
             <div class="progress" style="width: 75%"></div>
@@ -26,7 +26,7 @@
     <hr />
 
     <div class="reset-section">
-        <button>Return to Initial Stage</button>
+        <button>Reset Exercise</button>
         <button>Fetch Latest Answer</button>
     </div>
 </div>
