@@ -45,7 +45,7 @@
         { "week": 3, "exercises": ["Exercise 6", "Exercise 7", "Exercise 8"] }
       ],
       "status": "active",
-      "expanded": "false"
+      "expanded": false
     },
     {
       "id": "1002",
@@ -55,7 +55,7 @@
         { "week": 2, "exercises": ["Exercise 3", "Exercise 4"] }
       ],
       "status": "active",
-      "expanded": "false"
+      "expanded": false
     },
     {
       "id": "1003",
@@ -66,7 +66,7 @@
         { "week": 3, "exercises": ["Exercise 7", "Exercise 8"] }
       ],
       "status": "hidden",
-      "expanded": "false"
+      "expanded": false
     }
   ];
 
@@ -113,7 +113,6 @@
       <div class="course-box">
           <header>
               <p class="courseTitle">{course.name}</p>
-              <nav>
                   <ul>
                       <li>
                           <Menu>
@@ -124,9 +123,10 @@
                           </Menu>
                       </li>
                   </ul>
-              </nav>
           </header>
-          <button class="download-button">Download</button>
+          <div>
+            <a class="link" href="https://tim.jyu.fi/">Open material page</a>
+          </div>
           <button
               class="expand-collapse-button"
               aria-expanded={course.expanded}
@@ -173,7 +173,6 @@
     <div class="course-box">
       <header>
         <p class="courseTitle">{course.name}</p>
-        <nav>
           <ul>
             <li>
               <Menu>
@@ -184,9 +183,10 @@
               </Menu>
             </li>
           </ul>
-        </nav>
       </header>
-      <button class="download-button">Download</button>
+      <div>
+        <a class="link" href="https://tim.jyu.fi/">Open material page</a>
+      </div>
       <button
       class="expand-collapse-button"
       aria-expanded={course.expanded}
@@ -286,7 +286,18 @@
     font-size: medium;
     cursor: pointer;
     margin-bottom: 1.5rem;
-        margin-left: 1.5rem;
+    margin-left: 1.5rem;
+  }
+
+  .link {
+    margin-bottom: 1.5rem;
+    margin-left: 1.5rem;
+    font-size: 0.9rem;
+    color: #007acc;
+  }
+  
+  .link:hover{
+    text-decoration: underline;
   }
 
   .download-all-button {
@@ -361,6 +372,10 @@
   width: 100%;
   height: 1px;
   background-color: gray;
+}
+
+.course-content {
+  margin-top: 2rem;
 }
 
 table {
