@@ -262,7 +262,7 @@
   .course-box {
     position: relative;
     background-color: #000000;
-    padding-bottom: 3rem;
+    padding-bottom: 3.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
     border-radius: 8px;
@@ -290,12 +290,11 @@
   }
 
   .link {
-    margin-bottom: 1.5rem;
     margin-left: 1.5rem;
     font-size: 0.9rem;
     color: #007acc;
   }
-  
+
   .link:hover{
     text-decoration: underline;
   }
@@ -364,7 +363,7 @@
   transform: rotate(-180deg);
 }
 
-.download-button::after {
+.link::after {
   content: '';
   position: absolute;
   bottom: 2rem;
