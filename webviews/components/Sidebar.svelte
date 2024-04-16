@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     let showSidebarWelcome = false;
-    
+
     // Listen for messages from the extension
     onMount(() => {
         window.addEventListener('message', (event) => {
@@ -14,6 +14,10 @@
     let isLoggedIn = false;
 
     function handleLogin() {
+      tsvscode.postMessage({
+        type: 'login',
+        value: ''
+      })
       isLoggedIn = true;
     }
   

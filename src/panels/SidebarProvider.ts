@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import Tide from "../api/tide";
 import { getNonce } from "../utilities/getNonce";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
@@ -44,6 +45,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				}
 				case "showCourses": {
 					vscode.commands.executeCommand("tide.showCourses");
+					const data = Tide.listCourses();
+					console.log(data);
+					this._view?.webview.postMessage({ type: "json", value: data });
 					break;
 				}
 				case "openSettings": {
@@ -52,6 +56,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				}
 				case "showTaskPanel": {
 					vscode.commands.executeCommand("tide.showTaskPanel");
+					break;
+				}
+				case "login": {
+					Tide.login();
 					break;
 				}
 			}
