@@ -29,8 +29,33 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.showCourses", () => {
 			CoursePanel.createOrShow(ctx.extensionUri);
+			getCoursesFromTide();
 		})
 	);
+
+	async function getCoursesFromTide() {
+		const coursePanel = CoursePanel.createOrShow(ctx.extensionUri);
+		console.log("Täällä commandseissa ollaan");
+		const data = await Tide.listCourses();
+		let json_array = JSON.parse(data);
+		if (!coursePanel) {
+			console.log("!coursePanel tökkää tähän if lauseeseen");
+			return;
+		}
+
+		let modified_json_array = json_array.map((course: any) => {
+			// Add 'status' and 'expanded' attributes if they are not present
+			if (!("status" in course)) {
+				course.status = "active";
+			}
+			if (!("expanded" in course)) {
+				course.expanded = false;
+			}
+			return course;
+		});
+
+		coursePanel.sendCourseListMessage(modified_json_array);
+	}
 
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.login", () => {

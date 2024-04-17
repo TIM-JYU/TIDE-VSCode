@@ -10,9 +10,6 @@
             if (message && message.type === 'settingValue') {
                 showSidebarWelcome = message.value;
             }
-            if (message && message.type === 'json') {
-            coursesJson = message.value;
-      }
         });
     });
     let isLoggedIn = false;
@@ -73,5 +70,3 @@
         value: ''
       })
   }}>Show task panel</button>
-
-<p>{coursesJson} tänne json tekstinä</p>

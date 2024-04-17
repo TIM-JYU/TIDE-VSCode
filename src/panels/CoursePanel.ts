@@ -26,7 +26,7 @@ export default class CoursePanel {
 		// If we already have a panel, show it.
 		if (CoursePanel.currentPanel) {
 			CoursePanel.currentPanel._panel.reveal(column);
-			return;
+			return CoursePanel.currentPanel;
 		}
 
 		// Otherwise, create a new panel.
@@ -46,6 +46,12 @@ export default class CoursePanel {
 			command: "setPathResult",
 			path: initialPath ? initialPath : null,
 		});
+	}
+
+	public sendCourseListMessage(json_array: any) {
+		console.log("Tänne tultiin");
+		console.log(json_array);
+		this._panel?.webview.postMessage({ type: "json", value: json_array });
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {

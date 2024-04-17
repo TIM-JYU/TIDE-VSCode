@@ -46,10 +46,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				case "showCourses": {
 					vscode.commands.executeCommand("tide.showCourses");
 					//TODO: Siirrä allaolevat tide.showCourses komennossa suoritettavaksi?
-					const data = await Tide.listCourses();
-					console.log(data);
-					let taulukko = JSON.parse(data);
-					this._view?.webview.postMessage({ type: "json", value: taulukko });
+					//const data = await Tide.listCourses();
+					//let json_array = JSON.parse(data);
+					//this._view?.webview.postMessage({ type: "json", value: json_array });
 					break;
 				}
 				case "openSettings": {

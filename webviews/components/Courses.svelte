@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
 
   let downloadPath = '';
-  let coursesJson = "";
+  let coursesJson = [];
 
   $: if (downloadPath== null) {
     tsvscode.postMessage({
@@ -23,7 +23,8 @@
         downloadPath = message.path || '';
       }
       if (message && message.type === 'json') {
-        coursesJson = message.value;
+          coursesJson = message.value;
+          console.log(coursesJson);
       }
     });
   });
@@ -87,14 +88,14 @@
   //let courseExpanded = new Array(courses.length).fill(false);
 
   function toggleCourse(courseId) {
-  const courseIndex = courses.findIndex(course => course.id === courseId);
-  if (courseIndex !== -1) {
-    courses[courseIndex].expanded = !courses[courseIndex].expanded;
-  }
+    const courseIndex = coursesJson.findIndex(course => course.id === courseId);
+    if (courseIndex !== -1) {
+      coursesJson[courseIndex].expanded = !coursesJson[courseIndex].expanded;
+    }
 }
   
 </script>
-<p>{coursesJson} tänne json tekstinä</p>
+<p>{JSON.stringify(coursesJson)} tänne json tekstinä</p>
 <h1>My Courses</h1>
 
 <p>Current download folder: {downloadPath}</p>
@@ -113,7 +114,7 @@
 </button>
 
 {#if activeCoursesExpanded}
-  {#each courses.filter(course => course.status === 'active') as course, i}
+  {#each coursesJson.filter(course => course.status === 'active') as course, i}
       <div class="course-box">
           <header>
               <p class="courseTitle">{course.name}</p>
@@ -129,7 +130,7 @@
                   </ul>
           </header>
           <div>
-            <a class="link" href="https://tim.jyu.fi/">Open material page</a>
+            <a class="link" href={"https://tim.jyu.fi/view/" + course.path}>Open material page</a>
           </div>
           <button
               class="expand-collapse-button"
@@ -150,10 +151,10 @@
                           </tr>
                       </thead>
                       <tbody>
-                          {#each course.exerciseWeeks as { week, exercises }}
+                          {#each course.tasks as task}
                               <tr>
-                                  <td>{week}</td>
-                                  <td>{exercises.length}</td>
+                                  <td>{task.name}</td>
+                                  <td>7</td> <!-- Example number of exercises -->
                                   <td>6/8</td> <!-- Example user points -->
                                   <td><button class="download-all-button">Download</button></td>
                               </tr>
@@ -173,7 +174,7 @@
 </button>
 
 {#if hiddenCoursesExpanded}
-  {#each courses.filter(course => course.status === 'hidden') as course, i}
+  {#each coursesJson.filter(course => course.status === 'hidden') as course, i}
     <div class="course-box">
       <header>
         <p class="courseTitle">{course.name}</p>
@@ -189,7 +190,7 @@
           </ul>
       </header>
       <div>
-        <a class="link" href="https://tim.jyu.fi/">Open material page</a>
+        <a class="link" href={"https://tim.jyu.fi/view/" + course.path}>Open material page</a>
       </div>
       <button
       class="expand-collapse-button"
@@ -210,10 +211,10 @@
                   </tr>
               </thead>
               <tbody>
-                  {#each course.exerciseWeeks as { week, exercises }}
+                  {#each course.tasks as task}
                       <tr>
-                          <td>{week}</td>
-                          <td>{exercises.length}</td>
+                          <td>{task.name}</td>
+                          <td>8</td>
                           <td>6/8</td> <!-- Example user points -->
                           <td><button class="download-all-button">Download</button></td>
                       </tr>
@@ -225,139 +226,6 @@
     </div>
   {/each}
 {/if}
-
-
-<h1>My Courses</h1>
-
-<p>Current download folder: {downloadPath}</p>
-
-<button on:click={() => {
-  tsvscode.postMessage({
-    type: 'setPath',
-    value: ''
-  })
-}}>Set file download folder</button>
-
-<!-- Active Courses Section -->
-<button class="button-header" on:click={toggleActive}>
-  Active Courses
-  <span class="arrow {!activeCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
-</button>
-
-{#if activeCoursesExpanded}
-  {#each courses.filter(course => course.status === 'active') as course, i}
-      <div class="course-box">
-          <header>
-              <p class="courseTitle">{course.name}</p>
-                  <ul>
-                      <li>
-                          <Menu>
-                              <span slot='toggle'>&#8942;</span>
-                              <MenuItem>
-                                  <a href="#?" on:click={() => moveToHidden(course)}>Move to hidden courses</a>
-                              </MenuItem>
-                          </Menu>
-                      </li>
-                  </ul>
-          </header>
-          <div>
-            <a class="link" href="https://tim.jyu.fi/">Open material page</a>
-          </div>
-          <button
-              class="expand-collapse-button"
-              aria-expanded={course.expanded}
-              on:click={() => toggleCourse(course.id)}
-          >
-              <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
-          </button>
-          {#if course.expanded}
-              <div class="course-content">
-                  <table>
-                      <thead>
-                          <tr>
-                              <th>Task set</th>
-                              <th>Number of exercises</th>
-                              <th>Points</th>
-                              <th></th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {#each course.exerciseWeeks as { week, exercises }}
-                              <tr>
-                                  <td>{week}</td>
-                                  <td>{exercises.length}</td>
-                                  <td>6/8</td> <!-- Example user points -->
-                                  <td><button class="download-all-button">Download</button></td>
-                              </tr>
-                          {/each}
-                      </tbody>
-                  </table>
-              </div>
-          {/if}
-      </div>
-  {/each}
-{/if}
-
-<!-- Hidden Courses Section -->
-<button class="button-header" on:click={toggleHidden}>
-  Hidden Courses
-  <span class="arrow {!hiddenCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
-</button>
-
-{#if hiddenCoursesExpanded}
-  {#each courses.filter(course => course.status === 'hidden') as course, i}
-    <div class="course-box">
-      <header>
-        <p class="courseTitle">{course.name}</p>
-          <ul>
-            <li>
-              <Menu>
-                <span slot='toggle'>&#8942;</span>
-                <MenuItem>
-                  <a href="#?" on:click={() => moveToActive(course)}>Move to active courses</a>
-                </MenuItem>
-              </Menu>
-            </li>
-          </ul>
-      </header>
-      <div>
-        <a class="link" href="https://tim.jyu.fi/">Open material page</a>
-      </div>
-      <button
-      class="expand-collapse-button"
-      aria-expanded={course.expanded}
-      on:click={() => toggleCourse(course.id)}
-  >
-      <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
-  </button>
-  {#if course.expanded}
-      <div class="course-content">
-          <table>
-              <thead>
-                  <tr>
-                    <th>Task set</th>
-                    <th>Number of exercises</th>
-                    <th>Points</th>
-                    <th></th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {#each course.exerciseWeeks as { week, exercises }}
-                      <tr>
-                          <td>{week}</td>
-                          <td>{exercises.length}</td>
-                          <td>6/8</td> <!-- Example user points -->
-                          <td><button class="download-all-button">Download</button></td>
-                      </tr>
-                  {/each}
-              </tbody>
-          </table>
-      </div>
-  {/if}
-    </div>
-  {/each}
-{/if}
-
 
 <style>
   :global(body) {
