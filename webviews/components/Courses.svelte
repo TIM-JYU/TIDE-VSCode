@@ -4,7 +4,7 @@
   import { onMount } from 'svelte';
 
   let downloadPath = '';
-  let coursesJson = [];
+  let coursesJson = "";
 
   $: if (downloadPath== null) {
     tsvscode.postMessage({
@@ -94,7 +94,7 @@
 }
   
 </script>
-<p>{coursesJson} haloo</p>
+<p>{coursesJson} tänne json tekstinä</p>
 <h1>My Courses</h1>
 
 <p>Current download folder: {downloadPath}</p>

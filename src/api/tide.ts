@@ -25,10 +25,12 @@ export default class Tide {
 	}
 
 	public static async listCourses() {
-		return await this.runAndHandle(["courses", "--json"], (data: string) => {
+		let coursedata = "";
+		await this.runAndHandle(["courses", "--json"], (data: string) => {
 			Logger.debug(data);
-			return data;
+			coursedata = data;
 		});
+		return coursedata;
 	}
 
 	// tide task list /polku/jne/yms
