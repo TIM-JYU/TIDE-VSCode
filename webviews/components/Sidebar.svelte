@@ -23,6 +23,10 @@
     }
   
     function handleLogout() {
+      tsvscode.postMessage({
+        type: 'logout',
+        value: ''
+      })
       isLoggedIn = false;
     }
 </script>

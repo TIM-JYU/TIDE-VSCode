@@ -60,7 +60,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					break;
 				}
 				case "login": {
-					Tide.login();
+					vscode.commands.executeCommand("tide.login");
+					break;
+				}
+				case "logout": {
+					vscode.commands.executeCommand("tide.logout");
 					break;
 				}
 			}
