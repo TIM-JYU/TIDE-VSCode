@@ -85,8 +85,6 @@
     courses = [...courses];
   }
 
-  //let courseExpanded = new Array(courses.length).fill(false);
-
   function toggleCourse(courseId) {
     const courseIndex = coursesJson.findIndex(course => course.id === courseId);
     if (courseIndex !== -1) {
@@ -95,7 +93,6 @@
 }
   
 </script>
-<p>{JSON.stringify(coursesJson)} tänne json tekstinä</p>
 <h1>My Courses</h1>
 
 <p>Current download folder: {downloadPath}</p>
@@ -151,10 +148,10 @@
                           </tr>
                       </thead>
                       <tbody>
-                          {#each course.tasks as task}
+                          {#each course.task_docs as taskset}
                               <tr>
-                                  <td>{task.name}</td>
-                                  <td>7</td> <!-- Example number of exercises -->
+                                  <td>{taskset.name}</td>
+                                  <td>{taskset.tasks.length}</td>
                                   <td>6/8</td> <!-- Example user points -->
                                   <td><button class="download-all-button">Download</button></td>
                               </tr>
@@ -211,10 +208,10 @@
                   </tr>
               </thead>
               <tbody>
-                  {#each course.tasks as task}
+                  {#each course.task_docs as taskset}
                       <tr>
-                          <td>{task.name}</td>
-                          <td>8</td>
+                          <td>{taskset.name}</td>
+                          <td>{taskset.tasks.length}</td>
                           <td>6/8</td> <!-- Example user points -->
                           <td><button class="download-all-button">Download</button></td>
                       </tr>

@@ -24,6 +24,10 @@ export default class Tide {
 		});
 	}
 
+	/**
+	 * Lists user's IDE-compatible courses from TIM in JSON array.
+	 * @returns course data
+	 */
 	public static async listCourses() {
 		let coursedata = "";
 		await this.runAndHandle(["courses", "--json"], (data: string) => {
@@ -36,20 +40,24 @@ export default class Tide {
 	// tide task list /polku/jne/yms
 	// TODO: Mieti parempi nimi
 	/**
-	 * listaa setin taskit timista
+	 * Lists all the tasks in one task set.
+	 * @param taskSetPath path to task set. Path can be found by executing cli courses command
+	 * @returns task data
 	 */
-	public static async listSetTasks(taskSetPath: string) {
-		this.runAndHandle(["task", "list", taskSetPath], (data: string) => {
+	public static async listTasksFromSet(taskSetPath: string) {
+		let taskdata = "";
+		await this.runAndHandle(["task", "list", taskSetPath, "--json"], (data: string) => {
 			Logger.debug(data);
+			taskdata = data;
 		});
+		return taskdata;
 	}
 
 	/**
-	 * luo task setin taskit lokaalisti
-	 *
-	 * @param {string} taskSetPath - task setin kansio
+	 * Downloads task set from TIM; creates files for each task
+	 * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
 	 */
-	public static async createSetTasks(taskSetPath: string) {
+	public static async downloadTaskSets(taskSetPath: string) {
 		this.runAndHandle(["task", "create", "-a", taskSetPath], (data: string) => {
 			Logger.debug(data);
 		});

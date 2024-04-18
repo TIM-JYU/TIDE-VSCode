@@ -43,18 +43,28 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 			return;
 		}
 
-		let modified_json_array = json_array.map((course: any) => {
-			// Add 'status' and 'expanded' attributes if they are not present
+		// Loops through each course in the JSON array
+		for (let course of json_array) {
+			// Loops through each task set in the course
+			for (let taskSet of course.task_docs) {
+				// Fetches task data for the current task set
+				const taskSetPath = taskSet.path;
+				const taskData = await Tide.listTasksFromSet(taskSetPath);
+				const tasks = JSON.parse(taskData);
+
+				// Adds the fetched task data to the current task set
+				taskSet.tasks = tasks;
+			}
+
 			if (!("status" in course)) {
 				course.status = "active";
 			}
 			if (!("expanded" in course)) {
 				course.expanded = false;
 			}
-			return course;
-		});
+		}
 
-		coursePanel.sendCourseListMessage(modified_json_array);
+		coursePanel.sendCourseListMessage(json_array);
 	}
 
 	ctx.subscriptions.push(
