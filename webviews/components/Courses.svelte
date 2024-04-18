@@ -90,6 +90,23 @@
     if (courseIndex !== -1) {
       coursesJson[courseIndex].expanded = !coursesJson[courseIndex].expanded;
     }
+  }
+
+  function downloadTaskSet(taskSetPath) {
+    // Check if downloadPath is set
+    if (!downloadPath) {
+      tsvscode.postMessage({
+        type: 'onError',
+        value: 'Folder for downloading tasks must be set'
+      });
+      return;
+    }
+    
+    // Send a message to the extension with the courseId and taskSetPath
+    tsvscode.postMessage({
+      type: 'downloadTaskSet',
+      taskSetPath
+    });
 }
   
 </script>
@@ -153,7 +170,7 @@
                                   <td>{taskset.name}</td>
                                   <td>{taskset.tasks.length}</td>
                                   <td>6/8</td> <!-- Example user points -->
-                                  <td><button class="download-all-button">Download</button></td>
+                                  <button class="download-all-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button>
                               </tr>
                           {/each}
                       </tbody>

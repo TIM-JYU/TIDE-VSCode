@@ -55,6 +55,11 @@
 			{
 				"command": "tide.debug",
 				"title": "Magic Button"
+			},
+			{
+				"command": "tide.downloadTaskSet",
+				"title": "Download all tasks from task set",
+				"category": "TIDE"
 			}
 		],
 		"viewsContainers": {

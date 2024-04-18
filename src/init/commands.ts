@@ -80,6 +80,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	);
 
 	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.downloadTaskSet", (taskSetPath, downloadPath) => {
+			Tide.downloadTaskSet(taskSetPath, downloadPath);
+		})
+	);
+
+	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.listCourses", () => {
 			Tide.listCourses();
 		})

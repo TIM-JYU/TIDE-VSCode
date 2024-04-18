@@ -121,6 +121,13 @@ export default class CoursePanel {
 					vscode.workspace.getConfiguration().update("tide.fileDownloadPath", newPath ? newPath[0].fsPath : null, vscode.ConfigurationTarget.Global);
 					return;
 				}
+				case "downloadTaskSet": {
+					const taskSetPath = data.taskSetPath;
+					const downloadPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+					console.log("Downloading task set:", taskSetPath);
+					vscode.commands.executeCommand("tide.downloadTaskSet", taskSetPath, downloadPath);
+					break;
+				}
 			}
 		});
 	}

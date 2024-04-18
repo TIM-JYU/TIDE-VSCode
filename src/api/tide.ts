@@ -57,8 +57,8 @@ export default class Tide {
 	 * Downloads task set from TIM; creates files for each task
 	 * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
 	 */
-	public static async downloadTaskSets(taskSetPath: string) {
-		this.runAndHandle(["task", "create", "-a", taskSetPath], (data: string) => {
+	public static async downloadTaskSet(taskSetPath: string, downloadPath: string) {
+		this.runAndHandle(["task", "create", taskSetPath, "-a", "-d", downloadPath], (data: string) => {
 			Logger.debug(data);
 		});
 	}
