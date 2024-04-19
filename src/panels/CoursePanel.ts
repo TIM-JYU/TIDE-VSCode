@@ -134,6 +134,9 @@ export default class CoursePanel {
 					let folder = downloadPath + "/" + taskSetName;
 					console.log(folder);
 					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(folder));
+					//const folderUri = vscode.Uri.file(downloadPath + "/" + taskSetName);
+					//const options = { uri: folderUri, name: taskSetName };
+					//vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, options);
 				}
 			}
 		});

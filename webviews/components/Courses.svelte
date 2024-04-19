@@ -75,14 +75,17 @@
     }
   ];
 
-  function moveToActive(course) {
-    course.status = "active";
-    courses = [...courses];
-  }
-
-  function moveToHidden(course) {
-    course.status = "hidden";
-    courses = [...courses];
+  //TODO: keksi parempi
+  function moveCourse(course, status) {
+    const index = coursesJson.findIndex(c => c.id === course.id);
+    if (index !== -1) {
+        // Create a new array with the updated status
+        coursesJson = [
+            ...coursesJson.slice(0, index),
+            { ...course, status },
+            ...coursesJson.slice(index + 1)
+        ];
+    }
   }
 
   function toggleCourse(courseId) {
@@ -146,7 +149,7 @@
                           <Menu>
                               <span slot='toggle'>&#8942;</span>
                               <MenuItem>
-                                  <a href="#?" on:click={() => moveToHidden(course)}>Move to hidden courses</a>
+                                  <a href="#?" on:click={() => moveCourse(course, 'hidden')}>Move to hidden courses</a>
                               </MenuItem>
                           </Menu>
                       </li>
@@ -208,7 +211,7 @@
               <Menu>
                 <span slot='toggle'>&#8942;</span>
                 <MenuItem>
-                  <a href="#?" on:click={() => moveToActive(course)}>Move to active courses</a>
+                  <a href="#?" on:click={() => moveCourse(course, 'active')}>Move to active courses</a>
                 </MenuItem>
               </Menu>
             </li>
@@ -296,7 +299,8 @@
     margin-bottom: 1rem;
     border-radius: 8px;
     font-size: 1.4em;
-    max-width: 80%;
+    max-width: 85%;
+    min-width: 24em;
     width: 100%;
     box-sizing: border-box;
   }
@@ -396,11 +400,15 @@
 
   .course-content {
     margin-top: 2rem;
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: content-box;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
+    box-sizing: content-box;
   }
 
   th, td {
