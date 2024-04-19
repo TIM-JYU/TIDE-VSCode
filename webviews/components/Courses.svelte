@@ -107,6 +107,15 @@
       type: 'downloadTaskSet',
       taskSetPath
     });
+  }
+
+  function openWorkspace(taskSetName) {
+    //Send a message to extension with taskset's name and downloadpath
+    tsvscode.postMessage({
+      type: 'openWorkspace',
+      taskSetName,
+      downloadPath
+    });
 }
   
 </script>
@@ -162,6 +171,7 @@
                               <th>Number of exercises</th>
                               <th>Points</th>
                               <th></th>
+                              <th></th>
                           </tr>
                       </thead>
                       <tbody>
@@ -170,7 +180,8 @@
                                   <td>{taskset.name}</td>
                                   <td>{taskset.tasks.length}</td>
                                   <td>6/8</td> <!-- Example user points -->
-                                  <button class="download-all-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button>
+                                  <td><button class="download-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button></td>
+                                  <td><button class="open-workspace" on:click={() => openWorkspace(taskset.name)}>Open in workspace</button></td>
                               </tr>
                           {/each}
                       </tbody>
@@ -230,7 +241,7 @@
                           <td>{taskset.name}</td>
                           <td>{taskset.tasks.length}</td>
                           <td>6/8</td> <!-- Example user points -->
-                          <td><button class="download-all-button">Download</button></td>
+                          <td><button class="download-button">Download</button></td>
                       </tr>
                   {/each}
               </tbody>
@@ -295,29 +306,17 @@
     margin-top: 1.5rem;
   }
 
-  .download-button {
-    background-color: #007acc;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: medium;
-    cursor: pointer;
-    margin-bottom: 1.5rem;
-    margin-left: 1.5rem;
-  }
-
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
     color: #007acc;
   }
 
-  .link:hover{
+  .link:hover {
     text-decoration: underline;
   }
 
-  .download-all-button {
+  .download-button, .open-workspace {
     background-color: #007acc;
     color: white;
     border: none;
@@ -325,7 +324,11 @@
     border-radius: 4px;
     font-size: small;
     cursor: pointer;
-}
+  }
+
+  .download-button:active, .open-workspace:active {
+    background:#004d80;
+  }
   
   *,
 	*::before,
@@ -367,57 +370,57 @@
     bottom: 0rem;
     left: 50%;
     transform: translateX(-50%);
-}
+  }
 
-.arrow {
-  transition: transform 0.5s ease;
-}
+  .arrow {
+    transition: transform 0.5s ease;
+  }
 
-.down-arrow {
-  transform: rotate(0deg);
-}
+  .down-arrow {
+    transform: rotate(0deg);
+  }
 
-.up-arrow {
-  transform: rotate(-180deg);
-}
+  .up-arrow {
+    transform: rotate(-180deg);
+  }
 
-.link::after {
-  content: '';
-  position: absolute;
-  bottom: 2rem;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: gray;
-}
+  .link::after {
+    content: '';
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: gray;
+  }
 
-.course-content {
-  margin-top: 2rem;
-}
+  .course-content {
+    margin-top: 2rem;
+  }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-th, td {
-  border: none;
-  text-align: center;
-  padding: 8px;
-}
+  th, td {
+    border: none;
+    text-align: center;
+    padding: 8px;
+  }
 
-th {
-  background-color: black;
-  font-weight: normal;
-  font-size: smaller;
-}
+  th {
+    background-color: black;
+    font-weight: normal;
+    font-size: smaller;
+  }
 
-tbody tr:nth-child(odd) {
-  background-color: #222222;
-}
+  tbody tr:nth-child(odd) {
+    background-color: #222222;
+  }
 
-tbody tr:nth-child(even) {
-  background-color: #444444;
-}
+  tbody tr:nth-child(even) {
+    background-color: #444444;
+  }
 
 </style>

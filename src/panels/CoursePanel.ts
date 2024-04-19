@@ -128,6 +128,13 @@ export default class CoursePanel {
 					vscode.commands.executeCommand("tide.downloadTaskSet", taskSetPath, downloadPath);
 					break;
 				}
+				case "openWorkspace": {
+					const taskSetName = data.taskSetName;
+					const downloadPath = data.downloadPath;
+					let folder = downloadPath + "/" + taskSetName;
+					console.log(folder);
+					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(folder));
+				}
 			}
 		});
 	}
