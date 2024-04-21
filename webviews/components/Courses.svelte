@@ -1,6 +1,7 @@
 <script>
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
+  import CourseList from './CourseList.svelte';
   import { onMount } from 'svelte';
 
   let downloadPath = '';
@@ -80,11 +81,12 @@
     const index = coursesJson.findIndex(c => c.id === course.id);
     if (index !== -1) {
         // Create a new array with the updated status
-        coursesJson = [
-            ...coursesJson.slice(0, index),
-            { ...course, status },
-            ...coursesJson.slice(index + 1)
-        ];
+        // coursesJson = [
+        //     ...coursesJson.slice(0, index),
+        //     { ...course, status },
+        //     ...coursesJson.slice(index + 1)
+        // ];
+        coursesJson[index] = {...course, "status":status};
     }
   }
 
@@ -133,127 +135,26 @@
   })
 }}>Set file download folder</button>
 
-<!-- Active Courses Section -->
-<button class="button-header" on:click={toggleActive}>
-  Active Courses
-  <span class="arrow {!activeCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
-</button>
+<CourseList
+  isExpanded={activeCoursesExpanded}
+  toggle={toggleActive}
+  toggleCourse={toggleCourse}
+  status={"active"}
+  courses={coursesJson.filter(c => c.status == "active")}
+  moveCourse={moveCourse}
+  downloadTaskSet={downloadTaskSet}
+  openWorkspace={openWorkspace}/>
 
-{#if activeCoursesExpanded}
-  {#each coursesJson.filter(course => course.status === 'active') as course, i}
-      <div class="course-box">
-          <header>
-              <p class="courseTitle">{course.name}</p>
-                  <ul>
-                      <li>
-                          <Menu>
-                              <span slot='toggle'>&#8942;</span>
-                              <MenuItem>
-                                  <a href="#?" on:click={() => moveCourse(course, 'hidden')}>Move to hidden courses</a>
-                              </MenuItem>
-                          </Menu>
-                      </li>
-                  </ul>
-          </header>
-          <div>
-            <a class="link" href={"https://tim.jyu.fi/view/" + course.path}>Open material page</a>
-          </div>
-          <button
-              class="expand-collapse-button"
-              aria-expanded={course.expanded}
-              on:click={() => toggleCourse(course.id)}
-          >
-              <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
-          </button>
-          {#if course.expanded}
-              <div class="course-content">
-                  <table>
-                      <thead>
-                          <tr>
-                              <th>Task set</th>
-                              <th>Number of exercises</th>
-                              <th>Points</th>
-                              <th></th>
-                              <th></th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {#each course.task_docs as taskset}
-                              <tr>
-                                  <td>{taskset.name}</td>
-                                  <td>{taskset.tasks.length}</td>
-                                  <td>6/8</td> <!-- Example user points -->
-                                  <td><button class="download-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button></td>
-                                  <td><button class="open-workspace" on:click={() => openWorkspace(taskset.name)}>Open in workspace</button></td>
-                              </tr>
-                          {/each}
-                      </tbody>
-                  </table>
-              </div>
-          {/if}
-      </div>
-  {/each}
-{/if}
 
-<!-- Hidden Courses Section -->
-<button class="button-header" on:click={toggleHidden}>
-  Hidden Courses
-  <span class="arrow {!hiddenCoursesExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
-</button>
-
-{#if hiddenCoursesExpanded}
-  {#each coursesJson.filter(course => course.status === 'hidden') as course, i}
-    <div class="course-box">
-      <header>
-        <p class="courseTitle">{course.name}</p>
-          <ul>
-            <li>
-              <Menu>
-                <span slot='toggle'>&#8942;</span>
-                <MenuItem>
-                  <a href="#?" on:click={() => moveCourse(course, 'active')}>Move to active courses</a>
-                </MenuItem>
-              </Menu>
-            </li>
-          </ul>
-      </header>
-      <div>
-        <a class="link" href={"https://tim.jyu.fi/view/" + course.path}>Open material page</a>
-      </div>
-      <button
-      class="expand-collapse-button"
-      aria-expanded={course.expanded}
-      on:click={() => toggleCourse(course.id)}
-  >
-      <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
-  </button>
-  {#if course.expanded}
-      <div class="course-content">
-          <table>
-              <thead>
-                  <tr>
-                    <th>Task set</th>
-                    <th>Number of exercises</th>
-                    <th>Points</th>
-                    <th></th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {#each course.task_docs as taskset}
-                      <tr>
-                          <td>{taskset.name}</td>
-                          <td>{taskset.tasks.length}</td>
-                          <td>6/8</td> <!-- Example user points -->
-                          <td><button class="download-button">Download</button></td>
-                      </tr>
-                  {/each}
-              </tbody>
-          </table>
-      </div>
-  {/if}
-    </div>
-  {/each}
-{/if}
+<CourseList
+  isExpanded={hiddenCoursesExpanded}
+  toggle={toggleHidden}
+  toggleCourse={toggleCourse}
+  status={"hidden"}
+  courses={coursesJson.filter(c => c.status == "hidden")}
+  moveCourse={moveCourse}
+  downloadTaskSet={downloadTaskSet}
+  openWorkspace={openWorkspace}/>
 
 <style>
   :global(body) {
@@ -264,171 +165,4 @@
     margin-bottom: 2rem;
     font-size: 2rem;
   }
-
-  .button-header {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-size: 1.4rem;
-    font-weight: bold;
-    margin-top: 1.5rem;
-    padding: 0;
-    color: white;
-  }
-
-  .arrow {
-    margin-left: 8px;
-    transition: transform 0.3s ease;
-  }
-
-  .left-arrow {
-    transform: rotate(90deg);
-  }
-
-  .down-arrow {
-    transform: rotate(0deg);
-  }
-
-  .course-box {
-    position: relative;
-    background-color: #000000;
-    padding-bottom: 3.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-    font-size: 1.4em;
-    max-width: 85%;
-    min-width: 24em;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .courseTitle {
-    margin-left: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .link {
-    margin-left: 1.5rem;
-    font-size: 0.9rem;
-    color: #007acc;
-  }
-
-  .link:hover {
-    text-decoration: underline;
-  }
-
-  .download-button, .open-workspace {
-    background-color: #007acc;
-    color: white;
-    border: none;
-    padding: 0.3rem 0.5rem;
-    border-radius: 4px;
-    font-size: small;
-    cursor: pointer;
-  }
-
-  .download-button:active, .open-workspace:active {
-    background:#004d80;
-  }
-  
-  *,
-	*::before,
-	*::after {
-  	box-sizing: border-box;
-	}
-
-	ul,
-	li {
-  	margin: 0;
-		padding: 0;
-	}
-
-  header {
-    display: flex;
-    justify-content: space-between;
-  }
-	
-	ul {
-		list-style-type: none;
-	}
-	
-	a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .expand-collapse-button {
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    background-color: transparent;
-    border: none;
-    width: 36px;
-    height: 36px;
-    position: absolute;
-    bottom: 0rem;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .arrow {
-    transition: transform 0.5s ease;
-  }
-
-  .down-arrow {
-    transform: rotate(0deg);
-  }
-
-  .up-arrow {
-    transform: rotate(-180deg);
-  }
-
-  .link::after {
-    content: '';
-    position: absolute;
-    bottom: 2rem;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: gray;
-  }
-
-  .course-content {
-    margin-top: 2rem;
-    max-width: 100%;
-    overflow-x: auto;
-    box-sizing: content-box;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    box-sizing: content-box;
-  }
-
-  th, td {
-    border: none;
-    text-align: center;
-    padding: 8px;
-  }
-
-  th {
-    background-color: black;
-    font-weight: normal;
-    font-size: smaller;
-  }
-
-  tbody tr:nth-child(odd) {
-    background-color: #222222;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #444444;
-  }
-
 </style>
