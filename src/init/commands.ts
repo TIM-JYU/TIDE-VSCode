@@ -14,18 +14,27 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		})
 	);
 
+	/**
+	 * Opens VS Code settings and filters them to match with the extension.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.openSettings", () => {
 			vscode.commands.executeCommand("workbench.action.openSettings", "TIDE-extension");
 		})
 	);
 
+	/**
+	 * Opens task panel.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.showTaskPanel", () => {
 			TaskPanel.createOrShow(ctx.extensionUri);
 		})
 	);
 
+	/**
+	 * Opens My courses -view.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.showCourses", () => {
 			CoursePanel.createOrShow(ctx.extensionUri);
@@ -33,13 +42,15 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		})
 	);
 
+	/**
+	 * Retrieves course data from TIDE, and sends a message with the course list to coursePanel.
+	 * @returns {Promise<void>} A promise that resolves once the course data is retrieved and processed.
+	 */
 	async function getCoursesFromTide() {
 		const coursePanel = CoursePanel.createOrShow(ctx.extensionUri);
-		console.log("Täällä commandseissa ollaan");
 		const data = await Tide.listCourses();
 		let json_array = JSON.parse(data);
 		if (!coursePanel) {
-			console.log("!coursePanel tökkää tähän if lauseeseen");
 			return;
 		}
 
@@ -67,24 +78,38 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		coursePanel.sendCourseListMessage(json_array);
 	}
 
+	/**
+	 * Registers the 'tide.login' command, allowing users to log in to TIDE.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.login", () => {
 			Tide.login();
 		})
 	);
 
+	/**
+	 * Registers the 'tide.logout' command, allowing users to log out of TIDE.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.logout", () => {
 			Tide.logout();
 		})
 	);
 
+	/**
+	 * Registers the 'tide.downloadTaskSet' command, allowing users to download a task set from TIDE.
+	 * @param taskSetPath - The path of the task set to download.
+	 * @param downloadPath - The path where the task set will be downloaded.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.downloadTaskSet", (taskSetPath, downloadPath) => {
 			Tide.downloadTaskSet(taskSetPath, downloadPath);
 		})
 	);
 
+	/**
+	 * Registers the 'tide.listCourses' command, allowing users to list courses from TIDE.
+	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.listCourses", () => {
 			Tide.listCourses();
