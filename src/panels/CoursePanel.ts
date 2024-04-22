@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
+import ExtensionStateManager from "../api/ExtensionStateManager";
 
 function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
 	return {
@@ -59,19 +60,6 @@ export default class CoursePanel {
 
 		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
 		CoursePanel.currentPanel.sendInitialPath();
-
-		vscode.workspace.onDidChangeConfiguration(() => {
-			CoursePanel.currentPanel?._updateFolderPath();
-		});
-	}
-
-	private async _updateFolderPath() {
-		const configuration = vscode.workspace.getConfiguration();
-		const newPath = configuration.get("tide.fileDownloadPath");
-		await this._panel.webview.postMessage({
-			command: "updatePath",
-			path: newPath,
-		});
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -107,19 +95,28 @@ export default class CoursePanel {
 					break;
 				}
 				case "setPath": {
-					const newPath = await vscode.window.showOpenDialog({
+					let newPath: vscode.Uri[] | undefined = await vscode.window.showOpenDialog({
 						canSelectFiles: false,
 						canSelectFolders: true,
 						canSelectMany: false,
-						openLabel: "Select folder",
+						openLabel: "Select directory",
 					});
+					// If newPath is undefined or user cancels, get the previous path from global state
+					if (!newPath) {
+						const previousPath = ExtensionStateManager.getDownloadPath();
+						if (previousPath) {
+							newPath = [vscode.Uri.file(previousPath)];
+						}
+					}
 					// Send the selected path back to the webview
 					this._panel.webview.postMessage({
 						command: "setPathResult",
 						path: newPath ? newPath[0].fsPath : null,
 					});
-					vscode.workspace.getConfiguration().update("tide.fileDownloadPath", newPath ? newPath[0].fsPath : null, vscode.ConfigurationTarget.Global);
-					return;
+					// Update the configuration with the new path
+					const updatedPath = newPath ? newPath[0].fsPath : null;
+					vscode.workspace.getConfiguration().update("tide.fileDownloadPath", updatedPath, vscode.ConfigurationTarget.Global);
+					break;
 				}
 				case "downloadTaskSet": {
 					const taskSetPath = data.taskSetPath;
@@ -165,7 +162,7 @@ export default class CoursePanel {
 	private _update() {
 		const webview = this._panel.webview;
 		this._panel.webview.html = this._getHtmlForWebview(webview);
-		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		const path = ExtensionStateManager.getDownloadPath();
 		this._panel.webview.postMessage({
 			command: "setPathResult",
 			path: path ? path : null,

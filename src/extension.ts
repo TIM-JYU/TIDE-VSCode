@@ -28,5 +28,21 @@ function onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
 	}
 }
 
+//Listens to changes in configuration
+vscode.workspace.onDidChangeConfiguration((event) => {
+	if (event.affectsConfiguration("tide.fileDownloadPath")) {
+		// Get the new value of tide.fileDownloadPath
+		const newPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+
+		// Update ExtensionStateManager with the new path
+		if (typeof newPath === "string") {
+			ExtensionStateManager.setDownloadPath(newPath);
+		} else {
+			// Handle invalid or undefined newPath
+			console.log("Undefined download path");
+		}
+	}
+});
+
 // This method is called when your extension is deactivated
 export function deactivate() {}

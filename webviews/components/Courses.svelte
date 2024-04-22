@@ -20,9 +20,6 @@
       if (message && message.command === 'setPathResult') {
         downloadPath = message.path;
       }
-      if (message && message.command === 'updatePath') {
-        downloadPath = message.path || '';
-      }
       if (message && message.type === 'json') {
           coursesJson = message.value;
           console.log(coursesJson);
