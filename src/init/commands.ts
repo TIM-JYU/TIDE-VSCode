@@ -4,6 +4,7 @@ import Tide from "../api/tide";
 import TestPanel from "../panels/TestPanel";
 import CoursePanel from "../panels/CoursePanel";
 import TaskPanel from "../panels/TaskPanel";
+import ExtensionStateManager from "../api/ExtensionStateManager";
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
 	Logger.info("Registering commands.");
@@ -48,33 +49,47 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 */
 	async function getCoursesFromTide() {
 		const coursePanel = CoursePanel.createOrShow(ctx.extensionUri);
-		const data = await Tide.listCourses();
-		let json_array = JSON.parse(data);
-		if (!coursePanel) {
-			return;
+		let json_array: any[] = [];
+
+		// Check if courses are available in global state
+		const coursesFromGlobalState = ExtensionStateManager.getCourses();
+		if (coursesFromGlobalState.length > 0) {
+			// If courses are available in global state, use them
+			json_array = coursesFromGlobalState;
+			console.log("Kurssit löytyy jo");
+		} else {
+			// If courses are not available in global state, fetch them from TIDE
+			console.log("Haetaan kurssit tidestä");
+			const data = await Tide.listCourses();
+			json_array = JSON.parse(data);
+
+			// Loops through each course in the JSON array
+			for (let course of json_array) {
+				// Loops through each task set in the course
+				for (let taskSet of course.task_docs) {
+					// Fetches task data for the current task set
+					const taskSetPath = taskSet.path;
+					const taskData = await Tide.listTasksFromSet(taskSetPath);
+					const tasks = JSON.parse(taskData);
+
+					// Adds the fetched task data to the current task set
+					taskSet.tasks = tasks;
+				}
+
+				// Ensure that necessary properties are available in each course object
+				if (!("status" in course)) {
+					course.status = "active";
+				}
+				if (!("expanded" in course)) {
+					course.expanded = false;
+				}
+			}
+
+			// Save fetched courses to global state for future use
+			ExtensionStateManager.setCourses(json_array);
 		}
 
-		// Loops through each course in the JSON array
-		for (let course of json_array) {
-			// Loops through each task set in the course
-			for (let taskSet of course.task_docs) {
-				// Fetches task data for the current task set
-				const taskSetPath = taskSet.path;
-				const taskData = await Tide.listTasksFromSet(taskSetPath);
-				const tasks = JSON.parse(taskData);
-
-				// Adds the fetched task data to the current task set
-				taskSet.tasks = tasks;
-			}
-
-			if (!("status" in course)) {
-				course.status = "active";
-			}
-			if (!("expanded" in course)) {
-				course.expanded = false;
-			}
-		}
-
+		// Send the course list message to the CoursePanel
 		coursePanel.sendCourseListMessage(json_array);
 	}
 

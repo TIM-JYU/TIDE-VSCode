@@ -22,7 +22,7 @@
       }
       if (message && message.type === 'json') {
           coursesJson = message.value;
-          console.log(coursesJson);
+          ExtensionStateManager.setCourses(coursesJson);
       }
     });
   });
@@ -71,6 +71,13 @@
   //   }
   // ];
 
+  function updateCoursesToGlobalState(coursesJson) {
+    tsvscode.postMessage({
+        type: 'updateCoursesToGlobalState',
+        coursesJson
+      });
+  }
+
   /**
    * Updates the status of a course to a new status.
    * @param {object} course - The course object to be updated.
@@ -79,7 +86,8 @@
   function moveCourse(course, status) {
     const index = coursesJson.findIndex(c => c.id === course.id);
     if (index !== -1) {
-        coursesJson[index] = {...course, "status":status};
+      coursesJson[index] = {...course, "status":status};
+      updateCoursesToGlobalState(coursesJson);
     }
   }
 
@@ -91,6 +99,7 @@
     const courseIndex = coursesJson.findIndex(course => course.id === courseId);
     if (courseIndex !== -1) {
       coursesJson[courseIndex].expanded = !coursesJson[courseIndex].expanded;
+      updateCoursesToGlobalState(coursesJson);
     }
   }
 

@@ -42,6 +42,31 @@ export default class ExtensionStateManager {
 		return this.readFromGlobalState("downloadPath");
 	}
 
+	/**
+	 * Sets the courses data in the global state.
+	 * @param courses - An array containing the course data to be stored.
+	 */
+	public static setCourses(courses: any[]) {
+		if (ExtensionStateManager.globalState) {
+			ExtensionStateManager.globalState.update("courses", courses);
+		} else {
+			console.error("Global state is not set.");
+		}
+	}
+
+	/**
+	 * Retrieves courses data from global state.
+	 * @returns Courses from the global state.
+	 */
+	public static getCourses(): any[] {
+		if (ExtensionStateManager.globalState) {
+			return ExtensionStateManager.globalState.get("courses") || [];
+		} else {
+			console.error("Global state is not set.");
+			return [];
+		}
+	}
+
 	private static prefixedKey(key: string): string {
 		return `${this.KEY_PREFIX}.${key}`;
 	}

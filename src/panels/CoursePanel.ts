@@ -52,7 +52,9 @@ export default class CoursePanel {
 	public sendCourseListMessage(json_array: any) {
 		console.log("Tänne tultiin");
 		console.log(json_array);
-		this._panel?.webview.postMessage({ type: "json", value: json_array });
+		let courses_array = ExtensionStateManager.getCourses();
+		this._panel?.webview.postMessage({ type: "json", value: courses_array });
+		//this._panel?.webview.postMessage({ type: "json", value: json_array });
 	}
 
 	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -125,6 +127,11 @@ export default class CoursePanel {
 					vscode.commands.executeCommand("tide.downloadTaskSet", taskSetPath, downloadPath);
 					break;
 				}
+				case "updateCoursesToGlobalState": {
+					const coursesJson = data.coursesJson;
+					ExtensionStateManager.setCourses(coursesJson);
+					break;
+				}
 				case "openWorkspace": {
 					const taskSetName = data.taskSetName;
 					const downloadPath = data.downloadPath;
@@ -134,6 +141,7 @@ export default class CoursePanel {
 					//const folderUri = vscode.Uri.file(downloadPath + "/" + taskSetName);
 					//const options = { uri: folderUri, name: taskSetName };
 					//vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, options);
+					break;
 				}
 			}
 		});
