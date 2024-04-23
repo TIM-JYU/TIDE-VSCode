@@ -20,31 +20,32 @@ export default class TaskPanel {
 	private readonly _extensionUri: vscode.Uri;
 	private _disposables: vscode.Disposable[] = [];
 
-	public static createOrShow(extensionUri: vscode.Uri) {
-		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
+	public static createOrShow(extensionUri: vscode.Uri, timDataContent: string) {
+		const column = vscode.ViewColumn.Two;
 
 		// If we already have a panel, show it.
 		if (TaskPanel.currentPanel) {
 			TaskPanel.currentPanel._panel.reveal(column);
+			TaskPanel.currentPanel._panel.webview.postMessage({ command: "updateTimData", data: timDataContent });
 			return;
 		}
 
 		// Otherwise, create a new panel.
 		const panel = vscode.window.createWebviewPanel(TaskPanel.viewType, "Task Panel", column || vscode.ViewColumn.Two, getWebviewOptions(extensionUri));
 
-		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri);
+		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri, timDataContent);
 	}
 
-	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri);
+	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, timDataContent: string) {
+		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri, timDataContent);
 	}
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, timDataContent: string) {
 		this._panel = panel;
 		this._extensionUri = extensionUri;
 
 		// Set the webview's initial html content
-		this._update();
+		this._update(timDataContent);
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
@@ -54,7 +55,7 @@ export default class TaskPanel {
 		this._panel.onDidChangeViewState(
 			(e) => {
 				if (this._panel.visible) {
-					this._update();
+					this._update(timDataContent);
 				}
 			},
 			null,
@@ -102,9 +103,18 @@ export default class TaskPanel {
 		}
 	}
 
-	private _update() {
+	public static dispose() {
+		if (TaskPanel.currentPanel) {
+			TaskPanel.currentPanel.dispose();
+			TaskPanel.currentPanel = undefined;
+		}
+	}
+
+	private _update(timDataContent: string) {
 		const webview = this._panel.webview;
 		this._panel.webview.html = this._getHtmlForWebview(webview);
+		this._panel?.webview.postMessage({ type: "updateTimData", value: timDataContent });
+		console.log(timDataContent);
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {

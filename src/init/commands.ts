@@ -5,6 +5,7 @@ import TestPanel from "../panels/TestPanel";
 import CoursePanel from "../panels/CoursePanel";
 import TaskPanel from "../panels/TaskPanel";
 import ExtensionStateManager from "../api/ExtensionStateManager";
+import * as path from "path";
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
 	Logger.info("Registering commands.");
@@ -28,8 +29,24 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 * Opens task panel.
 	 */
 	ctx.subscriptions.push(
-		vscode.commands.registerCommand("tide.showTaskPanel", () => {
-			TaskPanel.createOrShow(ctx.extensionUri);
+		vscode.commands.registerCommand("tide.showTaskPanel", async (currentFile) => {
+			const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
+
+			try {
+				// Read the content of the .timdata file
+				const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
+				// Convert the content to a string
+				const timDataString = timDataContent.toString();
+				const timDataJson = JSON.parse(timDataString);
+
+				// Dispose any existing TaskPanel
+				TaskPanel.dispose();
+
+				// Create or show the TaskPanel and pass the .timdata content as a parameter
+				TaskPanel.createOrShow(ctx.extensionUri, timDataJson);
+			} catch (error) {
+				console.log("Error occurred while checking for .timdata file:", error);
+			}
 		})
 	);
 
