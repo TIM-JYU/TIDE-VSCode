@@ -6,6 +6,7 @@ import CoursePanel from "../panels/CoursePanel";
 import TaskPanel from "../panels/TaskPanel";
 import ExtensionStateManager from "../api/ExtensionStateManager";
 import * as path from "path";
+import { Uri } from "vscode";
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
 	Logger.info("Registering commands.");
@@ -32,6 +33,9 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		vscode.commands.registerCommand("tide.showTaskPanel", async (currentFile) => {
 			const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
 
+			const lastIndex = currentFile.lastIndexOf("/");
+			const submitPath = currentFile.substring(0, lastIndex + 1);
+
 			try {
 				// Read the content of the .timdata file
 				const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
@@ -43,7 +47,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 				TaskPanel.dispose();
 
 				// Create or show the TaskPanel and pass the .timdata content as a parameter
-				TaskPanel.createOrShow(ctx.extensionUri, timDataJson);
+				TaskPanel.createOrShow(ctx.extensionUri, timDataJson, submitPath);
 			} catch (error) {
 				console.log("Error occurred while checking for .timdata file:", error);
 			}
@@ -136,6 +140,16 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.downloadTaskSet", (taskSetPath, downloadPath) => {
 			Tide.downloadTaskSet(taskSetPath, downloadPath);
+		})
+	);
+
+	/**
+	 * Submits task to TIM
+	 * @param submitPath - The path of the to be submitted task in user's computer.
+	 */
+	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.submitTask", (submitPath) => {
+			Tide.submitTask(submitPath);
 		})
 	);
 

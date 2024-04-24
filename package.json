@@ -60,6 +60,11 @@
 				"command": "tide.downloadTaskSet",
 				"title": "Download all tasks from task set",
 				"category": "TIDE"
+			},
+			{
+				"command": "tide.submitTask",
+				"title": "Submit exercise to TIM",
+				"category": "TIDE"
 			}
 		],
 		"viewsContainers": {

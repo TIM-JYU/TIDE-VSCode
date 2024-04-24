@@ -13,6 +13,13 @@
             }
         });
     });
+    
+
+    function submitTask() {
+        tsvscode.postMessage({
+            type: 'submitTask'
+        });
+    }
 
 </script>
 
@@ -39,7 +46,7 @@
 
         <div class="points-section">
             <p>Points: Number of points user has</p>
-            <button class="submit-exercise">Submit Exercise</button>
+            <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
             <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
