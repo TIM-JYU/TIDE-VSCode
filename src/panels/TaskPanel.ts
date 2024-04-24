@@ -117,7 +117,6 @@ export default class TaskPanel {
 		const webview = this._panel.webview;
 		this._panel.webview.html = this._getHtmlForWebview(webview);
 		this._panel?.webview.postMessage({ type: "updateTimData", value: timDataContent });
-		console.log(timDataContent);
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
