@@ -77,10 +77,8 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		if (coursesFromGlobalState.length > 0) {
 			// If courses are available in global state, use them
 			json_array = coursesFromGlobalState;
-			console.log("Kurssit löytyy jo");
 		} else {
 			// If courses are not available in global state, fetch them from TIDE
-			console.log("Haetaan kurssit tidestä");
 			const data = await Tide.listCourses();
 			json_array = JSON.parse(data);
 

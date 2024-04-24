@@ -82,7 +82,7 @@
 					"type": "webview",
 					"id": "tide-sidebar",
 					"name": "Menu",
-					"icon": "$(book)",
+					"icon": "./media/timlogovscode.png",
 					"contextualTitle": "TIDE"
 				}
 			]

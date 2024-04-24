@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
 
     let timData = null;
+    
     /**
      * Listens for messages from CoursePanel.ts.
      */
@@ -14,7 +15,9 @@
         });
     });
     
-
+    /**
+     * Sends message to TaskPanel about submitting exercise
+     */
     function submitTask() {
         tsvscode.postMessage({
             type: 'submitTask'

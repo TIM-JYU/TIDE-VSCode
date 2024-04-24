@@ -18,9 +18,6 @@ export function activate(ctx: vscode.ExtensionContext) {
 	const textDocumentListener = vscode.workspace.onDidOpenTextDocument(fileOpened);
 	ctx.subscriptions.push(textDocumentListener);
 
-	// const closeDocumentListener = vscode.workspace.onDidCloseTextDocument(fileClosed);
-	// ctx.subscriptions.push(closeDocumentListener);
-
 	const textEditor = vscode.window.onDidChangeActiveTextEditor(onDidChangeActiveTextEditor);
 	ctx.subscriptions.push(textEditor);
 }
@@ -38,18 +35,6 @@ function fileOpened(document: vscode.TextDocument) {
 	console.log("Text document opened:", document.fileName);
 	vscode.commands.executeCommand("tide.showTaskPanel", document.fileName);
 }
-
-// function fileClosed(document: vscode.TextDocument) {
-// 	console.log("Text document closed:", document.fileName);
-// 	vscode.commands.executeCommand("tide.showTaskPanel", document.fileName);
-// 	const activeEditor = vscode.window.activeTextEditor;
-// 	if (!activeEditor) {
-// 		vscode.window.showErrorMessage("No file opened.");
-// 		return;
-// 	}
-// 	const currentFilePath = activeEditor.document.fileName;
-// 	console.log(currentFilePath);
-// }
 
 //Listens to changes in configuration
 vscode.workspace.onDidChangeConfiguration((event) => {

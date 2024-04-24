@@ -12,12 +12,18 @@ export default class Tide {
 		});
 	}
 
+	/**
+	 * Executes tide login command.
+	 */
 	public static async login() {
 		this.runAndHandle(["login"], (data: string) => {
 			Logger.debug(data);
 		});
 	}
 
+	/**
+	 * Executes tide logout command.
+	 */
 	public static async logout() {
 		this.runAndHandle(["logout"], (data: string) => {
 			Logger.debug(data);
