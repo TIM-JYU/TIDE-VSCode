@@ -50,8 +50,6 @@ export default class CoursePanel {
 	}
 
 	public sendCourseListMessage(json_array: any) {
-		console.log("Tänne tultiin");
-		console.log(json_array);
 		let courses_array = ExtensionStateManager.getCourses();
 		this._panel?.webview.postMessage({ type: "json", value: courses_array });
 		//this._panel?.webview.postMessage({ type: "json", value: json_array });
@@ -123,7 +121,6 @@ export default class CoursePanel {
 				case "downloadTaskSet": {
 					const taskSetPath = data.taskSetPath;
 					const downloadPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
-					console.log("Downloading task set:", taskSetPath);
 					vscode.commands.executeCommand("tide.downloadTaskSet", taskSetPath, downloadPath);
 					break;
 				}
@@ -136,7 +133,6 @@ export default class CoursePanel {
 					const taskSetName = data.taskSetName;
 					const downloadPath = data.downloadPath;
 					let folder = downloadPath + "/" + taskSetName;
-					console.log(folder);
 					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(folder));
 					//const folderUri = vscode.Uri.file(downloadPath + "/" + taskSetName);
 					//const options = { uri: folderUri, name: taskSetName };
