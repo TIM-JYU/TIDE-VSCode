@@ -65,14 +65,6 @@
   </nav>
 {/if}
 
-<!-- 'Delete this later' -->
-<button on:click={() => {
-    tsvscode.postMessage({
-      type: 'showTaskPanel',
-      value: ''
-    })
-}}>Show task panel</button>
-
 <style>
   div {
     color: turquoise;
