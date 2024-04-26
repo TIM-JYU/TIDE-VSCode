@@ -67,6 +67,23 @@ export default class ExtensionStateManager {
 		}
 	}
 
+	public static setLoginData(loginData: any[]) {
+		if (ExtensionStateManager.globalState) {
+			ExtensionStateManager.globalState.update("loginData", loginData);
+		} else {
+			console.error("Global state is not set.");
+		}
+	}
+
+	public static getLoginData(): any[] {
+		if (ExtensionStateManager.globalState) {
+			return ExtensionStateManager.globalState.get("loginData") || [];
+		} else {
+			console.error("Global state is not set.");
+			return [];
+		}
+	}
+
 	private static prefixedKey(key: string): string {
 		return `${this.KEY_PREFIX}.${key}`;
 	}

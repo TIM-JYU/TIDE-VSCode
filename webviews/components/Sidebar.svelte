@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   let showSidebarWelcome = false;
   let isLoggedIn = false;
+  let loginData = [];
 
   /**
   * Listens to messages from the extension
@@ -11,6 +12,15 @@
           const message = event.data;
           if (message && message.type === 'settingValue') {
               showSidebarWelcome = message.value;
+          }
+          if (message && message.type ==='json') {
+              loginData = message.data;
+              if (loginData.login_successful == true) {
+                  isLoggedIn = true;
+              }
+              else {
+                isLoggedIn = false;
+              }
           }
       });
   });
@@ -23,7 +33,7 @@
       type: 'login',
       value: ''
     })
-    isLoggedIn = true;
+    //isLoggedIn = true;
   }
 
   /**
@@ -34,7 +44,7 @@
       type: 'logout',
       value: ''
     })
-    isLoggedIn = false;
+    //isLoggedIn = false;
   }
 </script>
   

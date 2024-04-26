@@ -4,6 +4,7 @@ import Tide from "../api/tide";
 import TestPanel from "../panels/TestPanel";
 import CoursePanel from "../panels/CoursePanel";
 import TaskPanel from "../panels/TaskPanel";
+import { SidebarProvider } from "../panels/SidebarProvider";
 import ExtensionStateManager from "../api/ExtensionStateManager";
 import * as path from "path";
 import { Uri } from "vscode";
@@ -116,8 +117,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 * Registers the 'tide.login' command, allowing users to log in to TIDE.
 	 */
 	ctx.subscriptions.push(
-		vscode.commands.registerCommand("tide.login", () => {
-			Tide.login();
+		vscode.commands.registerCommand("tide.login", async () => {
+			let data = await Tide.login();
+			let json_data: any[] = [];
+			json_data = JSON.parse(data);
+			ExtensionStateManager.setLoginData(json_data);
+			//TODO: Call SideBarProvider's sendLoginValue() function.
 		})
 	);
 

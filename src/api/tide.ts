@@ -1,6 +1,7 @@
 import * as cp from "child_process";
 import Logger from "../utilities/logger";
 import * as vscode from "vscode";
+import ExtensionStateManager from "./ExtensionStateManager";
 
 /**
  * This class handles communication with the cli tool
@@ -16,9 +17,12 @@ export default class Tide {
 	 * Executes tide login command.
 	 */
 	public static async login() {
-		this.runAndHandle(["login"], (data: string) => {
+		let loginData = "";
+		await this.runAndHandle(["login", "--json"], (data: string) => {
 			Logger.debug(data);
+			loginData = data;
 		});
+		return loginData;
 	}
 
 	/**
