@@ -122,7 +122,7 @@
         padding: 8px 15px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        background-color: turquoise;
+        background-color: #007acc;
     }
 
     .reset-section button:hover,
