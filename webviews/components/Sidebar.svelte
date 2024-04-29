@@ -33,7 +33,7 @@
       type: 'login',
       value: ''
     })
-    //isLoggedIn = true;
+    isLoggedIn = true;
   }
 
   /**
@@ -44,7 +44,7 @@
       type: 'logout',
       value: ''
     })
-    //isLoggedIn = false;
+    isLoggedIn = false;
   }
 </script>
   

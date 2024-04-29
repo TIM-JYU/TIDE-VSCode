@@ -50,10 +50,10 @@
         <div class="points-section">
             <p>Points: Number of points user has</p>
             <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
-            <p>Passed Tests</p>
+            <!-- <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
-            </div>
+            </div> -->
         </div>
 
         <hr />
@@ -123,11 +123,12 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
         background-color: #007acc;
+        color: white;
     }
 
     .reset-section button:hover,
     .points-section button:hover {
-        background-color: #33b3a6;
+        background-color: #00558e;
     }
 
     .task-panel hr {
