@@ -159,7 +159,7 @@ export default class CoursePanel {
 		});
 	}
 	private getHtmlForWebview(webview: vscode.Webview) {
-        return getDefaultHtmlForWebview(webview, this.extensionUri, ExamplePanel.fileNamePrefix);
+        return getDefaultHtmlForWebview(webview, this.extensionUri, CoursePanel.fileNamePrefix);
 	}
 
 }
