@@ -2,8 +2,8 @@ import * as vscode from "vscode";
 import Logger from "../utilities/logger";
 import Tide from "../api/tide";
 import TestPanel from "../panels/TestPanel";
-import CoursePanel from "../panels/CoursePanel";
-import TaskPanel from "../panels/TaskPanel";
+import CoursePanel from "../ui/panels/CoursePanel";
+import TaskPanel from "../ui/panels/TaskPanel";
 import { SidebarProvider } from "../panels/SidebarProvider";
 import ExtensionStateManager from "../api/ExtensionStateManager";
 import * as path from "path";
@@ -167,7 +167,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.debug", () => {
-			Tide.debug();
 		})
 	);
 }
