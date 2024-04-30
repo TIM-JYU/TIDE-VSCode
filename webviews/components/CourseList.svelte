@@ -62,7 +62,7 @@
               <tr>
                 <th>Task set</th>
                 <th>Number of exercises</th>
-                <th>Points</th>
+                <!-- <th>Points</th> -->
                 <th></th>
                 <th></th>
               </tr>
@@ -72,7 +72,7 @@
                 <tr>
                   <td>{taskset.name}</td>
                   <td>{taskset.tasks.length}</td>
-                  <td>6/8</td>
+                  <!-- <td>6/8</td> -->
                   <td><button class="download-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button></td>
                   <td><button class="open-workspace" on:click={() => openWorkspace(taskset.name)}>Open in workspace</button></td>
                 </tr>
