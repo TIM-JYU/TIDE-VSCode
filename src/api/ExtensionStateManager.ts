@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import Logger from "../utilities/logger";
 
+// TODO: observer
+
 export default class ExtensionStateManager {
 	private static globalState: vscode.Memento & { setKeysForSync(keys: readonly string[]): void };
 	private static KEY_PREFIX = "tide";
