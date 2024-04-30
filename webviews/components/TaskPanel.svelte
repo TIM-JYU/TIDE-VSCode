@@ -1,35 +1,71 @@
-<script lang="ts">
+<script>
+    import { onMount } from 'svelte';
+
+    let timData = null;
+    
+    /**
+     * Listens for messages from CoursePanel.ts.
+     */
+    onMount(() => {
+    window.addEventListener('message', (event) => {
+            const message = event.data;
+            if (message && message.type === 'updateTimData') {
+                timData = message.value;
+            }
+        });
+    });
+    
+    /**
+     * Sends message to TaskPanel about submitting exercise
+     */
+    function submitTask() {
+        tsvscode.postMessage({
+            type: 'submitTask'
+        });
+    }
+
 </script>
 
-<div class="task-panel">
-    <h2>Exercise or file name</h2>
+{#if timData} <!-- Check if timData is not null -->
+    <div class="task-panel">
+        {#if timData.header !== null}
+            <h2>{timData.header}</h2>
+        {:else}
+            <h2>{timData.task_files[0].file_name}</h2>
+        {/if}
+        <div class="instructions">
+            {#if timData.stem !== null}
+            <p>{timData.stem}</p>
+            {:else}
+            <p>To see the instructions, please open exercise in TIM.</p>
+            {/if}
+        </div>
 
-    <div class="instructions">
-        <p>Exercise instructions</p>
-    </div>
+        <div>
+            <a href={"https://tim.jyu.fi/view/" + timData.path}>Open exercise in TIM</a>
+        </div>
 
-    <div>
-        <a href="https://tim.jyu.fi/">Open exercise in TIM</a>
-    </div>
+        <hr />
 
-    <hr />
+        <div class="points-section">
+            <p>Points: Number of points user has</p>
+            <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
+            <!-- <p>Passed Tests</p>
+            <div class="progress-bar">
+                <div class="progress" style="width: 75%"></div>
+            </div> -->
+        </div>
 
-    <div class="points-section">
-        <p>Points: Number of points user has</p>
-        <button class="submit-exercise">Submit Exercise</button>
-        <p>Passed Tests</p>
-        <div class="progress-bar">
-            <div class="progress" style="width: 75%"></div>
+        <hr />
+
+        <div class="reset-section">
+            <button>Reset Exercise</button>
+            <button>Fetch Latest Answer</button>
         </div>
     </div>
-
-    <hr />
-
-    <div class="reset-section">
-        <button>Reset Exercise</button>
-        <button>Fetch Latest Answer</button>
-    </div>
-</div>
+{:else}
+    <p>Loading...</p>
+{/if}
 
 <style>
     .task-panel {
@@ -86,12 +122,13 @@
         padding: 8px 15px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        background-color: turquoise;
+        background-color: #007acc;
+        color: white;
     }
 
     .reset-section button:hover,
     .points-section button:hover {
-        background-color: #33b3a6;
+        background-color: #00558e;
     }
 
     .task-panel hr {
@@ -100,5 +137,5 @@
         border: none;
         border-top: 1px inset #ccc;
         width: 100%;
-}
+    }
 </style>

@@ -19,15 +19,18 @@
 			},
 			{
 				"command": "tide.login",
-				"title": "Login"
+				"title": "Login",
+				"category": "TIM-IDE"
 			},
 			{
 				"command": "tide.logout",
-				"title": "Log out"
+				"title": "Log out",
+				"category": "TIM-IDE"
 			},
 			{
 				"command": "tide.listCourses",
-				"title": "List Available Courses"
+				"title": "List Available Courses",
+				"category": "TIM-IDE"
 			},
 			{
 				"command": "tide.pull",
@@ -40,29 +43,39 @@
 			{
 				"command": "tide.showCourses",
 				"title": "Show My Courses",
-				"category": "TIDE"
+				"category": "TIM-IDE"
 			},
 			{
 				"command": "tide.openSettings",
 				"title": "Open Settings",
-				"category": "TIDE"
+				"category": "TIM-IDE"
 			},
 			{
 				"command": "tide.showTaskPanel",
 				"title": "Show Task Panel",
-				"category": "TIDE"
+				"category": "TIM-IDE"
 			},
 			{
 				"command": "tide.debug",
 				"title": "Magic Button"
+			},
+			{
+				"command": "tide.downloadTaskSet",
+				"title": "Download all tasks from task set",
+				"category": "TIM-IDE"
+			},
+			{
+				"command": "tide.submitTask",
+				"title": "Submit exercise to TIM",
+				"category": "TIM-IDE"
 			}
 		],
 		"viewsContainers": {
 			"activitybar": [
 				{
 					"id": "tide-extension",
-					"title": "TIDE",
-					"icon": "$(book)"
+					"title": "TIM-IDE",
+					"icon": "./media/timlogovscode.png"
 				}
 			]
 		},
@@ -72,13 +85,13 @@
 					"type": "webview",
 					"id": "tide-sidebar",
 					"name": "Menu",
-					"icon": "$(book)",
-					"contextualTitle": "TIDE"
+					"icon": "./media/timlogovscode.png",
+					"contextualTitle": "TIM-IDE"
 				}
 			]
 		},
 		"configuration": {
-			"title": "TIDE",
+			"title": "TIM-IDE",
 			"properties": {
 				"tide.sidebar.showSidebarWelcomeMessage": {
 					"type": "boolean",

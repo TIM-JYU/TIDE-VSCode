@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
+import ExtensionStateManager from "../api/ExtensionStateManager";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;
@@ -12,6 +13,17 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				this.updateWebview();
 			}
 		});
+	}
+
+	/**
+	 * Sends data to Sidebar if user's login is successful or not.
+	 * @param json_array JSON array from login data.
+	 */
+	public sendLoginValue() {
+		let loginData = ExtensionStateManager.getLoginData();
+		console.log(loginData);
+		this._view?.webview.postMessage({ type: "json", value: loginData });
+		//this._panel?.webview.postMessage({ type: "json", value: json_array });
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -52,6 +64,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				}
 				case "showTaskPanel": {
 					vscode.commands.executeCommand("tide.showTaskPanel");
+					break;
+				}
+				case "login": {
+					vscode.commands.executeCommand("tide.login");
+					break;
+				}
+				case "logout": {
+					vscode.commands.executeCommand("tide.logout");
 					break;
 				}
 			}
