@@ -27,8 +27,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 * Opens task panel.
 	 */
 	ctx.subscriptions.push(
-        // TODO: rikoit tämän
-		vscode.commands.registerCommand("tide.showTaskPanel", () => {UiController.showTaskPanel('');})
+		// TODO: rikoit tämän
+		vscode.commands.registerCommand("tide.showTaskPanel", () => {
+			UiController.showTaskPanel("", "");
+		})
 	);
 
 	/**
@@ -36,17 +38,17 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.showCourses", () => {
-			CoursePanel.createOrShow(ctx.extensionUri);
+			//UiController.showCoursePanel();
 			getCoursesFromTide();
 		})
 	);
 
 	/**
-	 * Retrieves course data from TIDE, and sends a message with the course list to coursePanel.
+	 * Retrieves course data from TIDE, and tells the UiController to show CoursePanel with the data.
 	 * @returns {Promise<void>} A promise that resolves once the course data is retrieved and processed.
 	 */
 	async function getCoursesFromTide() {
-		const coursePanel = CoursePanel.createOrShow(ctx.extensionUri);
+		//const coursePanel = CoursePanel.createOrShow(ctx.extensionUri);
 		let json_array: any[] = [];
 
 		// Check if courses are available in global state
@@ -85,8 +87,8 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 			ExtensionStateManager.setCourses(json_array);
 		}
 
-		// Send the course list message to the CoursePanel
-		coursePanel.sendCourseListMessage(json_array);
+		//Show coursePanel
+		UiController.showCoursePanel(json_array);
 	}
 
 	/**
@@ -141,8 +143,5 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		})
 	);
 
-	ctx.subscriptions.push(
-		vscode.commands.registerCommand("tide.debug", () => {
-		})
-	);
+	ctx.subscriptions.push(vscode.commands.registerCommand("tide.debug", () => {}));
 }
