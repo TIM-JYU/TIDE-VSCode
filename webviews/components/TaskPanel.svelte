@@ -24,13 +24,21 @@
         });
     }
 
+    function workspaceName(name) {
+        const lastIndex = name.lastIndexOf("/");
+		name = name.substring(lastIndex + 1, name.length);
+        return name;
+    }
+
 </script>
 
 {#if timData} <!-- Check if timData is not null -->
     <div class="task-panel">
         {#if timData.header !== null}
+            <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
             <h2>{timData.header}</h2>
         {:else}
+            <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
             <h2>{timData.task_files[0].file_name}</h2>
         {/if}
         <div class="instructions">
