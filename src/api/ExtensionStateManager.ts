@@ -1,8 +1,6 @@
 import * as vscode from "vscode";
 import Logger from "../utilities/logger";
 
-// TODO: observer
-
 export default class ExtensionStateManager {
     private static globalState: vscode.Memento & { setKeysForSync(keys: readonly string[]): void };
     private static KEY_PREFIX = "tide";
@@ -32,11 +30,7 @@ export default class ExtensionStateManager {
      * @param courses - An array containing the course data to be stored.
      */
     public static setCourses(courses: any[]) {
-        if (ExtensionStateManager.globalState) {
-            ExtensionStateManager.globalState.update("courses", courses);
-        } else {
-            Logger.error("Global state is not set.");
-        }
+        this.writeToGlobalState("courses", courses);
     }
 
     /**
@@ -44,29 +38,15 @@ export default class ExtensionStateManager {
      * @returns Courses from the global state.
      */
     public static getCourses(): any[] {
-        if (ExtensionStateManager.globalState) {
-            return ExtensionStateManager.globalState.get("courses") || [];
-        } else {
-            Logger.error("Global state is not set.");
-            return [];
-        }
+        return this.readFromGlobalState("courses");
     }
 
     public static setLoginData(loginData: any[]) {
-        if (ExtensionStateManager.globalState) {
-            ExtensionStateManager.globalState.update("loginData", loginData);
-        } else {
-            Logger.error("Global state is not set.");
-        }
+        this.writeToGlobalState("loginData", loginData);
     }
 
     public static getLoginData(): any[] {
-        if (ExtensionStateManager.globalState) {
-            return ExtensionStateManager.globalState.get("loginData") || [];
-        } else {
-            Logger.error("Global state is not set.");
-            return [];
-        }
+        return this.readFromGlobalState("loginData");
     }
 
     /**
@@ -87,7 +67,7 @@ export default class ExtensionStateManager {
      * @param {string} key - Key to write to
      * @param {string} value - Value to write
      */
-    private static writeToGlobalState(key: string, value: string) {
+    private static writeToGlobalState(key: string, value: any) {
         Logger.debug(`Writing to globalState: "${this.prefixedKey(key)}": "${value}"`);
         this.globalState.update(this.prefixedKey(key), value);
         this.notifySubscribers(key, value);
@@ -100,7 +80,7 @@ export default class ExtensionStateManager {
      * @param {string} key - Key of the value queries
      * @returns {string} value matching the key or an empty string if key doesn't exist
      */
-    private static readFromGlobalState(key: string): string {
+    private static readFromGlobalState(key: string): any {
         const prefixedKey = this.prefixedKey(key);
         const value: string = this.globalState.get(prefixedKey) || "";
         Logger.debug(`Found value "${value}" for key "${prefixedKey}" from globalState.`);
@@ -111,7 +91,7 @@ export default class ExtensionStateManager {
     private static subscribers: Array<SubscriptionObject> = [];
 
     /**
-     * Subscribe to listen to changes on the value of a given key
+     * Subscribe to listen to changes on the value of a given key. Calls the NotifyFunction with current value.
      *
      * @static
      * @param {string} key - Key to listen to
@@ -127,6 +107,8 @@ export default class ExtensionStateManager {
                 ExtensionStateManager.unsubscribe(subscriptionObject);
             }
         };
+
+        onValueChange(this.readFromGlobalState(key));
 
         return vscode.Disposable.from(disposableObject);
     }
