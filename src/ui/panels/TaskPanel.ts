@@ -3,11 +3,12 @@ import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
 
 export default class TaskPanel {
 	public static currentPanel: TaskPanel | undefined;
+	private timData: string = "";
 
-    private static readonly fileNamePrefix = "TaskPanel";
+	private static readonly fileNamePrefix = "TaskPanel";
 	private static readonly viewType = "TaskPanel";
-    private static readonly panelTitle = "Task Panel";
-    private static preferredColumn = vscode.ViewColumn.Two;
+	private static readonly panelTitle = "Task Panel";
+	private static preferredColumn = vscode.ViewColumn.Two;
 
 	private readonly panel: vscode.WebviewPanel;
 	private readonly extensionUri: vscode.Uri;
@@ -18,14 +19,23 @@ export default class TaskPanel {
 
 		// If we already have a panel, show it.
 		if (TaskPanel.currentPanel) {
-			TaskPanel.currentPanel.panel.reveal(column);
+			//TaskPanel.currentPanel.panel.reveal(column);
+			TaskPanel.currentPanel.timData = timDataContent;
+			TaskPanel.currentPanel.update(TaskPanel.currentPanel.timData, currentDirectory); // Update the panel with the new timDataContent
 			TaskPanel.currentPanel.panel.webview.postMessage({ command: "updateTimData", data: timDataContent });
 			return;
 		}
 
 		// Otherwise, create a new panel.
-        const panel = vscode.window.createWebviewPanel(this.viewType, this.panelTitle, this.preferredColumn, getWebviewOptions(extensionUri));
-
+		const panel = vscode.window.createWebviewPanel(
+			this.viewType,
+			this.panelTitle,
+			{
+				viewColumn: vscode.ViewColumn.Beside,
+				preserveFocus: true,
+			},
+			getWebviewOptions(extensionUri)
+		);
 
 		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri, timDataContent, currentDirectory);
 	}
@@ -34,12 +44,13 @@ export default class TaskPanel {
 		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri, timDataContent, currentDirectory);
 	}
 
-	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, timDataContent: string, currentDirectory: string) {
+	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, timData: string, currentDirectory: string) {
 		this.panel = panel;
 		this.extensionUri = extensionUri;
+		this.timData = timData;
 
 		// Set the webview's initial html content
-		this.update(timDataContent, currentDirectory);
+		this.update(this.timData, currentDirectory);
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programmatically
@@ -49,7 +60,7 @@ export default class TaskPanel {
 		this.panel.onDidChangeViewState(
 			(e) => {
 				if (this.panel.visible) {
-					this.update(timDataContent, currentDirectory);
+					this.update(this.timData, currentDirectory);
 				}
 			},
 			null,
@@ -104,11 +115,10 @@ export default class TaskPanel {
 	private update(timDataContent: string, currentDirectory: string) {
 		const webview = this.panel.webview;
 		this.panel.webview.html = this.getHtmlForWebview(webview);
-		this.panel?.webview.postMessage({ type: "updateTimData", value: timDataContent });
+		this.panel.webview.postMessage({ type: "updateTimData", value: timDataContent });
 	}
 
-    private getHtmlForWebview(webview: vscode.Webview) {
-        return getDefaultHtmlForWebview(webview, this.extensionUri, TaskPanel.fileNamePrefix);
+	private getHtmlForWebview(webview: vscode.Webview) {
+		return getDefaultHtmlForWebview(webview, this.extensionUri, TaskPanel.fileNamePrefix);
 	}
-
 }

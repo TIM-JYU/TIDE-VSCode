@@ -1,35 +1,34 @@
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
 export function getNonce(): string {
-    let text = "";
-    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
+	let text = "";
+	const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	for (let i = 0; i < 32; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return text;
 }
 
 export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
 	return {
 		// Enable javascript in the webview
 		enableScripts: true,
-
 		// And restrict the webview to only loading content from our extension's `media` directory.
 		localResourceRoots: [vscode.Uri.joinPath(extensionUri, "out/compiled")],
 	};
 }
 
 export function getDefaultHtmlForWebview(webview: vscode.Webview, extensionUri: vscode.Uri, fileNamePrefix: string) {
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "reset.css"));
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "vscode.css"));
+	const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "reset.css"));
+	const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "vscode.css"));
 
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "out", `compiled/${fileNamePrefix}.js`));
-		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "out", `compiled/${fileNamePrefix}.css`));
+	const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "out", `compiled/${fileNamePrefix}.js`));
+	const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "out", `compiled/${fileNamePrefix}.css`));
 
-		// Use a nonce to only allow a specific script to be run.
-		const nonce = getNonce();
+	// Use a nonce to only allow a specific script to be run.
+	const nonce = getNonce();
 
-		return `<!DOCTYPE html>
+	return `<!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -51,4 +50,3 @@ export function getDefaultHtmlForWebview(webview: vscode.Webview, extensionUri: 
         </body>
         </html>`;
 }
-

@@ -6,12 +6,6 @@ import * as path from "path";
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
 	let lastActiveEditor: vscode.TextEditor | undefined;
 
-	// const textDocumentListener = vscode.workspace.onDidOpenTextDocument(fileOpened);
-	// ctx.subscriptions.push(textDocumentListener);
-
-	// const textEditor = vscode.window.onDidChangeActiveTextEditor(onDidChangeActiveTextEditor);
-	// ctx.subscriptions.push(textEditor);
-
 	const textEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
 		if (editor && editor !== lastActiveEditor) {
 			// Update last active editor
@@ -32,53 +26,15 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
 				const timDataString = timDataContent.toString();
 				const timDataJson = JSON.parse(timDataString);
 
-				// Dispose any existing TaskPanel
-				UiController.closeTaskPanel();
-
 				// Create or show the TaskPanel and pass the .timdata content as a parameter
 				UiController.showTaskPanel(timDataJson, submitPath);
 			} catch (error) {
 				console.log(".timdata file doesn't exist in current directory", error);
+				UiController.closeTaskPanel();
 			}
 		}
 	});
 	ctx.subscriptions.push(textEditorListener);
-
-	// function onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-	// 	if (editor) {
-	// 		const currentFile = editor.document.fileName;
-	// 		console.log("Currently opened file:", currentFile);
-	// 	} else {
-	// 		console.log("No file is currently opened.");
-	// 	}
-	// }
-
-	// TODO: Fix things
-	// TODO: Fix showTaskPanel from commands.ts
-	// async function fileOpened(document: vscode.TextDocument) {
-	// 	console.log("Text document opened:", document.fileName);
-	// 	const currentFile = document.fileName;
-	// 	const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
-
-	// 	const lastIndex = currentFile.lastIndexOf("/");
-	// 	const submitPath = currentFile.substring(0, lastIndex + 1);
-
-	// 	try {
-	// 		// Read the content of the .timdata file
-	// 		const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
-	// 		// Convert the content to a string
-	// 		const timDataString = timDataContent.toString();
-	// 		const timDataJson = JSON.parse(timDataString);
-
-	// 		// Dispose any existing TaskPanel
-	// 		UiController.closeTaskPanel();
-
-	// 		// Create or show the TaskPanel and pass the .timdata content as a parameter
-	// 		UiController.showTaskPanel(timDataJson, submitPath);
-	// 	} catch (error) {
-	// 		console.log(".timdata file doesn't exist in current directory", error);
-	// 	}
-	// }
 
 	//Listens to changes in configuration
 	vscode.workspace.onDidChangeConfiguration((event) => {

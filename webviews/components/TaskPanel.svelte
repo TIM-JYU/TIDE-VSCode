@@ -10,7 +10,12 @@
     window.addEventListener('message', (event) => {
             const message = event.data;
             if (message && message.type === 'updateTimData') {
+                //timData = [...message.value];
+                //timData = null;
                 timData = message.value;
+                //timData = timData;
+                //timData = [];
+                //timData = timData;
             }
         });
     });
@@ -31,7 +36,6 @@
     }
 
 </script>
-
 {#if timData} <!-- Check if timData is not null -->
     <div class="task-panel">
         {#if timData.header !== null}
