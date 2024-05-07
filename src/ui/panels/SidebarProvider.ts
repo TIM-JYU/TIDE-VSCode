@@ -1,12 +1,14 @@
 import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { getNonce } from "../utils";
+import { LoginData } from "../../common/types";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;
 	_doc?: vscode.TextDocument;
 
 	constructor(private readonly _extensionUri: vscode.Uri) {
+        ExtensionStateManager.subscribe('loginData', this.sendLoginValue.bind(this));
 		vscode.workspace.onDidChangeConfiguration((event) => {
 			if (event.affectsConfiguration("tide.sidebar.showSidebarWelcomeMessage")) {
 				// Call a method to update the view with the new setting value
@@ -19,11 +21,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 	 * Sends data to Sidebar if user's login is successful or not.
 	 * @param json_array JSON array from login data.
 	 */
-	public sendLoginValue() {
-		let loginData = ExtensionStateManager.getLoginData();
-		console.log(loginData);
-		this._view?.webview.postMessage({ type: "json", value: loginData });
-		//this._panel?.webview.postMessage({ type: "json", value: json_array });
+	public sendLoginValue(loginData: LoginData) {
+		this._view?.webview.postMessage({ type: "loginData", value: loginData });
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView) {

@@ -1,7 +1,7 @@
 import * as cp from "child_process";
 import Logger from "../utilities/logger";
 import * as vscode from "vscode";
-import ExtensionStateManager from "./ExtensionStateManager";
+import { LoginData } from "../common/types";
 
 /**
  * This class handles communication with the cli tool
@@ -16,11 +16,11 @@ export default class Tide {
 	/**
 	 * Executes tide login command.
 	 */
-	public static async login() {
-		let loginData = "";
+	public static async login(): Promise<LoginData> {
+		let loginData = { isLogged: false };
 		await this.runAndHandle(["login", "--json"], (data: string) => {
-			Logger.debug(data);
-			loginData = data;
+            const parsedData = JSON.parse(data);
+			loginData = { isLogged: parsedData['login_success'] };
 		});
 		return loginData;
 	}
@@ -28,10 +28,12 @@ export default class Tide {
 	/**
 	 * Executes tide logout command.
 	 */
-	public static async logout() {
-		this.runAndHandle(["logout"], (data: string) => {
-			Logger.debug(data);
+	public static async logout(): Promise<LoginData> {
+        // TODO: Mitä tapahtuu jos uloskirjautuminen epäonnistuu?
+		await this.runAndHandle(["logout"], (data: string) => {
+			Logger.info(`Logout: ${data}`);
 		});
+        return { isLogged: false };
 	}
 
 	/**
@@ -114,9 +116,9 @@ export default class Tide {
 		let buffer = "";
 		//TODO: muuta takaisin toimimaan tidellä
 		const ar = ["run", "python", vscode.workspace.getConfiguration().get("tide.cliPath") as string, ...args];
-		const childProcess = cp.spawn("poetry", ar, { cwd: "/Users/stella/tideproject/tide-cli" });
+		const childProcess = cp.spawn("poetry", ar, { cwd: "/home/hannes/Documents/kurssit/ties405/TIDE-CLI/" });
 
-		//const childProcess = cp.spawn(vscode.workspace.getConfiguration().get("tide.cliPath") as string, args);
+		// const childProcess = cp.spawn(vscode.workspace.getConfiguration().get("tide.cliPath") as string, args);
 
 		childProcess.stdout.on("data", (data) => {
 			buffer += data.toString();

@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import Logger from "../utilities/logger";
+import { LoginData } from "../common/types";
 
 export default class ExtensionStateManager {
     private static globalState: vscode.Memento & { setKeysForSync(keys: readonly string[]): void };
@@ -41,11 +42,11 @@ export default class ExtensionStateManager {
         return this.readFromGlobalState("courses");
     }
 
-    public static setLoginData(loginData: any[]) {
+    public static setLoginData(loginData: LoginData) {
         this.writeToGlobalState("loginData", loginData);
     }
 
-    public static getLoginData(): any[] {
+    public static getLoginData(): LoginData {
         return this.readFromGlobalState("loginData");
     }
 
@@ -132,11 +133,10 @@ export default class ExtensionStateManager {
      * @param {string} value - The new value of the key
      */
     private static notifySubscribers(key: string, value: string) {
-        Logger.debug(`Notifying subscribers of the following new value "${key}": "${value}" `)
+        Logger.debug(`Notifying subscribers of the following new value "${key}": "${value}" `);
         this.subscribers.filter(subscriber => subscriber.key === key)
             .forEach(subscriber => subscriber.onValueChange(value));
     }
-
 }
 
 interface SubscriptionObject {
@@ -145,5 +145,5 @@ interface SubscriptionObject {
 }
 
 interface NotifyFunction {
-    (newValue: string): void
+    (newValue: any): void
 }

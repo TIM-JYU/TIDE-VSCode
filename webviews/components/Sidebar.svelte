@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
+  import type { LoginData } from '../common/types';
   let showSidebarWelcome = false;
   let isLoggedIn = false;
-  let loginData = [];
+  let loginData: LoginData;
 
   /**
   * Listens to messages from the extension
@@ -13,14 +14,8 @@
           if (message && message.type === 'settingValue') {
               showSidebarWelcome = message.value;
           }
-          if (message && message.type ==='json') {
-              loginData = message.data;
-              if (loginData.login_successful == true) {
-                  isLoggedIn = true;
-              }
-              else {
-                isLoggedIn = false;
-              }
+          if (message && message.type ==='loginData') {
+              loginData = message.value;
           }
       });
   });
@@ -33,7 +28,6 @@
       type: 'login',
       value: ''
     })
-    isLoggedIn = true;
   }
 
   /**
@@ -44,8 +38,9 @@
       type: 'logout',
       value: ''
     })
-    isLoggedIn = false;
   }
+
+  $: isLoggedIn = loginData ? loginData.isLogged : false;
 </script>
   
 {#if !isLoggedIn}
