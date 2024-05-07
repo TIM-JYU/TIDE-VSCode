@@ -104,16 +104,16 @@
 		"configuration": {
 			"title": "TIM-IDE",
 			"properties": {
-				"tide.sidebar.showSidebarWelcomeMessage": {
+				"TIM-IDE.sidebar.showSidebarWelcomeMessage": {
 					"type": "boolean",
 					"default": true,
 					"description": "Show welcome message in sidebar"
 				},
-				"tide.fileDownloadPath": {
+				"TIM-IDE.fileDownloadPath": {
 					"type": "string",
 					"description": "The location where the exercise folders will be downloaded."
 				},
-				"tide.cliPath": {
+				"TIM-IDE.cliPath": {
 					"type": "string",
 					"description": "Path to CLI tool"
 				}

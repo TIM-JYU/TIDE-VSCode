@@ -35,7 +35,7 @@ export default class CoursePanel {
 	}
 
 	private sendInitialPath() {
-		const initialPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		const initialPath = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 		this.panel.webview.postMessage({
 			command: "setPathResult",
 			path: initialPath ? initialPath : null,
@@ -51,7 +51,7 @@ export default class CoursePanel {
 	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, courseData: any) {
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
 
-		const path = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		const path = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 		CoursePanel.currentPanel.sendInitialPath();
 		CoursePanel.currentPanel.sendCourseListMessage(courseData);
 	}
@@ -111,12 +111,12 @@ export default class CoursePanel {
 					});
 					// Update the configuration with the new path
 					const updatedPath = newPath ? newPath[0].fsPath : null;
-					vscode.workspace.getConfiguration().update("tide.fileDownloadPath", updatedPath, vscode.ConfigurationTarget.Global);
+					vscode.workspace.getConfiguration().update("TIM-IDE.fileDownloadPath", updatedPath, vscode.ConfigurationTarget.Global);
 					break;
 				}
 				case "downloadTaskSet": {
 					const taskSetPath = data.taskSetPath;
-					const downloadPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+					const downloadPath = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 					vscode.commands.executeCommand("tide.downloadTaskSet", taskSetPath, downloadPath);
 					break;
 				}

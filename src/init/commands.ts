@@ -18,7 +18,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.openSettings", () => {
-			vscode.commands.executeCommand("workbench.action.openSettings", "TIDE-extension");
+			vscode.commands.executeCommand("workbench.action.openSettings", "TIM-IDE");
 		})
 	);
 

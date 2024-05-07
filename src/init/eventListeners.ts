@@ -38,9 +38,9 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
 
 	//Listens to changes in configuration
 	vscode.workspace.onDidChangeConfiguration((event) => {
-		if (event.affectsConfiguration("tide.fileDownloadPath")) {
-			// Get the new value of tide.fileDownloadPath
-			const newPath = vscode.workspace.getConfiguration().get("tide.fileDownloadPath");
+		if (event.affectsConfiguration("TIM-IDE.fileDownloadPath")) {
+			// Get the new value of fileDownloadPath
+			const newPath = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 
 			// Update ExtensionStateManager with the new path
 			if (typeof newPath === "string") {
