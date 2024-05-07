@@ -36,7 +36,6 @@ export default class TaskPanel {
 			},
 			getWebviewOptions(extensionUri)
 		);
-
 		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri, timDataContent, currentDirectory);
 	}
 
@@ -86,6 +85,9 @@ export default class TaskPanel {
 				}
 				case "submitTask": {
 					vscode.commands.executeCommand("tide.submitTask", currentDirectory);
+				}
+				case "showOutput": {
+					vscode.commands.executeCommand("workbench.action.output.toggleOutput");
 				}
 			}
 		});

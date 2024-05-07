@@ -30,7 +30,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
 				UiController.showTaskPanel(timDataJson, submitPath);
 			} catch (error) {
 				console.log(".timdata file doesn't exist in current directory", error);
-				UiController.closeTaskPanel();
+				//UiController.closeTaskPanel();
 			}
 		}
 	});

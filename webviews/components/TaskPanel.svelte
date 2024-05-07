@@ -10,12 +10,7 @@
     window.addEventListener('message', (event) => {
             const message = event.data;
             if (message && message.type === 'updateTimData') {
-                //timData = [...message.value];
-                //timData = null;
                 timData = message.value;
-                //timData = timData;
-                //timData = [];
-                //timData = timData;
             }
         });
     });
@@ -33,6 +28,12 @@
         const lastIndex = name.lastIndexOf("/");
 		name = name.substring(lastIndex + 1, name.length);
         return name;
+    }
+
+    function showOutput() {
+        tsvscode.postMessage({
+            type: 'showOutput'
+        });
     }
 
 </script>
@@ -60,8 +61,9 @@
         <hr />
 
         <div class="points-section">
-            <p>Points: Number of points user has</p>
+            <!-- <p>Points: Number of points user has</p> -->
             <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
+            <button on:click={() => showOutput()}>Open Output</button>
             <!-- <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
@@ -72,7 +74,7 @@
 
         <div class="reset-section">
             <button>Reset Exercise</button>
-            <button>Fetch Latest Answer</button>
+            <!-- <button>Fetch Latest Answer</button> -->
         </div>
     </div>
 {:else}
@@ -149,5 +151,9 @@
         border: none;
         border-top: 1px inset #ccc;
         width: 100%;
+    }
+
+    .submit-exercise {
+        margin-bottom: 10px;
     }
 </style>
