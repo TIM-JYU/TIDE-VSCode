@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 import Logger from "../utilities/logger";
 import Tide from "../api/tide";
-import CoursePanel from "../ui/panels/CoursePanel";
-import TaskPanel from "../ui/panels/TaskPanel";
 import ExtensionStateManager from "../api/ExtensionStateManager";
 import UiController from "../ui/UiController";
+import path from "path";
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
 	Logger.info("Registering commands.");
@@ -27,9 +26,36 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 * Opens task panel.
 	 */
 	ctx.subscriptions.push(
-		// TODO: rikoit tämän
-		vscode.commands.registerCommand("tide.showTaskPanel", () => {
-			UiController.showTaskPanel("", "");
+		// TODO: toistuvaa koodia eventlisteners.ts kanssa
+		vscode.commands.registerCommand("tide.showTaskPanel", async () => {
+			console.log("Ollaan showtaskpanelissta");
+			let editor = vscode.window.activeTextEditor;
+
+			if (!editor) {
+				// If no editor is active, show an error message
+				vscode.window.showErrorMessage("Task Panel can only be opened when you have a TIM task document open in the editor.");
+				return;
+			}
+
+			const currentFile = editor.document.fileName;
+			const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
+
+			const lastIndex = currentFile.lastIndexOf("/");
+			const submitPath = currentFile.substring(0, lastIndex + 1);
+
+			try {
+				// Read the content of the .timdata file
+				const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
+				// Convert the content to a string
+				const timDataString = timDataContent.toString();
+				const timDataJson = JSON.parse(timDataString);
+
+				// Create or show the TaskPanel and pass the .timdata content as a parameter
+				UiController.showTaskPanel(timDataJson, submitPath);
+			} catch (error) {
+				console.log(".timdata file doesn't exist in current directory", error);
+				vscode.window.showErrorMessage("Task Panel can only be opened when you have a TIM task document open in the editor.");
+			}
 		})
 	);
 

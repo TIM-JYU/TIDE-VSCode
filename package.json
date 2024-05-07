@@ -9,9 +9,19 @@
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [ "onStartupFinished" ],
+	"activationEvents": [
+		"onStartupFinished"
+	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"menus": {
+			"editor/title": [
+				{
+					"command": "tide.showTaskPanel",
+					"group": "navigation"
+				}
+			]
+		},
 		"commands": [
 			{
 				"command": "tide.hello-world",
