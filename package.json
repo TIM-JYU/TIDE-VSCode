@@ -63,7 +63,8 @@
 			{
 				"command": "tide.showTaskPanel",
 				"title": "Show Task Panel",
-				"category": "TIM-IDE"
+				"category": "TIM-IDE",
+				"icon": "$(mortar-board)"
 			},
 			{
 				"command": "tide.debug",
