@@ -91,13 +91,17 @@
 
         <hr />
 
+        <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
+        {#if timData.task_files.length < 2}
         <div class="reset-section">
             <button on:click={() => resetExercise(timData.path, timData.ide_task_id)}>Reset Exercise</button>
             <!-- <button>Fetch Latest Answer</button> -->
         </div>
+        {/if}
     </div>
 {:else}
     <p>Loading...</p>
+    <span class="loader"></span>
 {/if}
 
 <style>
@@ -181,5 +185,25 @@
 
     .submit-exercise {
         margin-bottom: 10px;
+    }
+
+    .loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>
