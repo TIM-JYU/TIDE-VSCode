@@ -18,6 +18,8 @@
               loginData = message.value;
           }
       });
+
+      tsvscode.postMessage({ type: 'requestLoggedInStatus', value: '' })
   });
 
   /**

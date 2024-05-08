@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { getNonce } from "../utils";
 import { LoginData } from "../../common/types";
+import Logger from "../../utilities/logger";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;
@@ -9,6 +10,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
 	constructor(private readonly _extensionUri: vscode.Uri) {
         ExtensionStateManager.subscribe('loginData', this.sendLoginValue.bind(this));
+
 		vscode.workspace.onDidChangeConfiguration((event) => {
 			if (event.affectsConfiguration("tide.sidebar.showSidebarWelcomeMessage")) {
 				// Call a method to update the view with the new setting value
@@ -73,6 +75,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand("tide.logout");
 					break;
 				}
+                case "requestLoggedInStatus": {
+                    this.sendLoginValue(ExtensionStateManager.getLoginData());
+                }
 			}
 		});
 	}
