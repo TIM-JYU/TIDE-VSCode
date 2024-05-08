@@ -134,11 +134,11 @@
    * Opens a workspace for the specified task set.
    * @param {string} taskSetName - The name of the task set to open a workspace for.
    */
-  function openWorkspace(taskSetName) {
+  function openWorkspace(taskSetName, taskSetPath) {
     tsvscode.postMessage({
       type: 'openWorkspace',
       taskSetName,
-      downloadPath
+      taskSetPath
     });
   }
   

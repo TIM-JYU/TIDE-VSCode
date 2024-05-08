@@ -74,7 +74,7 @@
                   <td>{taskset.tasks.length}</td>
                   <!-- <td>6/8</td> -->
                   <td><button class="download-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button></td>
-                  <td><button class="open-workspace" on:click={() => openWorkspace(taskset.name)}>Open in workspace</button></td>
+                  <td><button class="open-workspace" on:click={() => openWorkspace(taskset.name, taskset.path)}>Open in workspace</button></td>
                 </tr>
               {/each}
               </tbody>

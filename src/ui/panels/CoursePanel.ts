@@ -127,7 +127,8 @@ export default class CoursePanel {
 				}
 				case "openWorkspace": {
 					const taskSetName = data.taskSetName;
-					const downloadPath = data.downloadPath;
+					const taskSetPath = data.taskSetPath;
+					const downloadPath = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath);
 					let folder = downloadPath + "/" + taskSetName;
 					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(folder));
 					//const folderUri = vscode.Uri.file(downloadPath + "/" + taskSetName);
