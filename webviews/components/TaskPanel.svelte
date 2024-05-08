@@ -145,6 +145,11 @@
 
     .reset-section button {
         margin-bottom: 10px;
+        background-color: #D2042D;
+    }
+
+    .reset-section button:hover {
+        background-color: #93021f;
     }
 
     .points-section button, .reset-section button {
@@ -155,11 +160,13 @@
         padding: 8px 15px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        background-color: #007acc;
         color: white;
     }
 
-    .reset-section button:hover,
+    .points-section button {
+        background-color: #007acc;
+    }
+
     .points-section button:hover {
         background-color: #00558e;
     }

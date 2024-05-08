@@ -86,20 +86,21 @@ export default class TaskPanel {
 				}
 				case "submitTask": {
 					vscode.commands.executeCommand("tide.submitTask", currentDirectory);
-					console.log("submit");
 					break;
 				}
 				case "showOutput": {
-					console.log("showOutput");
 					vscode.commands.executeCommand("workbench.action.output.toggleOutput");
 					break;
 				}
 				case "resetExercise": {
-					console.log("resetex");
-					let taskSetPath = data.path;
-					let taskId = data.taskId;
-					let fileLocation = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath);
-					vscode.commands.executeCommand("tide.resetExercise", taskSetPath, taskId, fileLocation);
+					vscode.window.showInformationMessage("Are you sure you want to reset exercise? All unsubmitted changes will be lost.", "Continue", "Cancel").then((answer) => {
+						if (answer === "Continue") {
+							let taskSetPath = data.path;
+							let taskId = data.taskId;
+							let fileLocation = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath);
+							vscode.commands.executeCommand("tide.resetExercise", taskSetPath, taskId, fileLocation);
+						}
+					});
 					break;
 				}
 			}
