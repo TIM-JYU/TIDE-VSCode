@@ -24,16 +24,35 @@
         });
     }
 
+    /**
+     * Parses the current workspace's name from tide path
+     * @param name - tide path
+     */
     function workspaceName(name) {
         const lastIndex = name.lastIndexOf("/");
 		name = name.substring(lastIndex + 1, name.length);
         return name;
     }
 
+    /**
+     * Shows the output console
+     */
     function showOutput() {
         tsvscode.postMessage({
             type: 'showOutput'
         });
+    }
+
+    /**
+     * Resets the task file to it's initial stage from TIM.
+     * @param taskId ide task id of the task
+     */
+    function resetExercise(path, taskId) {
+        tsvscode.postMessage({
+            type: 'resetExercise',
+            path,
+            taskId
+        })
     }
 
 </script>
@@ -61,9 +80,9 @@
         <hr />
 
         <div class="points-section">
-            <!-- <p>Points: Number of points user has</p> -->
+            <p>Points: Information is not available. Please check task points from TIM.</p>
             <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
-            <button on:click={() => showOutput()}>Open Output</button>
+            <button on:click={() => showOutput()}>Show Output</button>
             <!-- <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
@@ -73,7 +92,7 @@
         <hr />
 
         <div class="reset-section">
-            <button>Reset Exercise</button>
+            <button on:click={() => resetExercise(timData.path, timData.ide_task_id)}>Reset Exercise</button>
             <!-- <button>Fetch Latest Answer</button> -->
         </div>
     </div>
@@ -125,13 +144,13 @@
     }
 
     .reset-section button {
-        width: 160px;
         margin-bottom: 10px;
     }
 
     .points-section button, .reset-section button {
         margin-right: 10px;
         border: none;
+        width: 130px;
         border-radius: 5px;
         padding: 8px 15px;
         cursor: pointer;

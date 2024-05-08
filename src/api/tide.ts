@@ -85,6 +85,18 @@ export default class Tide {
 	}
 
 	/**
+	 * Overwrites one exercise
+	 * @param taskSetPath - tide task set for the exercise that is going to be overwritten
+	 * @param ide_task_id - id/directory for the task that is going to be overwritten
+	 * @param fileLocation - path to the directory where user has loaded the task set
+	 */
+	public static async overwriteTask(taskSetPath: string, ide_task_id: string, fileLocation: string) {
+		this.runAndHandle(["task", "create", taskSetPath, ide_task_id, "-f", "-d", fileLocation], (data: string) => {
+			Logger.debug(data);
+		});
+	}
+
+	/**
 	 * palauta taski
 	 *
 	 * @param {string} taskPath - yksittaisen tehtavan kansio

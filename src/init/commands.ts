@@ -23,12 +23,20 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	);
 
 	/**
+	 * Resets exercise.
+	 */
+	ctx.subscriptions.push(
+		vscode.commands.registerCommand("tide.resetExercise", (taskSetPath, taskId, downloadPath) => {
+			Tide.overwriteTask(taskSetPath, taskId, downloadPath);
+		})
+	);
+
+	/**
 	 * Opens task panel.
 	 */
 	ctx.subscriptions.push(
 		// TODO: toistuvaa koodia eventlisteners.ts kanssa
 		vscode.commands.registerCommand("tide.showTaskPanel", async () => {
-			console.log("Ollaan showtaskpanelissta");
 			let editor = vscode.window.activeTextEditor;
 
 			if (!editor) {
@@ -147,6 +155,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.downloadTaskSet", (taskSetPath, downloadPath) => {
 			Tide.downloadTaskSet(taskSetPath, downloadPath);
+			ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath);
 		})
 	);
 
