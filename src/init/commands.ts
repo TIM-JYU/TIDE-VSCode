@@ -95,10 +95,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.login", async () => {
 			let data = await Tide.login();
-			let json_data: any[] = [];
-			json_data = JSON.parse(data);
-			ExtensionStateManager.setLoginData(json_data);
-			//TODO: Call SideBarProvider's sendLoginValue() function.
+			ExtensionStateManager.setLoginData(data);
 		})
 	);
 
@@ -106,8 +103,9 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 * Registers the 'tide.logout' command, allowing users to log out of TIDE.
 	 */
 	ctx.subscriptions.push(
-		vscode.commands.registerCommand("tide.logout", () => {
-			Tide.logout();
+		vscode.commands.registerCommand("tide.logout", async () => {
+			let data = await Tide.logout();
+            ExtensionStateManager.setLoginData(data);
 		})
 	);
 
