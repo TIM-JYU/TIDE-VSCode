@@ -50,6 +50,26 @@ export default class ExtensionStateManager {
         return this.readFromGlobalState("loginData");
     }
 
+  /**
+   * Sets the download path for a specific task set path in the Global State.
+   * @param taskSetPath - The path of the task set.
+   * @param downloadPath - The path where the task set will be downloaded.
+   */
+  static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
+    this.writeToGlobalState(taskSetPath, downloadPath);
+  }
+
+  /**
+   * Retrieves the download path for a specific task set path from the Global State.
+   * @param taskSetPath - The path of the task set.
+   * @returns The download path stored for the specified task set path.
+   */
+  static getTaskSetDownloadPath(taskSetPath: string): string {
+    return this.readFromGlobalState(taskSetPath);
+  }
+
+
+
     /**
      * Forms a string with the prefix prepended
      *

@@ -9,9 +9,19 @@
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [ "onStartupFinished" ],
+	"activationEvents": [
+		"onStartupFinished"
+	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"menus": {
+			"editor/title": [
+				{
+					"command": "tide.showTaskPanel",
+					"group": "navigation"
+				}
+			]
+		},
 		"commands": [
 			{
 				"command": "tide.hello-world",
@@ -53,7 +63,8 @@
 			{
 				"command": "tide.showTaskPanel",
 				"title": "Show Task Panel",
-				"category": "TIM-IDE"
+				"category": "TIM-IDE",
+				"icon": "$(mortar-board)"
 			},
 			{
 				"command": "tide.debug",
@@ -93,16 +104,16 @@
 		"configuration": {
 			"title": "TIM-IDE",
 			"properties": {
-				"tide.sidebar.showSidebarWelcomeMessage": {
+				"TIM-IDE.sidebar.showSidebarWelcomeMessage": {
 					"type": "boolean",
 					"default": true,
 					"description": "Show welcome message in sidebar"
 				},
-				"tide.fileDownloadPath": {
+				"TIM-IDE.fileDownloadPath": {
 					"type": "string",
 					"description": "The location where the exercise folders will be downloaded."
 				},
-				"tide.cliPath": {
+				"TIM-IDE.cliPath": {
 					"type": "string",
 					"description": "Path to CLI tool"
 				}

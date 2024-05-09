@@ -12,7 +12,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         ExtensionStateManager.subscribe('loginData', this.sendLoginValue.bind(this));
 
 		vscode.workspace.onDidChangeConfiguration((event) => {
-			if (event.affectsConfiguration("tide.sidebar.showSidebarWelcomeMessage")) {
+			if (event.affectsConfiguration("TIM-IDE.sidebar.showSidebarWelcomeMessage")) {
 				// Call a method to update the view with the new setting value
 				this.updateWebview();
 			}
@@ -63,10 +63,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand("tide.openSettings");
 					break;
 				}
-				case "showTaskPanel": {
-					vscode.commands.executeCommand("tide.showTaskPanel");
-					break;
-				}
 				case "login": {
 					vscode.commands.executeCommand("tide.login");
 					break;
@@ -88,7 +84,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
 	private updateWebview() {
 		if (this._view) {
-			const showSidebarWelcome = vscode.workspace.getConfiguration().get("tide.sidebar.showSidebarWelcomeMessage");
+			const showSidebarWelcome = vscode.workspace.getConfiguration().get("TIM-IDE.sidebar.showSidebarWelcomeMessage");
 			this._view.webview.postMessage({ type: "settingValue", value: showSidebarWelcome });
 		}
 	}

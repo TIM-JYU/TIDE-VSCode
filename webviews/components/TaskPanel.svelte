@@ -24,13 +24,45 @@
         });
     }
 
-</script>
+    /**
+     * Parses the current workspace's name from tide path
+     * @param name - tide path
+     */
+    function workspaceName(name) {
+        const lastIndex = name.lastIndexOf("/");
+		name = name.substring(lastIndex + 1, name.length);
+        return name;
+    }
 
+    /**
+     * Shows the output console
+     */
+    function showOutput() {
+        tsvscode.postMessage({
+            type: 'showOutput'
+        });
+    }
+
+    /**
+     * Resets the task file to it's initial stage from TIM.
+     * @param taskId ide task id of the task
+     */
+    function resetExercise(path, taskId) {
+        tsvscode.postMessage({
+            type: 'resetExercise',
+            path,
+            taskId
+        })
+    }
+
+</script>
 {#if timData} <!-- Check if timData is not null -->
     <div class="task-panel">
         {#if timData.header !== null}
+            <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
             <h2>{timData.header}</h2>
         {:else}
+            <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
             <h2>{timData.task_files[0].file_name}</h2>
         {/if}
         <div class="instructions">
@@ -48,8 +80,9 @@
         <hr />
 
         <div class="points-section">
-            <p>Points: Number of points user has</p>
+            <p>Points: Information is not available. Please check task points from TIM.</p>
             <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
+            <button on:click={() => showOutput()}>Show Output</button>
             <!-- <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
@@ -58,13 +91,17 @@
 
         <hr />
 
+        <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
+        {#if timData.task_files.length < 2}
         <div class="reset-section">
-            <button>Reset Exercise</button>
-            <button>Fetch Latest Answer</button>
+            <button on:click={() => resetExercise(timData.path, timData.ide_task_id)}>Reset Exercise</button>
+            <!-- <button>Fetch Latest Answer</button> -->
         </div>
+        {/if}
     </div>
 {:else}
     <p>Loading...</p>
+    <span class="loader"></span>
 {/if}
 
 <style>
@@ -111,22 +148,29 @@
     }
 
     .reset-section button {
-        width: 160px;
         margin-bottom: 10px;
+        background-color: #D2042D;
+    }
+
+    .reset-section button:hover {
+        background-color: #93021f;
     }
 
     .points-section button, .reset-section button {
         margin-right: 10px;
         border: none;
+        width: 130px;
         border-radius: 5px;
         padding: 8px 15px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        background-color: #007acc;
         color: white;
     }
 
-    .reset-section button:hover,
+    .points-section button {
+        background-color: #007acc;
+    }
+
     .points-section button:hover {
         background-color: #00558e;
     }
@@ -137,5 +181,29 @@
         border: none;
         border-top: 1px inset #ccc;
         width: 100%;
+    }
+
+    .submit-exercise {
+        margin-bottom: 10px;
+    }
+
+    .loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #FFF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 </style>

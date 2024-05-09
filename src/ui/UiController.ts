@@ -1,35 +1,37 @@
-import * as vscode from 'vscode';
-import * as path from "path";
-import TaskPanel from './panels/TaskPanel';
+import * as vscode from "vscode";
+import TaskPanel from "./panels/TaskPanel";
+import CoursePanel from "./panels/CoursePanel";
 
 export default class UiController {
-    private static ctx: vscode.ExtensionContext;
+	private static ctx: vscode.ExtensionContext;
 
-    static init(ctx: vscode.ExtensionContext) {
-        this.ctx = ctx;
-    }
+	static init(ctx: vscode.ExtensionContext) {
+		this.ctx = ctx;
+	}
 
-    static async showTaskPanel(currentFile: string) {
-        const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
+	/**
+	 * Creates or shows task panel.
+	 * @param timDataJson - .timdata file from the task
+	 * @param submitPath - the path that is needed if answer is submitted
+	 */
+	static showTaskPanel(timDataJson: string, submitPath: string) {
+		// Create or show the TaskPanel and pass the .timdata content as a parameter
+		TaskPanel.createOrShow(this.ctx.extensionUri, timDataJson, submitPath);
+	}
 
-        const lastIndex = currentFile.lastIndexOf("/");
-        const submitPath = currentFile.substring(0, lastIndex + 1);
+	/**
+	 * Closes the task panel.
+	 */
+	static closeTaskPanel() {
+		TaskPanel.dispose();
+	}
 
-        try {
-            // Read the content of the .timdata file
-            const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
-            // Convert the content to a string
-            const timDataString = timDataContent.toString();
-            const timDataJson = JSON.parse(timDataString);
-
-            // Dispose any existing TaskPanel
-            TaskPanel.dispose();
-
-            // Create or show the TaskPanel and pass the .timdata content as a parameter
-            TaskPanel.createOrShow(this.ctx.extensionUri, timDataJson, submitPath);
-        } catch (error) {
-            console.log("Error occurred while checking for .timdata file:", error);
-        }
-    }
-
+	/**
+	 * Creates or shows the course panel, and closes the task panel.
+	 * @param json_array - JSON data of TIM-IDE courses
+	 */
+	static showCoursePanel(json_array: any) {
+		this.closeTaskPanel();
+		CoursePanel.createOrShow(this.ctx.extensionUri, json_array);
+	}
 }
