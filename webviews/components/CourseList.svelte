@@ -39,7 +39,7 @@
           <p class="courseTitle">{course.name}</p>
             <Menu>
               <span slot='toggle'>&#8942;</span>
-              <MenuItem>
+              <MenuItem slot='menucontent'>
                 <a href="#?" on:click={() => moveCourse(course, getOppositeStatus())}>
                   Move to {getOppositeStatus()} courses
                 </a>

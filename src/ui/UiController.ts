@@ -30,8 +30,8 @@ export default class UiController {
 	 * Creates or shows the course panel, and closes the task panel.
 	 * @param json_array - JSON data of TIM-IDE courses
 	 */
-	static showCoursePanel(json_array: any) {
+	static showCoursePanel() {
 		this.closeTaskPanel();
-		CoursePanel.createOrShow(this.ctx.extensionUri, json_array);
+		CoursePanel.createOrShow(this.ctx.extensionUri);
 	}
 }

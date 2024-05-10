@@ -22,7 +22,6 @@
       }
       if (message && message.type === 'json') {
           coursesJson = message.value;
-          ExtensionStateManager.setCourses(coursesJson);
       }
     });
   });

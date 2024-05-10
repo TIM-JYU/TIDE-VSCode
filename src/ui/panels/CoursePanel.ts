@@ -14,11 +14,11 @@ export default class CoursePanel {
 	private readonly extensionUri: vscode.Uri;
 	private disposables: vscode.Disposable[] = [];
 
-	public static createOrShow(extensionUri: vscode.Uri, courseData: any) {
+	public static createOrShow(extensionUri: vscode.Uri) {
 		// If we already have a panel, show it.
 		if (CoursePanel.currentPanel) {
 			CoursePanel.currentPanel.panel.reveal(this.preferredColumn);
-			CoursePanel.currentPanel.sendCourseListMessage(courseData);
+			CoursePanel.currentPanel.sendCourseListMessage();
 			return CoursePanel.currentPanel;
 		}
 
@@ -29,7 +29,7 @@ export default class CoursePanel {
 
 		// Send initial file download folder to the webview
 		CoursePanel.currentPanel.sendInitialPath();
-		CoursePanel.currentPanel.sendCourseListMessage(courseData);
+		CoursePanel.currentPanel.sendCourseListMessage();
 
 		return CoursePanel.currentPanel;
 	}
@@ -42,18 +42,17 @@ export default class CoursePanel {
 		});
 	}
 
-	public sendCourseListMessage(json_array: any) {
+	public sendCourseListMessage() {
 		let courses_array = ExtensionStateManager.getCourses();
 		this.panel?.webview.postMessage({ type: "json", value: courses_array });
-		//this._panel?.webview.postMessage({ type: "json", value: json_array });
 	}
 
-	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, courseData: any) {
+	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
 
 		const path = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 		CoursePanel.currentPanel.sendInitialPath();
-		CoursePanel.currentPanel.sendCourseListMessage(courseData);
+		CoursePanel.currentPanel.sendCourseListMessage();
 	}
 
 	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -131,9 +130,6 @@ export default class CoursePanel {
 					const downloadPath = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath);
 					let folder = downloadPath + "/" + taskSetName;
 					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(folder));
-					//const folderUri = vscode.Uri.file(downloadPath + "/" + taskSetName);
-					//const options = { uri: folderUri, name: taskSetName };
-					//vscode.workspace.updateWorkspaceFolders(vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders.length : 0, null, options);
 					break;
 				}
 			}
@@ -158,7 +154,7 @@ export default class CoursePanel {
 		this.panel.onDidChangeViewState(() => {
 			if (this.panel.visible) {
 				// Panel became visible, refresh content
-				this.sendCourseListMessage(ExtensionStateManager.getCourses());
+				this.sendCourseListMessage();
 			}
 		});
 	}

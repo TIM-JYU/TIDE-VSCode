@@ -1,22 +1,14 @@
 import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
-import { getNonce } from "../utils";
 import { LoginData } from "../../common/types";
-import Logger from "../../utilities/logger";
+import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;
 	_doc?: vscode.TextDocument;
 
 	constructor(private readonly _extensionUri: vscode.Uri) {
-        ExtensionStateManager.subscribe('loginData', this.sendLoginValue.bind(this));
-
-		vscode.workspace.onDidChangeConfiguration((event) => {
-			if (event.affectsConfiguration("TIM-IDE.sidebar.showSidebarWelcomeMessage")) {
-				// Call a method to update the view with the new setting value
-				this.updateWebview();
-			}
-		});
+		ExtensionStateManager.subscribe("loginData", this.sendLoginValue.bind(this));
 	}
 
 	/**
@@ -71,9 +63,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand("tide.logout");
 					break;
 				}
-                case "requestLoggedInStatus": {
-                    this.sendLoginValue(ExtensionStateManager.getLoginData());
-                }
+				case "requestLoggedInStatus": {
+					this.sendLoginValue(ExtensionStateManager.getLoginData());
+				}
 			}
 		});
 	}
@@ -82,43 +74,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		this._view = panel;
 	}
 
-	private updateWebview() {
-		if (this._view) {
-			const showSidebarWelcome = vscode.workspace.getConfiguration().get("TIM-IDE.sidebar.showSidebarWelcomeMessage");
-			this._view.webview.postMessage({ type: "settingValue", value: showSidebarWelcome });
-		}
-	}
-
 	private _getHtmlForWebview(webview: vscode.Webview) {
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "media", "reset.css"));
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "media", "vscode.css"));
-
-		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.js"));
-		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "out", "compiled/sidebar.css"));
-
-		// Use a nonce to only allow a specific script to be run.
-		const nonce = getNonce();
-
-		return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<!--
-					Use a content security policy to only allow loading images from https or from our extension directory,
-					and only allow scripts that have a specific nonce.
-        -->
-        <meta http-equiv="Content-Security-Policy" content="img-src https: data:; style-src 'unsafe-inline' ${webview.cspSource}; script-src 'nonce-${nonce}';">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link href="${styleResetUri}" rel="stylesheet">
-				<link href="${styleVSCodeUri}" rel="stylesheet">
-        <link href="${styleMainUri}" rel="stylesheet">
-		<script nonce="${nonce}">
-		const tsvscode = acquireVsCodeApi();
-		</script>
-			</head>
-      <body>
-				<script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
-			</html>`;
+		return getDefaultHtmlForWebview(webview, this._extensionUri, "sidebar");
 	}
 }

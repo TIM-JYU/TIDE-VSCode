@@ -1,6 +1,6 @@
 <div>
 	<button><slot name="toggle" /></button>
-	<menu><slot /></menu>
+	<menu><slot name="menucontent"/></menu>
 </div>
 
 <style>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { LoginData } from '../common/types';
-  let showSidebarWelcome = false;
   let isLoggedIn = false;
   let loginData: LoginData;
 
@@ -11,9 +10,6 @@
   onMount(() => {
       window.addEventListener('message', (event) => {
           const message = event.data;
-          if (message && message.type === 'settingValue') {
-              showSidebarWelcome = message.value;
-          }
           if (message && message.type ==='loginData') {
               loginData = message.value;
           }
@@ -45,14 +41,11 @@
   $: isLoggedIn = loginData ? loginData.isLogged : false;
 </script>
   
-{#if !isLoggedIn}
-  {#if showSidebarWelcome}
-    <div>Welcome to TIDE-extension! Start by logging in.</div>
-  {/if}
-  <button on:click={handleLogin}>Login</button>
-{:else}
-  <nav>
-    <ul class="nav-list">
+<nav>
+  <ul class="nav-list">
+    {#if !isLoggedIn}
+      <li><button on:click={handleLogin}>Login</button></li>
+    {:else}
       <li>
         <button on:click={() => { tsvscode.postMessage({
           type: 'showCourses',
@@ -60,23 +53,19 @@
         })}}>My Courses</button>
       </li>
       <li>
-        <button on:click={() => { tsvscode.postMessage({
-          type: 'openSettings',
-          value: ''
-        })}}>Settings</button>
-      </li>
-      <li>
         <button on:click={handleLogout}>Logout</button>
       </li>
-    </ul>
-  </nav>
-{/if}
+    {/if}
+    <li>
+      <button on:click={() => { tsvscode.postMessage({
+        type: 'openSettings',
+        value: ''
+      })}}>Settings</button>
+    </li>
+  </ul>
+</nav>
 
 <style>
-  div {
-    color: turquoise;
-  }
-
   button {
     background: none;
     border: none;

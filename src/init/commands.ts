@@ -122,7 +122,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		}
 
 		//Show coursePanel
-		UiController.showCoursePanel(json_array);
+		UiController.showCoursePanel();
 	}
 
 	/**
@@ -141,7 +141,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.logout", async () => {
 			let data = await Tide.logout();
-            ExtensionStateManager.setLoginData(data);
+			ExtensionStateManager.setLoginData(data);
 		})
 	);
 
