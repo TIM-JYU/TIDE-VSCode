@@ -39,33 +39,41 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		vscode.commands.registerCommand("tide.showTaskPanel", async () => {
 			let editor = vscode.window.activeTextEditor;
 
-			if (!editor) {
-				// If no editor is active, show an error message
-				vscode.window.showErrorMessage("Task Panel can only be opened when you have a TIM task document open in the editor.");
-				return;
-			}
-
-			const currentFile = editor.document.fileName;
-			const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
-
-			const lastIndex = currentFile.lastIndexOf("/");
-			const submitPath = currentFile.substring(0, lastIndex + 1);
-
-			try {
-				// Read the content of the .timdata file
-				const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
-				// Convert the content to a string
-				const timDataString = timDataContent.toString();
-				const timDataJson = JSON.parse(timDataString);
-
-				// Create or show the TaskPanel and pass the .timdata content as a parameter
-				UiController.showTaskPanel(timDataJson, submitPath);
-			} catch (error) {
-				console.log(".timdata file doesn't exist in current directory", error);
-				vscode.window.showErrorMessage("Task Panel can only be opened when you have a TIM task document open in the editor.");
-			}
+			readTimData(editor);
 		})
 	);
+
+	/**
+	 * Reads .timdata file from current active editor and opens the taskpanel with the data.
+	 * If there is no .timdata file in current folder, tells UiController to open TaskPanel with "" as timdata.
+	 * TaskPanel knows to show error message to user based when data is an empty string.
+	 * @param editor - current active text editor
+	 */
+	async function readTimData(editor: vscode.TextEditor | undefined) {
+		if (!editor) {
+			return;
+		}
+
+		const currentFile = editor.document.fileName;
+		const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
+
+		const lastIndex = currentFile.lastIndexOf("/");
+		const submitPath = currentFile.substring(0, lastIndex + 1);
+
+		try {
+			// Read the content of the .timdata file
+			const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(currentDirectory, ".timdata"));
+			// Convert the content to a string
+			const timDataString = timDataContent.toString();
+			const timDataJson = JSON.parse(timDataString);
+
+			// Create or show the TaskPanel and pass the .timdata content as a parameter
+			UiController.showTaskPanel(timDataJson, submitPath);
+		} catch (error) {
+			console.log(".timdata file doesn't exist in current directory", error);
+			UiController.showTaskPanel("", "");
+		}
+	}
 
 	/**
 	 * Opens My courses -view.

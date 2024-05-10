@@ -34,42 +34,10 @@
     status === 'active' ? activeCoursesExpanded = !activeCoursesExpanded : hiddenCoursesExpanded = !hiddenCoursesExpanded;
   }
 
-  // Mock data for testing the webview
-  // let courses = [
-  //   {
-  //     "id": "1001",
-  //     "name": "Course1",
-  //     "task_docs": [
-  //       { "name": 1, "tasks": ["Exercise 1", "Exercise 2", "Exercise 3"] },
-  //       { "name": 2, "tasks": ["Exercise 4", "Exercise 5"] },
-  //       { "name": 3, "tasks": ["Exercise 6", "Exercise 7", "Exercise 8"] }
-  //     ],
-  //     "status": "active",
-  //     "expanded": false
-  //   },
-  //   {
-  //     "id": "1002",
-  //     "name": "Course2",
-  //     "task_docs": [
-  //       { "name": 1, "tasks": ["Exercise 1", "Exercise 2"] },
-  //       { "name": 2, "tasks": ["Exercise 3", "Exercise 4"] }
-  //     ],
-  //     "status": "active",
-  //     "expanded": false
-  //   },
-  //   {
-  //     "id": "1003",
-  //     "name": "Course3",
-  //     "task_docs": [
-  //       { "name": 1, "tasks": ["Exercise 1", "Exercise 2", "Exercise 3"] },
-  //       { "name": 2, "tasks": ["Exercise 4", "Exercise 5", "Exercise 6"] },
-  //       { "name": 3, "tasks": ["Exercise 7", "Exercise 8"] }
-  //     ],
-  //     "status": "hidden",
-  //     "expanded": false
-  //   }
-  // ];
-
+  /**
+   * Updates changes in courses to globalState.
+   * @param coursesJson - courses json array.
+   */
   function updateCoursesToGlobalState(coursesJson) {
     tsvscode.postMessage({
         type: 'updateCoursesToGlobalState',
@@ -154,26 +122,29 @@
   })
 }}>Set directory</button>
 
-<CourseList
-  isExpanded={activeCoursesExpanded}
-  toggle={toggleVisibility}
-  toggleCourse={toggleCourse}
-  status={"active"}
-  courses={coursesJson.filter(c => c.status == "active")}
-  moveCourse={moveCourse}
-  downloadTaskSet={downloadTaskSet}
-  openWorkspace={openWorkspace}/>
+{#if coursesJson.length === 0}
+    <p>No IDE courses were found. Are you sure you have bookmarked an IDE-course in TIM?</p>
+{:else}
+  <CourseList
+    isExpanded={activeCoursesExpanded}
+    toggle={toggleVisibility}
+    toggleCourse={toggleCourse}
+    status={"active"}
+    courses={coursesJson.filter(c => c.status == "active")}
+    moveCourse={moveCourse}
+    downloadTaskSet={downloadTaskSet}
+    openWorkspace={openWorkspace}/>
 
-
-<CourseList
-  isExpanded={hiddenCoursesExpanded}
-  toggle={toggleVisibility}
-  toggleCourse={toggleCourse}
-  status={"hidden"}
-  courses={coursesJson.filter(c => c.status == "hidden")}
-  moveCourse={moveCourse}
-  downloadTaskSet={downloadTaskSet}
-  openWorkspace={openWorkspace}/>
+  <CourseList
+    isExpanded={hiddenCoursesExpanded}
+    toggle={toggleVisibility}
+    toggleCourse={toggleCourse}
+    status={"hidden"}
+    courses={coursesJson.filter(c => c.status == "hidden")}
+    moveCourse={moveCourse}
+    downloadTaskSet={downloadTaskSet}
+    openWorkspace={openWorkspace}/>
+{/if}
 
 <style>
   :global(body) {

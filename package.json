@@ -104,11 +104,6 @@
 		"configuration": {
 			"title": "TIM-IDE",
 			"properties": {
-				"TIM-IDE.sidebar.showSidebarWelcomeMessage": {
-					"type": "boolean",
-					"default": true,
-					"description": "Show welcome message in sidebar"
-				},
 				"TIM-IDE.fileDownloadPath": {
 					"type": "string",
 					"description": "The location where the exercise folders will be downloaded."

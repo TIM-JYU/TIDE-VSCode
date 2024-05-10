@@ -56,7 +56,13 @@
     }
 
 </script>
-{#if timData} <!-- Check if timData is not null -->
+{#if timData === ""}
+    <p>Task Panel only shows information when you have a TIM task document open in the text editor.
+        If you are sure you have a TIM task open, try clicking the text editor to activate the document.</p>
+{:else if !timData}
+    <p>Loading...</p>
+    <span class="loader"></span>
+{:else}
     <div class="task-panel">
         {#if timData.header !== null}
             <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
@@ -99,9 +105,6 @@
         </div>
         {/if}
     </div>
-{:else}
-    <p>Loading...</p>
-    <span class="loader"></span>
 {/if}
 
 <style>

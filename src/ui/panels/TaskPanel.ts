@@ -20,7 +20,6 @@ export default class TaskPanel {
 
 		// If we already have a panel, show it.
 		if (TaskPanel.currentPanel) {
-			//TaskPanel.currentPanel.panel.reveal(column);
 			TaskPanel.currentPanel.timData = timDataContent;
 			TaskPanel.currentPanel.update(TaskPanel.currentPanel.timData, currentDirectory); // Update the panel with the new timDataContent
 			TaskPanel.currentPanel.panel.webview.postMessage({ command: "updateTimData", data: timDataContent });
