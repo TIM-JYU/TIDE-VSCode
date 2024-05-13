@@ -127,10 +127,11 @@ export default class Tide {
 		Logger.debug(`Running cli with args "${args}"`);
 		let buffer = "";
 		//TODO: muuta takaisin toimimaan tidellä
-		const ar = ["run", "python", vscode.workspace.getConfiguration().get("tide.cliPath") as string, ...args];
-		const childProcess = cp.spawn("poetry", ar, { cwd: "/Users/stella/tideproject/tide-cli" });
+		//const ar = ["run", "python", vscode.workspace.getConfiguration().get("tide.cliPath") as string, ...args];
+		//const childProcess = cp.spawn("poetry", ar, { cwd: "/Users/stella/tideproject/tide-cli" });
 
-		//const childProcess = cp.spawn(vscode.workspace.getConfiguration().get("tide.cliPath") as string, args);
+		const childProcess = cp.spawn(vscode.workspace.getConfiguration().get("TIM-IDE.cliPath") as string, args);
+		console.log(vscode.workspace.getConfiguration().get("TIM-IDE.cliPath") as string);
 
 		childProcess.stdout.on("data", (data) => {
 			buffer += data.toString();
