@@ -64,7 +64,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 		if (!editor) {
 			return;
 		}
-
 		const currentFile = editor.document.fileName;
 		const currentDirectory = vscode.Uri.file(path.dirname(currentFile));
 
@@ -81,7 +80,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 			// Create or show the TaskPanel and pass the .timdata content as a parameter.
 			UiController.showTaskPanel(timDataJson, submitPath);
 		} catch (error) {
-			console.log(".timdata file doesn't exist in current directory", error);
+			console.log(".timdata file doesn't exist in current directory or text editor is not active", error);
 			UiController.showTaskPanel("", "");
 		}
 	}
@@ -91,7 +90,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.showCourses", () => {
-			//UiController.showCoursePanel();
 			getCoursesFromTide();
 		})
 	);

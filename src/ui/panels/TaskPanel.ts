@@ -60,7 +60,7 @@ export default class TaskPanel {
 		this.submitPath = currentDirectory;
 
 		// Set the webview's initial html content.
-		this.update(this.timData, currentDirectory);
+		this.update(this.timData, this.submitPath);
 
 		// Listen for when the panel is disposed.
 		// This happens when the user closes the panel or when the panel is closed programmatically.
@@ -70,7 +70,7 @@ export default class TaskPanel {
 		this.panel.onDidChangeViewState(
 			(e) => {
 				if (this.panel.visible) {
-					this.update(this.timData, currentDirectory);
+					this.update(this.timData, this.submitPath);
 				}
 			},
 			null,
@@ -101,6 +101,7 @@ export default class TaskPanel {
 				}
 				case "showOutput": {
 					vscode.commands.executeCommand("workbench.action.output.toggleOutput");
+					vscode.commands.executeCommand("workbench.action.focusFirstEditorGroup");
 					break;
 				}
 				case "resetExercise": {
