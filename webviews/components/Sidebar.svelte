@@ -5,7 +5,7 @@
   let loginData: LoginData;
 
   /**
-  * Listens to messages from the extension
+  * Listens to messages from the extension.
   */
   onMount(() => {
       window.addEventListener('message', (event) => {
@@ -19,7 +19,7 @@
   });
 
   /**
-   * Posts message for the extension for logging user in
+   * Posts message for the extension for logging user in.
    */
   function handleLogin() {
     tsvscode.postMessage({
@@ -29,7 +29,7 @@
   }
 
   /**
-   * Posts message fot extension for logging user out
+   * Posts message for extension for logging user out.
    */
   function handleLogout() {
     tsvscode.postMessage({

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { LoginData } from "../../common/types";
-import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
+import { getDefaultHtmlForWebview } from "../utils";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;

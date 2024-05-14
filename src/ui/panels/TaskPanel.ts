@@ -48,14 +48,14 @@ export default class TaskPanel {
 		this.extensionUri = extensionUri;
 		this.timData = timData;
 
-		// Set the webview's initial html content
+		// Set the webview's initial html content.
 		this.update(this.timData, currentDirectory);
 
-		// Listen for when the panel is disposed
-		// This happens when the user closes the panel or when the panel is closed programmatically
+		// Listen for when the panel is disposed.
+		// This happens when the user closes the panel or when the panel is closed programmatically.
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-		// Update the content based on view changes
+		// Update the content based on view changes.
 		this.panel.onDidChangeViewState(
 			(e) => {
 				if (this.panel.visible) {
@@ -66,7 +66,7 @@ export default class TaskPanel {
 			this.disposables
 		);
 
-		// Handle messages from the webview
+		// Handle messages from the webview.
 		this.panel.webview.onDidReceiveMessage(async (data) => {
 			switch (data.type) {
 				case "onInfo": {

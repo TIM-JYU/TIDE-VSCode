@@ -27,13 +27,16 @@ export default class CoursePanel {
 
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
 
-		// Send initial file download folder to the webview
+		// Send initial file download path and courses to the webview.
 		CoursePanel.currentPanel.sendInitialPath();
 		CoursePanel.currentPanel.sendCourseListMessage();
 
 		return CoursePanel.currentPanel;
 	}
 
+	/**
+	 * Sends initial file download path to svelte file.
+	 */
 	private sendInitialPath() {
 		const initialPath = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 		this.panel.webview.postMessage({
@@ -42,6 +45,9 @@ export default class CoursePanel {
 		});
 	}
 
+	/**
+	 * Sends courses json array to svelte file.
+	 */
 	public sendCourseListMessage() {
 		let courses_array = ExtensionStateManager.getCourses();
 		this.panel?.webview.postMessage({ type: "json", value: courses_array });
@@ -150,6 +156,10 @@ export default class CoursePanel {
 		}
 	}
 
+	/**
+	 * Handles the panel visibility in case tabs are switched.
+	 * Ensures that courses doesn't look empty when user opens My Courses tab again.
+	 */
 	private handlePanelVisibilityChange() {
 		this.panel.onDidChangeViewState(() => {
 			if (this.panel.visible) {
