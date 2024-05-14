@@ -1,3 +1,8 @@
+/**
+* CSS from vscode extension sample. Makes webviews look like VSCode.
+* https://github.com/microsoft/vscode-extension-samples/blob/main/webview-sample/media/vscode.css
+*/
+
 :root {
 	--container-padding: 20px;
 	--input-padding-vertical: 6px;
