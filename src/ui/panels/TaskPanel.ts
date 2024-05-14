@@ -1,3 +1,11 @@
+/**
+ * A panel for displaying task information.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 2.5.2024
+ */
 import * as vscode from "vscode";
 import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
 import ExtensionStateManager from "../../api/ExtensionStateManager";

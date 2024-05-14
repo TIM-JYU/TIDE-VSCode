@@ -1,3 +1,11 @@
+/**
+ * A webview that is displayed as a sidebar on the left.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 16.3.2024
+ */
 import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { LoginData } from "../../common/types";

@@ -1,6 +1,11 @@
 <li><slot /></li>
 
 <style>
+  /**
+  * This component is a li part of hover menu.
+  * From Svelte.dev On Hover Menu: https://svelte.dev/repl/2f5ab01c05f84790bcb94a0f79afee7b?version=3.46.2
+  */
+
   li {
     position: relative;
     display: block;

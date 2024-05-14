@@ -1,3 +1,16 @@
+/**
+ * Manages the global state for the extension.
+ *
+ * This class handles storing and retrieving various states such as download paths,
+ * course data, and login information in the VSCode global state. It also allows
+ * for subscribing to changes in specific state keys.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 27.3.2024
+ */
+
 import * as vscode from "vscode";
 import Logger from "../utilities/logger";
 import { LoginData } from "../common/types";

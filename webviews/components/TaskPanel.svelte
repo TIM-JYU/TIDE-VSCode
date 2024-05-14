@@ -1,4 +1,12 @@
 <script>
+    /**
+     * This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
+     * 
+     * @author Stella Palenius
+     * @license MIT
+     * @date 9.4.2024
+     */
+
     import { onMount } from 'svelte';
 
     let timData = null;

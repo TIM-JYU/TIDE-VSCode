@@ -1,4 +1,13 @@
 <script>
+  /**
+  * This component manages the display and interaction with a list of courses. It listens for messages from CoursePanel.ts, 
+  * updates the courses' status, and handles downloading task sets and opening workspaces.
+  * 
+  * @author Stella Palenius
+  * @license MIT
+  * @date 22.3.2024
+  */
+ 
   import CourseList from './CourseList.svelte';
   import { onMount } from 'svelte';
 

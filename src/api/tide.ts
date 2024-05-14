@@ -1,11 +1,17 @@
+/**
+ * This class handles communication with the cli tool.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 6.3.2024
+ */
+
 import * as cp from "child_process";
 import Logger from "../utilities/logger";
 import * as vscode from "vscode";
 import { LoginData } from "../common/types";
 
-/**
- * This class handles communication with the cli tool
- */
 export default class Tide {
 	public static async debug() {
 		this.runAndHandle([], (data: string) => {
