@@ -55,8 +55,6 @@ export default class Tide {
 		return coursedata;
 	}
 
-	// tide task list /polku/jne/yms
-	// TODO: Mieti parempi nimi
 	/**
 	 * Lists all the tasks in one task set.
 	 * @param taskSetPath path to task set. Path can be found by executing cli courses command
@@ -82,9 +80,9 @@ export default class Tide {
 	}
 
 	/**
-	 * korvaa lokaalin set taskin
+	 * Overwrites a local task set
 	 *
-	 * @param {string} taskSetPath - task setin kansio
+	 * @param {string} taskSetPath - path of the task set
 	 */
 	public static async overwriteSetTasks(taskSetPath: string) {
 		this.runAndHandle(["task", "create", "-a", "-f", taskSetPath], (data: string) => {
@@ -105,39 +103,44 @@ export default class Tide {
 	}
 
 	/**
-	 * palauta taski
+	 * Return a task to TIM
 	 *
-	 * @param {string} taskPath - yksittaisen tehtavan kansio
+	 * @param {string} taskPath - path of the task
 	 */
 	public static async submitTask(taskPath: string) {
 		this.runAndHandle(["submit", taskPath], (data: string) => {
 			Logger.debug(data);
 		});
-		// TODO: asetuksista tms taskin polku (kts. createSetTasks())
 	}
 
-	// TODO: Keksi parempi nimi
+    /**
+     * Executes the process defined in the extension's settings with arguments provided in "args" parameter. calls the function provided as parameter "handler" with the stdout of the executed process passed in as a parameter for the function.
+     *
+     * @param args - arguments to run the executable with
+     * @param handler - a handler function to be called after the executable exits
+     */
 	private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
 		const data = await this.spawnTideProcess(...args);
 		handler(data);
 	}
 
-	// x(json: string) {
-	//     type kissa = {
-	//         nimi: string
-	//     };
-	//     const objekti = JSON.parse(json) as kissa;
-	// }
-
+    /**
+     * Executes the process defined in the extension's settings.
+     *
+     * @param args - arguments to be passed to the executable
+     * @returns the stdout of the executed process
+     */
 	private static async spawnTideProcess(...args: Array<string>): Promise<string> {
 		Logger.debug(`Running cli with args "${args}"`);
 		let buffer = "";
-		//TODO: muuta takaisin toimimaan tidellä
+        
+        // To run an uncompiled version of the CLI tool:
+        // 1. Point the cli tool path in your extension settings to the main.py -file
 		//const ar = ["run", "python", vscode.workspace.getConfiguration().get("tide.cliPath") as string, ...args];
+        // 2. Edit the value of cwd to match the root directory of the cli tool repository
 		//const childProcess = cp.spawn("poetry", ar, { cwd: "/Users/stella/tideproject/tide-cli" });
 
 		const childProcess = cp.spawn(vscode.workspace.getConfiguration().get("TIM-IDE.cliPath") as string, args);
-		console.log(vscode.workspace.getConfiguration().get("TIM-IDE.cliPath") as string);
 
 		childProcess.stdout.on("data", (data) => {
 			buffer += data.toString();

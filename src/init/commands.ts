@@ -81,7 +81,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 			// Create or show the TaskPanel and pass the .timdata content as a parameter.
 			UiController.showTaskPanel(timDataJson, submitPath);
 		} catch (error) {
-			console.log(".timdata file doesn't exist in current directory", error);
+			Logger.debug(".timdata file doesn't exist in current directory");
 			UiController.showTaskPanel("", "");
 		}
 	}
@@ -98,7 +98,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
 	/**
 	 * Retrieves course data from TIDE, and tells the UiController to show CoursePanel with the data.
-	 * @returns {Promise<void>} A promise that resolves once the course data is retrieved and processed.
+	 * @returns A promise that resolves once the course data is retrieved and processed.
 	 */
 	async function getCoursesFromTide() {
 		let json_array: any[] = [];
