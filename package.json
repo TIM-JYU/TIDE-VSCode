@@ -1,7 +1,15 @@
 {
-	"name": "tide-vscode",
-	"displayName": "TIDE-VSCode",
+	"name": "tim-ide",
+	"displayName": "TIM-IDE",
 	"description": "",
+	"authors": [
+		{
+			"name": "Hannes Koivusipilä"
+		},
+		{
+			"name": "Stella Palenius"
+		}
+	],
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.86.0"
