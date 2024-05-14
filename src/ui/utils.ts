@@ -1,3 +1,16 @@
+/**
+ * Utility functions for managing webviews.
+ *
+ * This module provides helper functions to generate secure webview content and options within
+ * a VSCode extension, including nonce generation for security, webview option configuration,
+ * and default HTML content creation for webviews.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 2.5.2024
+ */
+
 import * as vscode from "vscode";
 
 export function getNonce(): string {

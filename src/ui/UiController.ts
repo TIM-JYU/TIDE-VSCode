@@ -1,3 +1,11 @@
+/**
+ * This class manages the display and closure of various panels within the extension.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 2.5.2024
+ */
 import * as vscode from "vscode";
 import TaskPanel from "./panels/TaskPanel";
 import CoursePanel from "./panels/CoursePanel";
@@ -11,11 +19,10 @@ export default class UiController {
 
 	/**
 	 * Creates or shows task panel.
-	 * @param timDataJson - .timdata file from the task
-	 * @param submitPath - the path that is needed if answer is submitted
+	 * @param timDataJson - .timdata file from the task.
+	 * @param submitPath - the path that is needed if answer is submitted.
 	 */
 	static showTaskPanel(timDataJson: string, submitPath: string) {
-		// Create or show the TaskPanel and pass the .timdata content as a parameter
 		TaskPanel.createOrShow(this.ctx.extensionUri, timDataJson, submitPath);
 	}
 
@@ -28,7 +35,7 @@ export default class UiController {
 
 	/**
 	 * Creates or shows the course panel, and closes the task panel.
-	 * @param json_array - JSON data of TIM-IDE courses
+	 * @param json_array - JSON data of TIM-IDE courses.
 	 */
 	static showCoursePanel() {
 		this.closeTaskPanel();

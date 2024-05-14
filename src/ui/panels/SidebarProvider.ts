@@ -1,7 +1,15 @@
+/**
+ * A webview that is displayed as a sidebar on the left.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 16.3.2024
+ */
 import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { LoginData } from "../../common/types";
-import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
+import { getDefaultHtmlForWebview } from "../utils";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;

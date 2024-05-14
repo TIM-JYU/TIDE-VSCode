@@ -1,7 +1,15 @@
 {
-	"name": "tide-vscode",
-	"displayName": "TIDE-VSCode",
+	"name": "tim-ide",
+	"displayName": "TIM-IDE",
 	"description": "",
+	"authors": [
+		{
+			"name": "Hannes Koivusipilä"
+		},
+		{
+			"name": "Stella Palenius"
+		}
+	],
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.86.0"
@@ -104,11 +112,6 @@
 		"configuration": {
 			"title": "TIM-IDE",
 			"properties": {
-				"TIM-IDE.sidebar.showSidebarWelcomeMessage": {
-					"type": "boolean",
-					"default": true,
-					"description": "Show welcome message in sidebar"
-				},
 				"TIM-IDE.fileDownloadPath": {
 					"type": "string",
 					"description": "The location where the exercise folders will be downloaded."

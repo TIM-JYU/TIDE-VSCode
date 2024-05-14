@@ -4,6 +4,11 @@
 </div>
 
 <style>
+    /**
+    * This component creates a on hover menu with a toggle button and menu content.
+    * From Svelte.dev On Hover Menu: https://svelte.dev/repl/2f5ab01c05f84790bcb94a0f79afee7b?version=3.46.2
+    */
+
     div {
         transition: all 0.5s ease;
     }

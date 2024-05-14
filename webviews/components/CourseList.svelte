@@ -1,4 +1,14 @@
 <script>
+    /**
+    * This component renders a list of courses with options to toggle their visibility,
+    * expand or collapse course details, and perform actions like downloading task sets
+    * or opening workspaces.
+    * 
+    * @author Stella Palenius
+    * @license MIT
+    * @date 30.4.2024
+    */
+
     import Menu from './Menu.svelte';
     import MenuItem from './MenuItem.svelte';
     

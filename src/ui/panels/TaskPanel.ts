@@ -1,3 +1,11 @@
+/**
+ * A panel for displaying task information.
+ *
+ * @author Hannes Koivusipilä
+ * @author Stella Palenius
+ * @license MIT
+ * @date 2.5.2024
+ */
 import * as vscode from "vscode";
 import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
@@ -20,7 +28,6 @@ export default class TaskPanel {
 
 		// If we already have a panel, show it.
 		if (TaskPanel.currentPanel) {
-			//TaskPanel.currentPanel.panel.reveal(column);
 			TaskPanel.currentPanel.timData = timDataContent;
 			TaskPanel.currentPanel.update(TaskPanel.currentPanel.timData, currentDirectory); // Update the panel with the new timDataContent
 			TaskPanel.currentPanel.panel.webview.postMessage({ command: "updateTimData", data: timDataContent });
@@ -49,14 +56,14 @@ export default class TaskPanel {
 		this.extensionUri = extensionUri;
 		this.timData = timData;
 
-		// Set the webview's initial html content
+		// Set the webview's initial html content.
 		this.update(this.timData, currentDirectory);
 
-		// Listen for when the panel is disposed
-		// This happens when the user closes the panel or when the panel is closed programmatically
+		// Listen for when the panel is disposed.
+		// This happens when the user closes the panel or when the panel is closed programmatically.
 		this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-		// Update the content based on view changes
+		// Update the content based on view changes.
 		this.panel.onDidChangeViewState(
 			(e) => {
 				if (this.panel.visible) {
@@ -67,7 +74,7 @@ export default class TaskPanel {
 			this.disposables
 		);
 
-		// Handle messages from the webview
+		// Handle messages from the webview.
 		this.panel.webview.onDidReceiveMessage(async (data) => {
 			switch (data.type) {
 				case "onInfo": {

@@ -1,11 +1,21 @@
 <script lang="ts">
+  /**
+  * This component manages the sidebar navigation and user authentication.
+  * It listens for messages from the extension to handle login and logout functionalities.
+  * 
+  * @author Hannes Koivusipilä
+  * @author Stella Palenius
+  * @license MIT
+  * @date 16.3.2024
+  */
+
   import { onMount } from 'svelte';
   import type { LoginData } from '../common/types';
   let isLoggedIn = false;
   let loginData: LoginData;
 
   /**
-  * Listens to messages from the extension
+  * Listens to messages from the extension.
   */
   onMount(() => {
       window.addEventListener('message', (event) => {
@@ -19,7 +29,7 @@
   });
 
   /**
-   * Posts message for the extension for logging user in
+   * Posts message for the extension for logging user in.
    */
   function handleLogin() {
     tsvscode.postMessage({
@@ -29,7 +39,7 @@
   }
 
   /**
-   * Posts message fot extension for logging user out
+   * Posts message for extension for logging user out.
    */
   function handleLogout() {
     tsvscode.postMessage({
