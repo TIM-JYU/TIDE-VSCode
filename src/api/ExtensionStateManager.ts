@@ -19,6 +19,9 @@ export default class ExtensionStateManager {
 	private static globalState: vscode.Memento & { setKeysForSync(keys: readonly string[]): void };
 	private static KEY_PREFIX = "tide";
 
+    // TODO: temporary solution until fetching course data during a vscode session in implemented
+    private static courses: unknown[] = [];
+
 	static setContext(ctx: vscode.ExtensionContext) {
 		this.globalState = ctx.globalState;
 	}
@@ -44,7 +47,10 @@ export default class ExtensionStateManager {
 	 * @param courses - An array containing the course data to be stored.
 	 */
 	public static setCourses(courses: unknown[]) {
-		this.writeToGlobalState("courses", courses);
+		// this.writeToGlobalState("courses", courses);
+        
+        // TODO: temporary solution until fetching course data during a vscode session in implemented
+        this.courses = courses;
 	}
 
 	/**
@@ -52,13 +58,28 @@ export default class ExtensionStateManager {
 	 * @returns Courses from the global state.
 	 */
 	public static getCourses(): unknown[] {
-		return this.readFromGlobalState("courses");
+		// return this.readFromGlobalState("courses");
+        
+        // TODO: temporary solution until fetching course data during a vscode session in implemented
+        return this.courses;
 	}
 
+    /**
+     * Sets the login data in the global state
+     *
+     * @static
+     * @param {LoginData} loginData - the data to be saved
+     */
 	public static setLoginData(loginData: LoginData) {
 		this.writeToGlobalState("loginData", loginData);
 	}
 
+    /**
+     * Retrieves login data from global state
+     *
+     * @static
+     * @returns {LoginData} LoginData saved to the global state
+     */
 	public static getLoginData(): LoginData {
 		return this.readFromGlobalState("loginData");
 	}
@@ -169,6 +190,13 @@ export default class ExtensionStateManager {
 	}
 }
 
+/**
+ * Represents the data required for subscribing to the ExtensionStateManager
+ *
+ * @interface SubscriptionObject
+ * @field {string} key - The key to listen to
+ * @field {NotifyFunction} onValueChange - The function to call when the value of the key is changed
+ */
 interface SubscriptionObject {
 	key: string;
 	onValueChange: NotifyFunction;

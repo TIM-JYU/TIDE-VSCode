@@ -13,6 +13,9 @@
 
 import * as vscode from "vscode";
 
+/**
+ * From https://github.com/microsoft/vscode-extension-samples/blob/main/webview-view-sample/src/extension.ts
+ */
 export function getNonce(): string {
 	let text = "";
 	const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -22,6 +25,13 @@ export function getNonce(): string {
 	return text;
 }
 
+
+/**
+ * Returns the default options for a webview
+ *
+ * @param extensionUri - extensionUri used for generating the options
+ * @returns Default webview options
+ */
 export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
 	return {
 		// Enable javascript in the webview
@@ -31,7 +41,15 @@ export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptio
 	};
 }
 
-export function getDefaultHtmlForWebview(webview: vscode.Webview, extensionUri: vscode.Uri, fileNamePrefix: string) {
+/**
+ * Generates the default html for a webview.
+ *
+ * @param webview - webview used for generating the html string
+ * @param extensionUri - extensionUri used for generating the html string
+ * @param fileNamePrefix - file name  prefix of the compiled components in "/out/compiled/" directory
+ * @returns [TODO:description]
+ */
+export function getDefaultHtmlForWebview(webview: vscode.Webview, extensionUri: vscode.Uri, fileNamePrefix: string): string {
 	const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "reset.css"));
 	const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "media", "vscode.css"));
 

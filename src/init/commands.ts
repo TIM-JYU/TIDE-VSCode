@@ -96,7 +96,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
 	/**
 	 * Retrieves course data from TIDE, and tells the UiController to show CoursePanel with the data.
-	 * @returns {Promise<void>} A promise that resolves once the course data is retrieved and processed.
+	 * @returns A promise that resolves once the course data is retrieved and processed.
 	 */
 	async function getCoursesFromTide() {
 		let json_array: any[] = [];

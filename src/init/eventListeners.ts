@@ -9,6 +9,7 @@
 
 import * as vscode from "vscode";
 import ExtensionStateManager from "../api/ExtensionStateManager";
+import Logger from "../utilities/logger";
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
 	let lastActiveEditor: vscode.TextEditor | undefined;
@@ -43,7 +44,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
 				ExtensionStateManager.setDownloadPath(newPath);
 			} else {
 				// Handle invalid or undefined newPath
-				console.log("Undefined download path");
+				Logger.warning("Undefined download path");
 			}
 		}
 	});

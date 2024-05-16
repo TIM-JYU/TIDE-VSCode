@@ -1,24 +1,24 @@
 # tide-vscode README
 
-## Development
+## Developing
 
-### Svelte related things
+When cloning the repository, run `npm run watch-svelte` to compile the webviews.
 
-To automatically compile Svelte components along with extension code, run
+### Developing webviews using Svelte
 
-```
-npm run watch-svelte
-```
+To create a new Svelte component run the script in `/scripts` with the desired name as argument. 
+This will create the Svelte-file in ./webviews/components directory and the necessary boilerplate in ./webviews/pages directory.
+The name provided as argument will also be used as the file prefix in `/out/compiled`.
 
-To create a new Svelte component run the following at project root folder (where the script is located)
-
-```
+```sh
 ./create-webview KissaIstuu
 ```
 
-This will create the Svelte-file in ./webviews/components directory and the necessary boilerplate in ./webviews/pages directory.
+To automatically compile Svelte components on when saving, run
 
-Compiled Svelte-components are saved to ./out/compiled from where they can be used in panels (see TestPanel.ts)
-
+```sh
+npm run watch-svelte
+```
+Compiled Svelte-components are saved to ./out/compiled from where they can be used in panels.
 
 
