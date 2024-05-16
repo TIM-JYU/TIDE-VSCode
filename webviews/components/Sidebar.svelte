@@ -11,6 +11,7 @@
 
   import { onMount } from 'svelte';
   import type { LoginData } from '../common/types';
+    import { MessageType } from '../common/messages';
   let isLoggedIn = false;
   let loginData: LoginData;
 
@@ -20,12 +21,12 @@
   onMount(() => {
       window.addEventListener('message', (event) => {
           const message = event.data;
-          if (message && message.type ==='loginData') {
+          if (message && message.type === MessageType.LoginData) {
               loginData = message.value;
           }
       });
 
-      tsvscode.postMessage({ type: 'requestLoggedInStatus', value: '' })
+      tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
   });
 
   /**

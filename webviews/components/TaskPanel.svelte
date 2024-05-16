@@ -1,34 +1,40 @@
 <script>
     /**
      * This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
-     * 
+     *
      * @author Stella Palenius
      * @license MIT
      * @date 9.4.2024
      */
 
-    import { onMount } from 'svelte';
+    import { onMount } from "svelte";
+    import { MessageType } from "../common/messages";
 
     let timData = null;
-    
+    let loginData = {};
+    let isLoggedIn = false;
+
     /**
      * Listens for messages from CoursePanel.ts.
      */
     onMount(() => {
-    window.addEventListener('message', (event) => {
+        window.addEventListener("message", (event) => {
             const message = event.data;
-            if (message && message.type === 'updateTimData') {
+            if (message && message.type === "updateTimData") {
                 timData = message.value;
+            } else if (message.type === MessageType.LoginData) {
+                loginData = message.value;
             }
         });
+        tsvscode.postMessage({ type: MessageType.RequestLoginData, value: "" });
     });
-    
+
     /**
      * Sends message to TaskPanel about submitting exercise
      */
     function submitTask() {
         tsvscode.postMessage({
-            type: 'submitTask'
+            type: "submitTask",
         });
     }
 
@@ -38,7 +44,7 @@
      */
     function workspaceName(name) {
         const lastIndex = name.lastIndexOf("/");
-		name = name.substring(lastIndex + 1, name.length);
+        name = name.substring(lastIndex + 1, name.length);
         return name;
     }
 
@@ -47,7 +53,7 @@
      */
     function showOutput() {
         tsvscode.postMessage({
-            type: 'showOutput'
+            type: "showOutput",
         });
     }
 
@@ -57,16 +63,21 @@
      */
     function resetExercise(path, taskId) {
         tsvscode.postMessage({
-            type: 'resetExercise',
+            type: "resetExercise",
             path,
-            taskId
-        })
+            taskId,
+        });
     }
 
+    $: isLoggedIn = loginData.isLogged ?? false;
 </script>
+
 {#if timData === ""}
-    <p>Task Panel only shows information when you have a TIM task document open in the text editor.
-        If you are sure you have a TIM task open, try clicking the text editor to activate the document.</p>
+    <p>
+        Task Panel only shows information when you have a TIM task document open
+        in the text editor. If you are sure you have a TIM task open, try
+        clicking the text editor to activate the document.
+    </p>
 {:else if !timData}
     <p>Loading...</p>
     <span class="loader"></span>
@@ -81,21 +92,30 @@
         {/if}
         <div class="instructions">
             {#if timData.stem !== null}
-            <p>{timData.stem}</p>
+                <p>{timData.stem}</p>
             {:else}
-            <p>To see the instructions, please open exercise in TIM.</p>
+                <p>To see the instructions, please open exercise in TIM.</p>
             {/if}
         </div>
 
         <div>
-            <a href={"https://tim.jyu.fi/view/" + timData.path}>Open exercise in TIM</a>
+            <a href={"https://tim.jyu.fi/view/" + timData.path}
+                >Open exercise in TIM</a
+            >
         </div>
 
         <hr />
 
         <div class="points-section">
-            <p>Points: Information is not available. Please check task points from TIM.</p>
-            <button class="submit-exercise" on:click={() => submitTask()}>Submit Exercise</button>
+            <p>
+                Points: Information is not available. Please check task points
+                from TIM.
+            </p>
+            <button
+                class="submit-exercise"
+                on:click={() => submitTask()}
+                disabled={!isLoggedIn}>Submit Exercise</button
+            >
             <button on:click={() => showOutput()}>Show Output</button>
             <!-- <p>Passed Tests</p>
             <div class="progress-bar">
@@ -107,10 +127,14 @@
 
         <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
         {#if timData.task_files.length < 2}
-        <div class="reset-section">
-            <button on:click={() => resetExercise(timData.path, timData.ide_task_id)}>Reset Exercise</button>
-            <!-- <button>Fetch Latest Answer</button> -->
-        </div>
+            <div class="reset-section">
+                <button
+                    on:click={() =>
+                        resetExercise(timData.path, timData.ide_task_id)}
+                    disabled={!isLoggedIn}>Reset Exercise</button
+                >
+                <!-- <button>Fetch Latest Answer</button> -->
+            </div>
         {/if}
     </div>
 {/if}
@@ -160,14 +184,15 @@
 
     .reset-section button {
         margin-bottom: 10px;
-        background-color: #D2042D;
+        background-color: #d2042d;
     }
 
     .reset-section button:hover {
         background-color: #93021f;
     }
 
-    .points-section button, .reset-section button {
+    .points-section button,
+    .reset-section button {
         margin-right: 10px;
         border: none;
         width: 130px;
@@ -199,22 +224,28 @@
     }
 
     .loader {
-    width: 48px;
-    height: 48px;
-    border: 5px solid #FFF;
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
+        width: 48px;
+        height: 48px;
+        border: 5px solid #fff;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+    }
+
+    button:disabled {
+        background: grey;
     }
 
     @keyframes rotation {
         0% {
             transform: rotate(0deg);
         }
+
         100% {
             transform: rotate(360deg);
         }
     }
 </style>
+

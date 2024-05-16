@@ -1,4 +1,5 @@
 <script>
+    import { MessageType } from '../common/messages';
   /**
   * This component manages the display and interaction with a list of courses. It listens for messages from CoursePanel.ts, 
   * updates the courses' status, and handles downloading task sets and opening workspaces.
@@ -15,6 +16,8 @@
   let coursesJson = [];
   let activeCoursesExpanded = true;
   let hiddenCoursesExpanded = false;
+  let loginData = {}
+  let isLoggedIn
 
   $: if (downloadPath== null) {
     directoryNotSet();
@@ -28,11 +31,13 @@
       const message = event.data;
       if (message && message.command === 'setPathResult') {
         downloadPath = message.path;
-      }
-      if (message && message.type === 'json') {
+      } else if (message && message.type === 'json') {
           coursesJson = message.value;
+      } else if (message.type === MessageType.LoginData) {
+          loginData = message.value;
       }
     });
+    tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
   });
 
   /**
@@ -118,6 +123,7 @@
     });
   }
   
+  $: isLoggedIn = loginData.isLogged ?? false;
 </script>
 
 <h1>My Courses</h1>
@@ -142,7 +148,8 @@
     courses={coursesJson.filter(c => c.status == "active")}
     moveCourse={moveCourse}
     downloadTaskSet={downloadTaskSet}
-    openWorkspace={openWorkspace}/>
+    openWorkspace={openWorkspace}
+    isLoggedIn={isLoggedIn}/>
 
   <CourseList
     isExpanded={hiddenCoursesExpanded}
@@ -152,7 +159,8 @@
     courses={coursesJson.filter(c => c.status == "hidden")}
     moveCourse={moveCourse}
     downloadTaskSet={downloadTaskSet}
-    openWorkspace={openWorkspace}/>
+    openWorkspace={openWorkspace}
+    isLoggedIn={isLoggedIn}/>
 {/if}
 
 <style>

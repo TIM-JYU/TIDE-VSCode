@@ -10,6 +10,7 @@ import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { LoginData } from "../../common/types";
 import { getDefaultHtmlForWebview } from "../utils";
+import { MessageType } from "../../common/messages";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 	_view?: vscode.WebviewView;
@@ -24,7 +25,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 	 * @param json_array JSON array from login data.
 	 */
 	public sendLoginValue(loginData: LoginData) {
-		this._view?.webview.postMessage({ type: "loginData", value: loginData });
+		this._view?.webview.postMessage({ type: MessageType.LoginData, value: loginData });
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -71,7 +72,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 					vscode.commands.executeCommand("tide.logout");
 					break;
 				}
-				case "requestLoggedInStatus": {
+				case MessageType.RequestLoginData: {
 					this.sendLoginValue(ExtensionStateManager.getLoginData());
 				}
 			}

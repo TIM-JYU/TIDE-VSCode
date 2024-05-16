@@ -9,6 +9,8 @@
 import * as vscode from "vscode";
 import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
+import { LoginData } from "../../common/types";
+import { MessageType } from "../../common/messages";
 
 export default class TaskPanel {
 	public static currentPanel: TaskPanel | undefined;
@@ -53,11 +55,21 @@ export default class TaskPanel {
 		TaskPanel.currentPanel = new TaskPanel(panel, extensionUri, timDataContent, currentDirectory);
 	}
 
+    private sendLoginData(loginData: LoginData) {
+        this.panel.webview.postMessage({
+            type: MessageType.LoginData,
+            value: loginData
+        })
+    }
+
 	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, timData: string, currentDirectory: string) {
 		this.panel = panel;
 		this.extensionUri = extensionUri;
 		this.timData = timData;
 		this.submitPath = currentDirectory;
+        
+        // subscribe to changes in login data
+		this.disposables.push(ExtensionStateManager.subscribe("loginData", this.sendLoginData.bind(this)));
 
 		// Set the webview's initial html content.
 		this.update(this.timData, this.submitPath);
@@ -115,6 +127,9 @@ export default class TaskPanel {
 					});
 					break;
 				}
+                case MessageType.RequestLoginData: {
+                    this.sendLoginData(ExtensionStateManager.getLoginData())
+                }
 			}
 		});
 	}

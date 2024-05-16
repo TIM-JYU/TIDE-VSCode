@@ -9,6 +9,9 @@
 import * as vscode from "vscode";
 import ExtensionStateManager from "../../api/ExtensionStateManager";
 import { getDefaultHtmlForWebview, getWebviewOptions } from "../utils";
+import { LoginData } from "../../common/types";
+import { MessageType } from "../../common/messages";
+import Logger from "../../utilities/logger";
 
 export default class CoursePanel {
 	public static currentPanel: CoursePanel | undefined;
@@ -53,6 +56,13 @@ export default class CoursePanel {
 		});
 	}
 
+    private sendLoginData(loginData: LoginData) {
+        this.panel.webview.postMessage({
+            type: MessageType.LoginData,
+            value: loginData
+        })
+    }
+
 	/**
 	 * Sends courses json array to svelte file.
 	 */
@@ -61,10 +71,10 @@ export default class CoursePanel {
 		this.panel?.webview.postMessage({ type: "json", value: courses_array });
 	}
 
+
 	public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
 		CoursePanel.currentPanel = new CoursePanel(panel, extensionUri);
 
-		const path = vscode.workspace.getConfiguration().get("TIM-IDE.fileDownloadPath");
 		CoursePanel.currentPanel.sendInitialPath();
 		CoursePanel.currentPanel.sendCourseListMessage();
 	}
@@ -72,6 +82,9 @@ export default class CoursePanel {
 	private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
 		this.panel = panel;
 		this.extensionUri = extensionUri;
+
+        // subscribe to changes in login data
+		this.disposables.push(ExtensionStateManager.subscribe("loginData", this.sendLoginData.bind(this)));
 
 		// Set the webview's initial html content
 		this.update();
@@ -134,7 +147,7 @@ export default class CoursePanel {
 					break;
 				}
 				case "updateCoursesToGlobalState": {
-					const coursesJson = data.coursesJson;
+					const coursesJson = data.value;
 					ExtensionStateManager.setCourses(coursesJson);
 					break;
 				}
@@ -146,6 +159,10 @@ export default class CoursePanel {
 					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(folder));
 					break;
 				}
+                case MessageType.RequestLoginData: {
+                    Logger.debug('Course panel received a login data request')
+                    this.sendLoginData(ExtensionStateManager.getLoginData())
+                }
 			}
 		});
 	}
