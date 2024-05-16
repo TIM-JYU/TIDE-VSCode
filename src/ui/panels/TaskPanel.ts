@@ -13,6 +13,7 @@ import ExtensionStateManager from "../../api/ExtensionStateManager";
 export default class TaskPanel {
 	public static currentPanel: TaskPanel | undefined;
 	private timData: string = "";
+	private submitPath: string = "";
 
 	private static readonly fileNamePrefix = "TaskPanel";
 	private static readonly viewType = "TaskPanel";
@@ -28,6 +29,7 @@ export default class TaskPanel {
 
 		// If we already have a panel, show it.
 		if (TaskPanel.currentPanel) {
+			TaskPanel.currentPanel.submitPath = currentDirectory;
 			TaskPanel.currentPanel.timData = timDataContent;
 			TaskPanel.currentPanel.update(TaskPanel.currentPanel.timData, currentDirectory); // Update the panel with the new timDataContent
 			TaskPanel.currentPanel.panel.webview.postMessage({ command: "updateTimData", data: timDataContent });
@@ -55,9 +57,10 @@ export default class TaskPanel {
 		this.panel = panel;
 		this.extensionUri = extensionUri;
 		this.timData = timData;
+		this.submitPath = currentDirectory;
 
 		// Set the webview's initial html content.
-		this.update(this.timData, currentDirectory);
+		this.update(this.timData, this.submitPath);
 
 		// Listen for when the panel is disposed.
 		// This happens when the user closes the panel or when the panel is closed programmatically.
@@ -67,7 +70,7 @@ export default class TaskPanel {
 		this.panel.onDidChangeViewState(
 			(e) => {
 				if (this.panel.visible) {
-					this.update(this.timData, currentDirectory);
+					this.update(this.timData, this.submitPath);
 				}
 			},
 			null,
@@ -92,11 +95,13 @@ export default class TaskPanel {
 					break;
 				}
 				case "submitTask": {
-					vscode.commands.executeCommand("tide.submitTask", currentDirectory);
+					console.log(currentDirectory);
+					vscode.commands.executeCommand("tide.submitTask", this.submitPath);
 					break;
 				}
 				case "showOutput": {
 					vscode.commands.executeCommand("workbench.action.output.toggleOutput");
+					vscode.commands.executeCommand("workbench.action.focusFirstEditorGroup");
 					break;
 				}
 				case "resetExercise": {

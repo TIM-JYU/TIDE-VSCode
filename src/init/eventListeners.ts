@@ -22,9 +22,11 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
 	 */
 	const textEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
 		if (editor && editor !== lastActiveEditor) {
-			lastActiveEditor = editor;
+			if (editor.document && editor.document.uri.scheme === "file") {
+				lastActiveEditor = editor;
 
-			vscode.commands.executeCommand("tide.showTaskPanel");
+				vscode.commands.executeCommand("tide.showTaskPanel");
+			}
 		}
 	});
 	ctx.subscriptions.push(textEditorListener);
