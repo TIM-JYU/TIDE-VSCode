@@ -55,7 +55,7 @@
   function updateCoursesToGlobalState(coursesJson) {
     tsvscode.postMessage({
         type: 'updateCoursesToGlobalState',
-        coursesJson
+        value: coursesJson
       });
   }
 
