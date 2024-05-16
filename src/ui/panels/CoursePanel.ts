@@ -160,7 +160,6 @@ export default class CoursePanel {
 					break;
 				}
                 case MessageType.RequestLoginData: {
-                    Logger.debug('Course panel received a login data request')
                     this.sendLoginData(ExtensionStateManager.getLoginData())
                 }
 			}
