@@ -179,6 +179,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 	 */
 	ctx.subscriptions.push(
 		vscode.commands.registerCommand("tide.submitTask", (submitPath) => {
+            vscode.commands.executeCommand("workbench.action.files.save");
 			Tide.submitTask(submitPath);
 		})
 	);

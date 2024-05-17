@@ -107,7 +107,6 @@ export default class TaskPanel {
 					break;
 				}
 				case "submitTask": {
-					console.log(currentDirectory);
 					vscode.commands.executeCommand("tide.submitTask", this.submitPath);
 					break;
 				}
