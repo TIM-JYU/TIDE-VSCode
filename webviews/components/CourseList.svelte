@@ -20,6 +20,7 @@
     export let isExpanded; // "true" or "false"
     export let toggle; // function to hide or show "active" or "hidden" category for courses
     export let toggleCourse; // function to collapse or expand the course information
+    export let isLoggedIn;
   
     /**
      * Gets the opposite course status.
@@ -83,7 +84,7 @@
                   <td>{taskset.name}</td>
                   <td>{taskset.tasks.length}</td>
                   <!-- <td>6/8</td> -->
-                  <td><button class="download-button" on:click={() => downloadTaskSet(taskset.path)}>Download</button></td>
+                  <td><button class="download-button" on:click={() => downloadTaskSet(taskset.path)} disabled={!isLoggedIn}>Download</button></td>
                   <td><button class="open-workspace" on:click={() => openWorkspace(taskset.name, taskset.path)}>Open in workspace</button></td>
                 </tr>
               {/each}
@@ -167,6 +168,10 @@
 
   .download-button:active, .open-workspace:active {
     background:#004d80;
+  }
+
+  .download-button:disabled {
+    background: grey;
   }
   
   *,
