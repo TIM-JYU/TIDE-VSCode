@@ -1,2 +1,2 @@
-export * from './commands';
-export * from './eventListeners';
+export * from './commands'
+export * from './eventListeners'

@@ -6,7 +6,7 @@
  * @license MIT
  * @date 14.5.2024
  */
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
 
 enum LogLevel {
     Error = 'Error',
@@ -16,16 +16,15 @@ enum LogLevel {
 }
 
 export default class Logger {
-    private static _outputChannel: vscode.OutputChannel;
+    private static _outputChannel: vscode.OutputChannel
 
     private static getTimeStamp(): string {
-        const date = new Date();
-        const hoursStr = String(date.getHours()).padStart(2, '0');
-        const minutesStr = String(date.getMinutes()).padStart(2, '0');
-        const secondsStr = String(date.getSeconds()).padStart(2, '0');
-        return `${hoursStr}:${minutesStr}:${secondsStr}`;
+        const date = new Date()
+        const hoursStr = String(date.getHours()).padStart(2, '0')
+        const minutesStr = String(date.getMinutes()).padStart(2, '0')
+        const secondsStr = String(date.getSeconds()).padStart(2, '0')
+        return `${hoursStr}:${minutesStr}:${secondsStr}`
     }
-
 
     /**
      * Initialize the logger
@@ -35,7 +34,8 @@ export default class Logger {
      */
     static init(outputChannelName: string) {
         if (!this._outputChannel) {
-            this._outputChannel = vscode.window.createOutputChannel(outputChannelName);
+            this._outputChannel =
+                vscode.window.createOutputChannel(outputChannelName)
         }
     }
 
@@ -43,14 +43,14 @@ export default class Logger {
      * Show the output channel.
      */
     static show() {
-        this._outputChannel.show();
+        this._outputChannel.show()
     }
 
     /**
      * Hide the output channel.
      */
     static hide() {
-        this._outputChannel.hide();
+        this._outputChannel.hide()
     }
 
     /**
@@ -59,7 +59,7 @@ export default class Logger {
      * @param msg - The message to be logged
      */
     static error(msg: string) {
-        this.log(msg, LogLevel.Error);
+        this.log(msg, LogLevel.Error)
     }
 
     /**
@@ -68,7 +68,7 @@ export default class Logger {
      * @param msg - The message to be logged
      */
     static warning(msg: string) {
-        this.log(msg, LogLevel.Warning);
+        this.log(msg, LogLevel.Warning)
     }
 
     /**
@@ -77,7 +77,7 @@ export default class Logger {
      * @param msg - The message to be logged
      */
     static info(msg: string) {
-        this.log(msg, LogLevel.Info);
+        this.log(msg, LogLevel.Info)
     }
 
     /**
@@ -87,10 +87,12 @@ export default class Logger {
      */
     static debug(msg: string) {
         // TODO: Add a boolean for debug mode to the class. When turned off the debug method return without logging.
-        this.log(msg, LogLevel.Debug);
+        this.log(msg, LogLevel.Debug)
     }
 
     private static log(msg: string, level: LogLevel) {
-        this._outputChannel.appendLine(`[${this.getTimeStamp()}] [${level}] ${msg}`);
+        this._outputChannel.appendLine(
+            `[${this.getTimeStamp()}] [${level}] ${msg}`
+        )
     }
 }
