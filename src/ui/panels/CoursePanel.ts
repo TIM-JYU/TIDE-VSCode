@@ -74,8 +74,9 @@ export default class CoursePanel {
      * Sends courses json array to svelte file.
      */
     public sendCourseListMessage() {
-        let courses_array = ExtensionStateManager.getCourses()
-        this.panel?.webview.postMessage({ type: 'json', value: courses_array })
+        let courseArray = ExtensionStateManager.getCourses()
+        console.log(courseArray)
+        this.panel?.webview.postMessage({ type: 'json', value: courseArray })
     }
 
     public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {

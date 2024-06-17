@@ -10,7 +10,8 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { LoginData } from '../common/types'
+import { Course, LoginData, Task } from '../common/types'
+import { parseCoursesFromJsonString, parseTasksFromJsonString } from '../utilities/parsers'
 
 export default class Tide {
     public static async debug() {
@@ -46,13 +47,14 @@ export default class Tide {
      * Lists user's IDE-compatible courses from TIM in JSON array.
      * @returns course data
      */
-    public static async listCourses() {
-        let coursedata = ''
-        await this.runAndHandle(['courses', '--json'], (data: string) => {
-            Logger.debug(data)
-            coursedata = data
-        })
-        return coursedata
+    public static async getCourseList(): Promise<Array<Course>> {
+        let courses: Array<Course> = []
+        await this.runAndHandle(
+            ['courses', '--json'],
+            async (data: string) => {
+                courses = await parseCoursesFromJsonString(data)
+            })
+        return courses
     }
 
     /**
@@ -60,16 +62,15 @@ export default class Tide {
      * @param taskSetPath path to task set. Path can be found by executing cli courses command
      * @returns task data
      */
-    public static async listTasksFromSet(taskSetPath: string) {
-        let taskdata = ''
+    public static async getTaskListForTaskSetPath(taskSetPath: string): Promise<Array<Task>> {
+        let tasks: Array<Task> = []
         await this.runAndHandle(
             ['task', 'list', taskSetPath, '--json'],
-            (data: string) => {
-                Logger.debug(data)
-                taskdata = data
+            async (data: string) => {
+                tasks = await parseTasksFromJsonString(data)
             }
         )
-        return taskdata
+        return tasks
     }
 
     /**
@@ -105,12 +106,12 @@ export default class Tide {
     /**
      * Overwrites one exercise
      * @param taskSetPath - tide task set for the exercise that is going to be overwritten
-     * @param ide_task_id - id/directory for the task that is going to be overwritten
+     * @param ideTaskId - id/directory for the task that is going to be overwritten
      * @param fileLocation - path to the directory where user has loaded the task set
      */
     public static async overwriteTask(
         taskSetPath: string,
-        ide_task_id: string,
+        ideTaskId: string,
         fileLocation: string
     ) {
         this.runAndHandle(
@@ -118,7 +119,7 @@ export default class Tide {
                 'task',
                 'create',
                 taskSetPath,
-                ide_task_id,
+                ideTaskId,
                 '-f',
                 '-d',
                 fileLocation,

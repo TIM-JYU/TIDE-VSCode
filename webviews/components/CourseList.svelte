@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     /**
      * This component renders a list of courses with options to toggle their visibility,
      * expand or collapse course details, and perform actions like downloading task sets
@@ -11,9 +11,10 @@
 
     import Menu from './Menu.svelte'
     import MenuItem from './MenuItem.svelte'
+    import { type Course, type CourseStatus } from '../common/types'
 
-    export let status // "active" or "hidden"
-    export let courses // array of courses
+    export let status: CourseStatus // "active" or "hidden"
+    export let courses: Array<Course> // array of courses
     export let moveCourse // function to move a course between lists
     export let downloadTaskSet // function to download a task set
     export let openWorkspace // function to open a workspace for task set
@@ -28,17 +29,10 @@
     function getOppositeStatus() {
         return status === 'active' ? 'hidden' : 'active'
     }
-
-    /**
-     * Get's the text according to the course status.
-     */
-    function statusText() {
-        return status == 'hidden' ? 'Hidden' : 'Active'
-    }
 </script>
 
 <button class="button-header" on:click={toggle(status)}>
-    {statusText()} Courses
+    <span class="button-header-span">{status} Courses</span>
     <span class="arrow {!isExpanded ? 'down-arrow' : 'left-arrow'}"
         >&#8250;</span
     >
@@ -140,6 +134,10 @@
         margin-top: 1.5rem;
         padding: 0;
         color: white;
+    }
+
+    .button-header-span::first-letter {
+        text-transform: capitalize;
     }
 
     .arrow {

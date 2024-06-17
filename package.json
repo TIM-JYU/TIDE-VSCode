@@ -64,6 +64,11 @@
 				"category": "TIM-IDE"
 			},
 			{
+				"command": "tide.updateCoursesFromTim",
+				"title": "Update courses from TIM",
+				"category": "TIM-IDE"
+			},
+			{
 				"command": "tide.openSettings",
 				"title": "Open Settings",
 				"category": "TIM-IDE"

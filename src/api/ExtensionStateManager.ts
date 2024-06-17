@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { LoginData } from '../common/types'
+import { Course, LoginData } from '../common/types'
 
 export default class ExtensionStateManager {
     private static globalState: vscode.Memento & {
@@ -22,7 +22,7 @@ export default class ExtensionStateManager {
     private static KEY_PREFIX = 'tide'
 
     // TODO: temporary solution until fetching course data during a vscode session in implemented
-    private static courses: unknown[] = []
+    private static courses: Array<Course> = []
 
     static setContext(ctx: vscode.ExtensionContext) {
         this.globalState = ctx.globalState
@@ -48,10 +48,10 @@ export default class ExtensionStateManager {
      * Sets the courses data in the global state.
      * @param courses - An array containing the course data to be stored.
      */
-    public static setCourses(courses: unknown[]) {
+    public static setCourses(courses: Array<Course>) {
         // this.writeToGlobalState("courses", courses);
 
-        // TODO: temporary solution until fetching course data during a vscode session in implemented
+        // TODO: this is temporary solution until fetching course data during a vscode session in implemented
         this.courses = courses
     }
 
@@ -59,7 +59,7 @@ export default class ExtensionStateManager {
      * Retrieves courses data from global state.
      * @returns Courses from the global state.
      */
-    public static getCourses(): unknown[] {
+    public static getCourses(): Array<Course> {
         // return this.readFromGlobalState("courses");
 
         // TODO: temporary solution until fetching course data during a vscode session in implemented

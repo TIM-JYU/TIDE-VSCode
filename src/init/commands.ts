@@ -89,7 +89,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
             UiController.showTaskPanel(timDataJson, submitPath)
         } catch (error) {
             console.log(
-                ".timdata file doesn't exist in current directory or text editor is not active",
+                '.timdata file doesn\'t exist in current directory or text editor is not active',
                 error
             )
             UiController.showTaskPanel('', '')
@@ -101,56 +101,19 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
      */
     ctx.subscriptions.push(
         vscode.commands.registerCommand('tide.showCourses', () => {
-            getCoursesFromTide()
+            UiController.showCoursePanel()
         })
     )
 
     /**
-     * Retrieves course data from TIDE, and tells the UiController to show CoursePanel with the data.
-     * @returns A promise that resolves once the course data is retrieved and processed.
+     * Gets courses from TIM and updates the data to ExtensionStateManager
      */
-    async function getCoursesFromTide() {
-        let json_array: any[] = []
-
-        // Check if courses are available in global state.
-        const coursesFromGlobalState = ExtensionStateManager.getCourses()
-        if (coursesFromGlobalState.length > 0) {
-            // If courses are available in global state, use them.
-            json_array = coursesFromGlobalState
-        } else {
-            // If courses are not available in global state, fetch them from TIDE.
-            const data = await Tide.listCourses()
-            json_array = JSON.parse(data)
-
-            // Loops through each course in the JSON array.
-            for (let course of json_array) {
-                // Loops through each task set in the course.
-                for (let taskSet of course.task_docs) {
-                    // Fetches task data for the current task set.
-                    const taskSetPath = taskSet.path
-                    const taskData = await Tide.listTasksFromSet(taskSetPath)
-                    const tasks = JSON.parse(taskData)
-
-                    // Adds the fetched task data to the current task set.
-                    taskSet.tasks = tasks
-                }
-
-                // Ensure that necessary properties are available in each course object.
-                if (!('status' in course)) {
-                    course.status = 'active'
-                }
-                if (!('expanded' in course)) {
-                    course.expanded = false
-                }
-            }
-
-            // Save fetched courses to global state for future use.
-            ExtensionStateManager.setCourses(json_array)
-        }
-
-        //Show coursePanel.
-        UiController.showCoursePanel()
-    }
+    ctx.subscriptions.push(
+        vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
+            const courses =  await Tide.getCourseList()
+            ExtensionStateManager.setCourses(courses)
+        })
+    )
 
     /**
      * Registers the 'tide.login' command, allowing users to log in to TIDE.
@@ -206,11 +169,11 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
      */
     ctx.subscriptions.push(
         vscode.commands.registerCommand('tide.listCourses', () => {
-            Tide.listCourses()
+            Tide.getCourseList()
         })
     )
 
     ctx.subscriptions.push(
-        vscode.commands.registerCommand('tide.debug', () => {})
+        vscode.commands.registerCommand('tide.debug', () => { })
     )
 }
