@@ -5,22 +5,22 @@ From Svelte.dev On Hover Menu: https://svelte.dev/repl/2f5ab01c05f84790bcb94a0f7
 -->
 
 <li>
-    <slot />
+  <slot />
 </li>
 
 <style>
-    li {
-        position: relative;
-        display: block;
-        padding: 0.5rem;
-        transition-duration: 0.5s;
-        inline-size: 100%;
-        font-size: 14px;
-    }
+  li {
+    position: relative;
+    display: block;
+    padding: 0.5rem;
+    transition-duration: 0.5s;
+    inline-size: 100%;
+    font-size: 14px;
+  }
 
-    li:hover,
-    li:focus {
-        background-color: grey;
-        cursor: pointer;
-    }
+  li:hover,
+  li:focus {
+    background-color: grey;
+    cursor: pointer;
+  }
 </style>
