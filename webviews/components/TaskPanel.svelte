@@ -1,4 +1,10 @@
 <script lang="ts">
+    /**
+     * @author Stella Palenius
+     * @license MIT
+     * @date 9.4.2024
+     */
+
     import { onMount } from 'svelte'
     import { MessageType } from '../common/types'
 
@@ -28,7 +34,7 @@
     function submitTask() {
         tsvscode.postMessage({
             type: MessageType.SubmitTask,
-            value: {}
+            value: {},
         })
     }
 
@@ -48,7 +54,7 @@
     function showOutput() {
         tsvscode.postMessage({
             type: MessageType.ShowOutput,
-            value: {}
+            value: {},
         })
     }
 
@@ -62,7 +68,7 @@
             value: {
                 path,
                 taskId,
-            }
+            },
         })
     }
 
@@ -72,10 +78,6 @@
 <!--
 @component
 This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
-
-@author Stella Palenius
-@license MIT
-@date 9.4.2024
 -->
 
 {#if timData === ''}
