@@ -8,9 +8,8 @@
  */
 import * as vscode from 'vscode'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData } from '../../common/types'
+import { LoginData, MessageType } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
-import { MessageType } from '../../common/messages'
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
     _view?: vscode.WebviewView

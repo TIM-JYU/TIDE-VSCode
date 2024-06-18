@@ -1,5 +1,4 @@
-<script>
-    import { MessageType } from '../common/messages'
+<script lang="ts">
     /**
      * This component manages the display and interaction with a list of courses. It listens for messages from CoursePanel.ts,
      * updates the courses' status, and handles downloading task sets and opening workspaces.
@@ -11,13 +10,19 @@
 
     import CourseList from './CourseList.svelte'
     import { onMount } from 'svelte'
+    import {
+        type Course,
+        type CourseStatus,
+        type LoginData,
+        MessageType,
+    } from '../common/types'
 
-    let downloadPath = ''
-    let coursesJson = []
+    let downloadPath: string = ''
+    let courses: Array<Course>
     let activeCoursesExpanded = true
     let hiddenCoursesExpanded = false
-    let loginData = {}
-    let isLoggedIn
+    let loginData: LoginData
+    let isLoggedIn: boolean
 
     $: if (downloadPath == null) {
         directoryNotSet()
@@ -32,7 +37,7 @@
             if (message && message.command === 'setPathResult') {
                 downloadPath = message.path
             } else if (message && message.type === 'json') {
-                coursesJson = message.value
+                courses = message.value
             } else if (message.type === MessageType.LoginData) {
                 loginData = message.value
             }
@@ -44,7 +49,7 @@
      * Toggles the visibility of courses based on their status.
      * @param {string} status - Tells if the course status is "active" or "hidden".
      */
-    function toggleVisibility(status) {
+    function toggleVisibility(status: CourseStatus) {
         status === 'active'
             ? (activeCoursesExpanded = !activeCoursesExpanded)
             : (hiddenCoursesExpanded = !hiddenCoursesExpanded)
@@ -56,7 +61,7 @@
      */
     function updateCoursesToGlobalState(coursesJson) {
         tsvscode.postMessage({
-            type: 'updateCoursesToGlobalState',
+            type: MessageType.UpdateCoursesToGlobalState,
             value: coursesJson,
         })
     }
@@ -66,11 +71,11 @@
      * @param {object} course - The course object to be updated.
      * @param {string} status - The new status for the course.
      */
-    function moveCourse(course, status) {
-        const index = coursesJson.findIndex((c) => c.id === course.id)
+    function moveCourse(course: Course, status: CourseStatus) {
+        const index = courses.findIndex((c) => c.id === course.id)
         if (index !== -1) {
-            coursesJson[index] = { ...course, status: status }
-            updateCoursesToGlobalState(coursesJson)
+            courses[index] = { ...course, status: status }
+            updateCoursesToGlobalState(courses)
         }
     }
 
@@ -79,13 +84,12 @@
      * @param {string} courseId - - The unique identifier of the course.
      */
     function toggleCourse(courseId) {
-        const courseIndex = coursesJson.findIndex(
+        const courseIndex = courses.findIndex(
             (course) => course.id === courseId
         )
         if (courseIndex !== -1) {
-            coursesJson[courseIndex].expanded =
-                !coursesJson[courseIndex].expanded
-            updateCoursesToGlobalState(coursesJson)
+            courses[courseIndex].expanded = !courses[courseIndex].expanded
+            updateCoursesToGlobalState(courses)
         }
     }
 
@@ -95,7 +99,7 @@
      */
     function directoryNotSet() {
         tsvscode.postMessage({
-            type: 'onError',
+            type: MessageType.OnError,
             value: 'Directory for downloading tasks must be set',
         })
     }
@@ -104,15 +108,15 @@
      * Initiates the download of a task set identified by its path.
      * @param {string} taskSetPath - The path of the task set to be downloaded.
      */
-    function downloadTaskSet(taskSetPath) {
+    function downloadTaskSet(taskSetPath: string) {
         if (!downloadPath) {
             directoryNotSet()
             return
         }
 
         tsvscode.postMessage({
-            type: 'downloadTaskSet',
-            taskSetPath,
+            type: MessageType.DownloadTaskSet,
+            value: taskSetPath,
         })
     }
 
@@ -120,11 +124,13 @@
      * Opens a workspace for the specified task set.
      * @param {string} taskSetName - The name of the task set to open a workspace for.
      */
-    function openWorkspace(taskSetName, taskSetPath) {
+    function openWorkspace(taskSetName: string, taskSetPath: string) {
         tsvscode.postMessage({
-            type: 'openWorkspace',
-            taskSetName,
-            taskSetPath,
+            type: MessageType.OpenWorkspace,
+            value: {
+                taskSetName,
+                taskSetPath,
+            },
         })
     }
 
@@ -138,13 +144,13 @@
 <button
     on:click={() => {
         tsvscode.postMessage({
-            type: 'setPath',
+            type: MessageType.SetDownloadPath,
             value: '',
         })
     }}>Set directory</button
 >
 
-{#if coursesJson.length === 0}
+{#if courses.length === 0}
     <p>
         No IDE courses were found. Are you sure you have bookmarked an
         IDE-course in TIM?
@@ -155,7 +161,7 @@
         toggle={toggleVisibility}
         {toggleCourse}
         status={'active'}
-        courses={coursesJson.filter((c) => c.status == 'active')}
+        courses={courses.filter((c) => c.status == 'active')}
         {moveCourse}
         {downloadTaskSet}
         {openWorkspace}
@@ -167,7 +173,7 @@
         toggle={toggleVisibility}
         {toggleCourse}
         status={'hidden'}
-        courses={coursesJson.filter((c) => c.status == 'hidden')}
+        courses={courses.filter((c) => c.status == 'hidden')}
         {moveCourse}
         {downloadTaskSet}
         {openWorkspace}

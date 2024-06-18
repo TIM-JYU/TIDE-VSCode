@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     /**
      * This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
      *
@@ -7,45 +7,47 @@
      * @date 9.4.2024
      */
 
-    import { onMount } from "svelte";
-    import { MessageType } from "../common/messages";
+    import { onMount } from 'svelte'
+    import { MessageType } from '../common/types'
 
-    let timData = null;
-    let loginData = {};
-    let isLoggedIn = false;
+    // TODO: timdata type
+    let timData: unknown = null
+    let loginData = {}
+    let isLoggedIn = false
 
     /**
      * Listens for messages from CoursePanel.ts.
      */
     onMount(() => {
-        window.addEventListener("message", (event) => {
-            const message = event.data;
-            if (message && message.type === "updateTimData") {
-                timData = message.value;
+        window.addEventListener('message', (event) => {
+            const message = event.data
+            if (message && message.type === MessageType.UpdateTimData) {
+                timData = message.value
             } else if (message.type === MessageType.LoginData) {
-                loginData = message.value;
+                loginData = message.value
             }
-        });
-        tsvscode.postMessage({ type: MessageType.RequestLoginData, value: "" });
-    });
+        })
+        tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
+    })
 
     /**
      * Sends message to TaskPanel about submitting exercise
      */
     function submitTask() {
         tsvscode.postMessage({
-            type: "submitTask",
-        });
+            type: MessageType.SubmitTask,
+            value: {}
+        })
     }
 
     /**
      * Parses the current workspace's name from tide path
      * @param name - tide path
      */
-    function workspaceName(name) {
-        const lastIndex = name.lastIndexOf("/");
-        name = name.substring(lastIndex + 1, name.length);
-        return name;
+    function workspaceName(name: string) {
+        const lastIndex = name.lastIndexOf('/')
+        name = name.substring(lastIndex + 1, name.length)
+        return name
     }
 
     /**
@@ -53,26 +55,29 @@
      */
     function showOutput() {
         tsvscode.postMessage({
-            type: "showOutput",
-        });
+            type: MessageType.ShowOutput,
+            value: {}
+        })
     }
 
     /**
      * Resets the task file to it's initial stage from TIM.
      * @param taskId ide task id of the task
      */
-    function resetExercise(path, taskId) {
+    function resetExercise(path: string, taskId: number) {
         tsvscode.postMessage({
-            type: "resetExercise",
-            path,
-            taskId,
-        });
+            type: MessageType.ResetExercise,
+            value: {
+                path,
+                taskId,
+            }
+        })
     }
 
-    $: isLoggedIn = loginData.isLogged ?? false;
+    $: isLoggedIn = loginData.isLogged ?? false
 </script>
 
-{#if timData === ""}
+{#if timData === ''}
     <p>
         Task Panel only shows information when you have a TIM task document open
         in the text editor. If you are sure you have a TIM task open, try
@@ -99,7 +104,7 @@
         </div>
 
         <div>
-            <a href={"https://tim.jyu.fi/view/" + timData.path}
+            <a href={'https://tim.jyu.fi/view/' + timData.path}
                 >Open exercise in TIM</a
             >
         </div>
@@ -248,4 +253,3 @@
         }
     }
 </style>
-

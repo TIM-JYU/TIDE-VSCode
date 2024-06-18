@@ -71,3 +71,31 @@ export interface TaskSet {
 export interface Task {
 
 }
+
+export interface TimData {
+
+}
+
+
+/**
+ *  An enum to avoid typo potholes
+ */
+export enum MessageType {
+    DownloadTaskSet = 'downloadTaskSet',
+    Login = 'login',
+    LoginData = 'loginData',
+    Logout = 'logout',
+    OnError = 'onError',
+    OnInfo = 'onInfo',
+    OpenSettings = 'openSettings',
+    OpenWorkspace = 'openWorkspace',
+    RequestLoginData = 'requestLoginData',
+    ResetExercise = 'resetExercise',
+    SetDownloadPath = 'setDownloadPath',
+    SetDownloadPathResult = 'setDownloadPathResult',
+    ShowCourses = 'showCourses',
+    ShowOutput = 'showOutput',
+    SubmitTask = 'submitTask',
+    UpdateCoursesToGlobalState = 'updateCoursesToGlobalState',
+    UpdateTimData = 'updateTimData',
+}

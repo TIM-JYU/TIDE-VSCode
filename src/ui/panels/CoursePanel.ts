@@ -9,9 +9,7 @@
 import * as vscode from 'vscode'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
-import { LoginData } from '../../common/types'
-import { MessageType } from '../../common/messages'
-import Logger from '../../utilities/logger'
+import { LoginData, MessageType } from '../../common/types'
 
 export default class CoursePanel {
     public static currentPanel: CoursePanel | undefined
@@ -58,7 +56,7 @@ export default class CoursePanel {
             .getConfiguration()
             .get('TIM-IDE.fileDownloadPath')
         this.panel.webview.postMessage({
-            command: 'setPathResult',
+            command: MessageType.SetDownloadPathResult,
             path: initialPath ? initialPath : null,
         })
     }
@@ -76,6 +74,8 @@ export default class CoursePanel {
     public sendCourseListMessage() {
         let courseArray = ExtensionStateManager.getCourses()
         console.log(courseArray)
+
+        // TODO: #refactor# type: 'json' ???
         this.panel?.webview.postMessage({ type: 'json', value: courseArray })
     }
 
@@ -121,14 +121,14 @@ export default class CoursePanel {
         // Handle messages from the webview
         this.panel.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
-                case 'onError': {
+                case MessageType.OnError: {
                     if (!data.value) {
                         return
                     }
                     vscode.window.showErrorMessage(data.value)
                     break
                 }
-                case 'setPath': {
+                case MessageType.SetDownloadPath: {
                     let newPath: vscode.Uri[] | undefined =
                         await vscode.window.showOpenDialog({
                             canSelectFiles: false,
@@ -146,7 +146,7 @@ export default class CoursePanel {
                     }
                     // Send the selected path back to the webview
                     this.panel.webview.postMessage({
-                        command: 'setPathResult',
+                        command: MessageType.SetDownloadPathResult,
                         path: newPath ? newPath[0].fsPath : null,
                     })
                     // Update the configuration with the new path
@@ -160,7 +160,7 @@ export default class CoursePanel {
                         )
                     break
                 }
-                case 'downloadTaskSet': {
+                case MessageType.DownloadTaskSet: {
                     const taskSetPath = data.taskSetPath
                     const downloadPath = vscode.workspace
                         .getConfiguration()
@@ -172,12 +172,12 @@ export default class CoursePanel {
                     )
                     break
                 }
-                case 'updateCoursesToGlobalState': {
+                case MessageType.UpdateCoursesToGlobalState: {
                     const coursesJson = data.value
                     ExtensionStateManager.setCourses(coursesJson)
                     break
                 }
-                case 'openWorkspace': {
+                case MessageType.OpenWorkspace: {
                     const taskSetName = data.taskSetName
                     const taskSetPath = data.taskSetPath
                     const downloadPath =
@@ -230,7 +230,7 @@ export default class CoursePanel {
         this.panel.webview.html = this.getHtmlForWebview(webview)
         const path = ExtensionStateManager.getDownloadPath()
         this.panel.webview.postMessage({
-            command: 'setPathResult',
+            command: MessageType.SetDownloadPathResult,
             path: path ? path : null,
         })
     }

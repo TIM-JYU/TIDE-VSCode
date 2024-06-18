@@ -9,8 +9,7 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData } from '../../common/types'
-import { MessageType } from '../../common/messages'
+import { LoginData, MessageType } from '../../common/types'
 
 export default class TaskPanel {
     public static currentPanel: TaskPanel | undefined
@@ -42,7 +41,7 @@ export default class TaskPanel {
                 currentDirectory
             ) // Update the panel with the new timDataContent
             TaskPanel.currentPanel.panel.webview.postMessage({
-                command: 'updateTimData',
+                command: MessageType.UpdateTimData,
                 data: timDataContent,
             })
             return
@@ -127,28 +126,28 @@ export default class TaskPanel {
         // Handle messages from the webview.
         this.panel.webview.onDidReceiveMessage(async (data) => {
             switch (data.type) {
-                case 'onInfo': {
+                case MessageType.OnInfo: {
                     if (!data.value) {
                         return
                     }
                     vscode.window.showInformationMessage(data.value)
                     break
                 }
-                case 'onError': {
+                case MessageType.OnError: {
                     if (!data.value) {
                         return
                     }
                     vscode.window.showErrorMessage(data.value)
                     break
                 }
-                case 'submitTask': {
+                case MessageType.SubmitTask: {
                     vscode.commands.executeCommand(
                         'tide.submitTask',
                         this.submitPath
                     )
                     break
                 }
-                case 'showOutput': {
+                case MessageType.ShowOutput: {
                     vscode.commands.executeCommand(
                         'workbench.action.output.toggleOutput'
                     )
@@ -157,7 +156,7 @@ export default class TaskPanel {
                     )
                     break
                 }
-                case 'resetExercise': {
+                case MessageType.ResetExercise: {
                     vscode.window
                         .showInformationMessage(
                             'Are you sure you want to reset exercise? All unsubmitted changes will be lost.',
@@ -214,7 +213,7 @@ export default class TaskPanel {
         const webview = this.panel.webview
         this.panel.webview.html = this.getHtmlForWebview(webview)
         this.panel.webview.postMessage({
-            type: 'updateTimData',
+            type: MessageType.UpdateTimData,
             value: timDataContent,
         })
     }

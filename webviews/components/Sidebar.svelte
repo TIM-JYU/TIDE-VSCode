@@ -10,8 +10,7 @@
      */
 
     import { onMount } from 'svelte'
-    import type { LoginData } from '../common/types'
-    import { MessageType } from '../common/messages'
+    import { type LoginData, MessageType } from '../common/types'
     let isLoggedIn = false
     let loginData: LoginData
 
@@ -34,7 +33,7 @@
      */
     function handleLogin() {
         tsvscode.postMessage({
-            type: 'login',
+            type: MessageType.Login,
             value: '',
         })
     }
@@ -44,7 +43,7 @@
      */
     function handleLogout() {
         tsvscode.postMessage({
-            type: 'logout',
+            type: MessageType.Logout,
             value: '',
         })
     }
@@ -61,7 +60,7 @@
                 <button
                     on:click={() => {
                         tsvscode.postMessage({
-                            type: 'showCourses',
+                            type: MessageType.ShowCourses,
                             value: '',
                         })
                     }}>My Courses</button
@@ -75,7 +74,7 @@
             <button
                 on:click={() => {
                     tsvscode.postMessage({
-                        type: 'openSettings',
+                        type: MessageType.OpenSettings,
                         value: '',
                     })
                 }}>Settings</button
