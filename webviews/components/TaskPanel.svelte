@@ -1,12 +1,4 @@
 <script lang="ts">
-    /**
-     * This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
-     *
-     * @author Stella Palenius
-     * @license MIT
-     * @date 9.4.2024
-     */
-
     import { onMount } from 'svelte'
     import { MessageType } from '../common/types'
 
@@ -76,6 +68,15 @@
 
     $: isLoggedIn = loginData.isLogged ?? false
 </script>
+
+<!--
+@component
+This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
+
+@author Stella Palenius
+@license MIT
+@date 9.4.2024
+-->
 
 {#if timData === ''}
     <p>

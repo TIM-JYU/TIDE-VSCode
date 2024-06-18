@@ -1,14 +1,4 @@
 <script lang="ts">
-    /**
-     * This component renders a list of courses with options to toggle their visibility,
-     * expand or collapse course details, and perform actions like downloading task sets
-     * or opening workspaces.
-     *
-     * @author Stella Palenius
-     * @license MIT
-     * @date 30.4.2024
-     */
-
     import Menu from './Menu.svelte'
     import MenuItem from './MenuItem.svelte'
     import { type Course, type CourseStatus } from '../common/types'
@@ -30,6 +20,17 @@
         return status === 'active' ? 'hidden' : 'active'
     }
 </script>
+
+<!--
+@component
+This component renders a list of courses with options to toggle their visibility,
+expand or collapse course details, and perform actions like downloading task sets
+or opening workspaces.
+
+@author Stella Palenius
+@license MIT
+@date 30.4.2024
+-->
 
 <button class="button-header" on:click={toggle(status)}>
     <span class="button-header-span">{status} Courses</span>
