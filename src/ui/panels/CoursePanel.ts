@@ -12,233 +12,230 @@ import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { LoginData, MessageType } from '../../common/types'
 
 export default class CoursePanel {
-    public static currentPanel: CoursePanel | undefined
+  public static currentPanel: CoursePanel | undefined
 
-    private static readonly fileNamePrefix = 'courses'
-    private static readonly viewType = 'Courses'
-    private static readonly panelTitle = 'My Courses'
-    private static preferredColumn = vscode.ViewColumn.One
+  private static readonly fileNamePrefix = 'courses'
+  private static readonly viewType = 'Courses'
+  private static readonly panelTitle = 'My Courses'
+  private static preferredColumn = vscode.ViewColumn.One
 
-    private readonly panel: vscode.WebviewPanel
-    private readonly extensionUri: vscode.Uri
-    private disposables: vscode.Disposable[] = []
+  private readonly panel: vscode.WebviewPanel
+  private readonly extensionUri: vscode.Uri
+  private disposables: vscode.Disposable[] = []
 
-    public static createOrShow(extensionUri: vscode.Uri) {
-        // If we already have a panel, show it.
-        if (CoursePanel.currentPanel) {
-            CoursePanel.currentPanel.panel.reveal(this.preferredColumn)
-            CoursePanel.currentPanel.sendCourseListMessage()
-            return CoursePanel.currentPanel
-        }
-
-        // Otherwise, create a new panel.
-        const panel = vscode.window.createWebviewPanel(
-            this.viewType,
-            this.panelTitle,
-            this.preferredColumn,
-            getWebviewOptions(extensionUri)
-        )
-
-        CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
-
-        // Send initial file download path and courses to the webview.
-        CoursePanel.currentPanel.sendInitialPath()
-        CoursePanel.currentPanel.sendCourseListMessage()
-
-        return CoursePanel.currentPanel
+  public static createOrShow(extensionUri: vscode.Uri) {
+    // If we already have a panel, show it.
+    if (CoursePanel.currentPanel) {
+      CoursePanel.currentPanel.panel.reveal(this.preferredColumn)
+      CoursePanel.currentPanel.sendCourseListMessage()
+      return CoursePanel.currentPanel
     }
 
-    /**
-     * Sends initial file download path to svelte file.
-     */
-    private sendInitialPath() {
-        const initialPath = vscode.workspace
+    // Otherwise, create a new panel.
+    const panel = vscode.window.createWebviewPanel(
+      this.viewType,
+      this.panelTitle,
+      this.preferredColumn,
+      getWebviewOptions(extensionUri),
+    )
+
+    CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
+
+    // Send initial file download path and courses to the webview.
+    CoursePanel.currentPanel.sendInitialPath()
+    CoursePanel.currentPanel.sendCourseListMessage()
+
+    return CoursePanel.currentPanel
+  }
+
+  /**
+   * Sends initial file download path to svelte file.
+   */
+  private sendInitialPath() {
+    const initialPath = vscode.workspace
+      .getConfiguration()
+      .get('TIM-IDE.fileDownloadPath')
+    this.panel.webview.postMessage({
+      command: MessageType.SetDownloadPathResult,
+      path: initialPath ? initialPath : null,
+    })
+  }
+
+  private sendLoginData(loginData: LoginData) {
+    this.panel.webview.postMessage({
+      type: MessageType.LoginData,
+      value: loginData,
+    })
+  }
+
+  /**
+   * Sends courses json array to svelte file.
+   */
+  public sendCourseListMessage() {
+    let courseArray = ExtensionStateManager.getCourses()
+    console.log(courseArray)
+
+    // TODO: #refactor# type: 'json' ???
+    this.panel?.webview.postMessage({ type: 'json', value: courseArray })
+  }
+
+  public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
+
+    CoursePanel.currentPanel.sendInitialPath()
+    CoursePanel.currentPanel.sendCourseListMessage()
+  }
+
+  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    this.panel = panel
+    this.extensionUri = extensionUri
+
+    // subscribe to changes in login data
+    this.disposables.push(
+      ExtensionStateManager.subscribe(
+        'loginData',
+        this.sendLoginData.bind(this),
+      ),
+    )
+
+    // Set the webview's initial html content
+    this.update()
+
+    // Listen for when the panel is disposed
+    // This happens when the user closes the panel or when the panel is closed programmatically
+    this.panel.onDidDispose(() => this.dispose(), null, this.disposables)
+
+    // Update the content based on view changes
+    this.panel.onDidChangeViewState(
+      (e) => {
+        if (this.panel.visible) {
+          this.update()
+        }
+      },
+      null,
+      this.disposables,
+    )
+
+    this.handlePanelVisibilityChange()
+
+    // Handle messages from the webview
+    this.panel.webview.onDidReceiveMessage(async (data) => {
+      switch (data.type) {
+        case MessageType.OnError: {
+          if (!data.value) {
+            return
+          }
+          vscode.window.showErrorMessage(data.value)
+          break
+        }
+        case MessageType.SetDownloadPath: {
+          let newPath: vscode.Uri[] | undefined =
+            await vscode.window.showOpenDialog({
+              canSelectFiles: false,
+              canSelectFolders: true,
+              canSelectMany: false,
+              openLabel: 'Select directory',
+            })
+          // If newPath is undefined or user cancels, get the previous path from global state
+          if (!newPath) {
+            const previousPath = ExtensionStateManager.getDownloadPath()
+            if (previousPath) {
+              newPath = [vscode.Uri.file(previousPath)]
+            }
+          }
+          // Send the selected path back to the webview
+          this.panel.webview.postMessage({
+            command: MessageType.SetDownloadPathResult,
+            path: newPath ? newPath[0].fsPath : null,
+          })
+          // Update the configuration with the new path
+          const updatedPath = newPath ? newPath[0].fsPath : null
+          vscode.workspace
+            .getConfiguration()
+            .update(
+              'TIM-IDE.fileDownloadPath',
+              updatedPath,
+              vscode.ConfigurationTarget.Global,
+            )
+          break
+        }
+        case MessageType.DownloadTaskSet: {
+          const taskSetPath = data.taskSetPath
+          const downloadPath = vscode.workspace
             .getConfiguration()
             .get('TIM-IDE.fileDownloadPath')
-        this.panel.webview.postMessage({
-            command: MessageType.SetDownloadPathResult,
-            path: initialPath ? initialPath : null,
-        })
-    }
-
-    private sendLoginData(loginData: LoginData) {
-        this.panel.webview.postMessage({
-            type: MessageType.LoginData,
-            value: loginData,
-        })
-    }
-
-    /**
-     * Sends courses json array to svelte file.
-     */
-    public sendCourseListMessage() {
-        let courseArray = ExtensionStateManager.getCourses()
-        console.log(courseArray)
-
-        // TODO: #refactor# type: 'json' ???
-        this.panel?.webview.postMessage({ type: 'json', value: courseArray })
-    }
-
-    public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-        CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
-
-        CoursePanel.currentPanel.sendInitialPath()
-        CoursePanel.currentPanel.sendCourseListMessage()
-    }
-
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-        this.panel = panel
-        this.extensionUri = extensionUri
-
-        // subscribe to changes in login data
-        this.disposables.push(
-            ExtensionStateManager.subscribe(
-                'loginData',
-                this.sendLoginData.bind(this)
-            )
-        )
-
-        // Set the webview's initial html content
-        this.update()
-
-        // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programmatically
-        this.panel.onDidDispose(() => this.dispose(), null, this.disposables)
-
-        // Update the content based on view changes
-        this.panel.onDidChangeViewState(
-            (e) => {
-                if (this.panel.visible) {
-                    this.update()
-                }
-            },
-            null,
-            this.disposables
-        )
-
-        this.handlePanelVisibilityChange()
-
-        // Handle messages from the webview
-        this.panel.webview.onDidReceiveMessage(async (data) => {
-            switch (data.type) {
-                case MessageType.OnError: {
-                    if (!data.value) {
-                        return
-                    }
-                    vscode.window.showErrorMessage(data.value)
-                    break
-                }
-                case MessageType.SetDownloadPath: {
-                    let newPath: vscode.Uri[] | undefined =
-                        await vscode.window.showOpenDialog({
-                            canSelectFiles: false,
-                            canSelectFolders: true,
-                            canSelectMany: false,
-                            openLabel: 'Select directory',
-                        })
-                    // If newPath is undefined or user cancels, get the previous path from global state
-                    if (!newPath) {
-                        const previousPath =
-                            ExtensionStateManager.getDownloadPath()
-                        if (previousPath) {
-                            newPath = [vscode.Uri.file(previousPath)]
-                        }
-                    }
-                    // Send the selected path back to the webview
-                    this.panel.webview.postMessage({
-                        command: MessageType.SetDownloadPathResult,
-                        path: newPath ? newPath[0].fsPath : null,
-                    })
-                    // Update the configuration with the new path
-                    const updatedPath = newPath ? newPath[0].fsPath : null
-                    vscode.workspace
-                        .getConfiguration()
-                        .update(
-                            'TIM-IDE.fileDownloadPath',
-                            updatedPath,
-                            vscode.ConfigurationTarget.Global
-                        )
-                    break
-                }
-                case MessageType.DownloadTaskSet: {
-                    const taskSetPath = data.taskSetPath
-                    const downloadPath = vscode.workspace
-                        .getConfiguration()
-                        .get('TIM-IDE.fileDownloadPath')
-                    vscode.commands.executeCommand(
-                        'tide.downloadTaskSet',
-                        taskSetPath,
-                        downloadPath
-                    )
-                    break
-                }
-                case MessageType.UpdateCoursesToGlobalState: {
-                    const coursesJson = data.value
-                    ExtensionStateManager.setCourses(coursesJson)
-                    break
-                }
-                case MessageType.OpenWorkspace: {
-                    const taskSetName = data.taskSetName
-                    const taskSetPath = data.taskSetPath
-                    const downloadPath =
-                        ExtensionStateManager.getTaskSetDownloadPath(
-                            taskSetPath
-                        )
-                    let folder = downloadPath + '/' + taskSetName
-                    vscode.commands.executeCommand(
-                        'vscode.openFolder',
-                        vscode.Uri.file(folder)
-                    )
-                    break
-                }
-                case MessageType.RequestLoginData: {
-                    this.sendLoginData(ExtensionStateManager.getLoginData())
-                }
-            }
-        })
-    }
-
-    public dispose() {
-        CoursePanel.currentPanel = undefined
-
-        // Clean up our resources
-        this.panel.dispose()
-
-        while (this.disposables.length) {
-            const x = this.disposables.pop()
-            if (x) {
-                x.dispose()
-            }
+          vscode.commands.executeCommand(
+            'tide.downloadTaskSet',
+            taskSetPath,
+            downloadPath,
+          )
+          break
         }
-    }
+        case MessageType.UpdateCoursesToGlobalState: {
+          const coursesJson = data.value
+          ExtensionStateManager.setCourses(coursesJson)
+          break
+        }
+        case MessageType.OpenWorkspace: {
+          const taskSetName = data.taskSetName
+          const taskSetPath = data.taskSetPath
+          const downloadPath =
+            ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
+          let folder = downloadPath + '/' + taskSetName
+          vscode.commands.executeCommand(
+            'vscode.openFolder',
+            vscode.Uri.file(folder),
+          )
+          break
+        }
+        case MessageType.RequestLoginData: {
+          this.sendLoginData(ExtensionStateManager.getLoginData())
+        }
+      }
+    })
+  }
 
-    /**
-     * Handles the panel visibility in case tabs are switched.
-     * Ensures that courses doesn't look empty when user opens My Courses tab again.
-     */
-    private handlePanelVisibilityChange() {
-        this.panel.onDidChangeViewState(() => {
-            if (this.panel.visible) {
-                // Panel became visible, refresh content
-                this.sendCourseListMessage()
-            }
-        })
-    }
+  public dispose() {
+    CoursePanel.currentPanel = undefined
 
-    private update() {
-        const webview = this.panel.webview
-        this.panel.webview.html = this.getHtmlForWebview(webview)
-        const path = ExtensionStateManager.getDownloadPath()
-        this.panel.webview.postMessage({
-            command: MessageType.SetDownloadPathResult,
-            path: path ? path : null,
-        })
+    // Clean up our resources
+    this.panel.dispose()
+
+    while (this.disposables.length) {
+      const x = this.disposables.pop()
+      if (x) {
+        x.dispose()
+      }
     }
-    private getHtmlForWebview(webview: vscode.Webview) {
-        return getDefaultHtmlForWebview(
-            webview,
-            this.extensionUri,
-            CoursePanel.fileNamePrefix
-        )
-    }
+  }
+
+  /**
+   * Handles the panel visibility in case tabs are switched.
+   * Ensures that courses doesn't look empty when user opens My Courses tab again.
+   */
+  private handlePanelVisibilityChange() {
+    this.panel.onDidChangeViewState(() => {
+      if (this.panel.visible) {
+        // Panel became visible, refresh content
+        this.sendCourseListMessage()
+      }
+    })
+  }
+
+  private update() {
+    const webview = this.panel.webview
+    this.panel.webview.html = this.getHtmlForWebview(webview)
+    const path = ExtensionStateManager.getDownloadPath()
+    this.panel.webview.postMessage({
+      command: MessageType.SetDownloadPathResult,
+      path: path ? path : null,
+    })
+  }
+  private getHtmlForWebview(webview: vscode.Webview) {
+    return getDefaultHtmlForWebview(
+      webview,
+      this.extensionUri,
+      CoursePanel.fileNamePrefix,
+    )
+  }
 }

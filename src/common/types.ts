@@ -1,5 +1,5 @@
 export interface LoginData {
-    isLogged: boolean
+  isLogged: boolean
 }
 
 export type CourseStatus = 'active' | 'hidden'
@@ -8,94 +8,89 @@ export type CourseStatus = 'active' | 'hidden'
  * Represents a course
  */
 export interface Course {
-    /**
-     * Course name.
-     */
-    name: string
+  /**
+   * Course name.
+   */
+  name: string
 
-    /**
-     * Course ID.
-     */
-    id: number
+  /**
+   * Course ID.
+   */
+  id: number
 
-    /**
-     * Course virtual path in TIM.
-     */
-    path: string
+  /**
+   * Course virtual path in TIM.
+   */
+  path: string
 
-    /**
-     * List of task sets in the course defined in TIM.
-     */
-    task_docs: Array<TaskSet>
+  /**
+   * List of task sets in the course defined in TIM.
+   */
+  task_docs: Array<TaskSet>
 
-    /**
-     * User specific status for the course
-     */
-    status: CourseStatus
+  /**
+   * User specific status for the course
+   */
+  status: CourseStatus
 
-    /**
-     * Whether or not the course is expanded in the course list
-     */
-    expanded: boolean
-    // TODO: does the thing above belong here / is it necessary to keep track of ui state over sessions
+  /**
+   * Whether or not the course is expanded in the course list
+   */
+  expanded: boolean
+  // TODO: does the thing above belong here / is it necessary to keep track of ui state over sessions
 }
 
 /**
  * Represents a task set
  */
 export interface TaskSet {
-    /**
-     * Task name.
-     */
-    name: string
+  /**
+   * Task name.
+   */
+  name: string
 
-    /**
-     * Doc ID, where task/csPlugin belongs to.
-     */
-    docId: number
+  /**
+   * Doc ID, where task/csPlugin belongs to.
+   */
+  docId: number
 
-    /**
-     * Task virtual path in TIM.
-     */
-    path: string
+  /**
+   * Task virtual path in TIM.
+   */
+  path: string
 
-    /**
-     * Tasks of the taskset
-     */
-    tasks: Array<Task>
+  /**
+   * Tasks of the taskset
+   */
+  tasks: Array<Task>
 }
 
 /**
  * Represents a single task
  */
-export interface Task {
+export interface Task {}
 
-}
-
-export interface TimData {
-
-}
-
+export interface TimData {}
 
 /**
  *  An enum to avoid typo potholes
  */
 export enum MessageType {
-    DownloadTaskSet = 'downloadTaskSet',
-    Login = 'login',
-    LoginData = 'loginData',
-    Logout = 'logout',
-    OnError = 'onError',
-    OnInfo = 'onInfo',
-    OpenSettings = 'openSettings',
-    OpenWorkspace = 'openWorkspace',
-    RequestLoginData = 'requestLoginData',
-    ResetExercise = 'resetExercise',
-    SetDownloadPath = 'setDownloadPath',
-    SetDownloadPathResult = 'setDownloadPathResult',
-    ShowCourses = 'showCourses',
-    ShowOutput = 'showOutput',
-    SubmitTask = 'submitTask',
-    UpdateCoursesToGlobalState = 'updateCoursesToGlobalState',
-    UpdateTimData = 'updateTimData',
+  DownloadTaskSet = 'downloadTaskSet',
+  Login = 'login',
+  LoginData = 'loginData',
+  Logout = 'logout',
+  OnError = 'onError',
+  OnInfo = 'onInfo',
+  OpenSettings = 'openSettings',
+  OpenWorkspace = 'openWorkspace',
+  RequestLoginData = 'requestLoginData',
+  ResetExercise = 'resetExercise',
+  SetDownloadPath = 'setDownloadPath',
+  SetDownloadPathResult = 'setDownloadPathResult',
+  ShowCourses = 'showCourses',
+  ShowOutput = 'showOutput',
+  SubmitTask = 'submitTask',
+  UpdateCoursesToGlobalState = 'updateCoursesToGlobalState',
+  UpdateTimData = 'updateTimData',
 }
