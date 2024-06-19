@@ -11,10 +11,7 @@ import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
 import { Course, LoginData, Task } from '../common/types'
-import {
-  parseCoursesFromJsonString,
-  parseTasksFromJsonString,
-} from '../utilities/parsers'
+import { parseCoursesFromJsonString } from '../utilities/parsers'
 
 export default class Tide {
   public static async debug() {
@@ -39,7 +36,6 @@ export default class Tide {
    * Executes tide logout command.
    */
   public static async logout(): Promise<LoginData> {
-    // TODO: Mitä tapahtuu jos uloskirjautuminen epäonnistuu?
     await this.runAndHandle(['logout'], (data: string) => {
       Logger.info(`Logout: ${data}`)
     })
@@ -55,6 +51,7 @@ export default class Tide {
     await this.runAndHandle(['courses', '--json'], async (data: string) => {
       courses = await parseCoursesFromJsonString(data)
     })
+    console.log(courses)
     return courses
   }
 
@@ -70,7 +67,7 @@ export default class Tide {
     await this.runAndHandle(
       ['task', 'list', taskSetPath, '--json'],
       async (data: string) => {
-        tasks = await parseTasksFromJsonString(data)
+        tasks = JSON.parse(data)
       },
     )
     return tasks

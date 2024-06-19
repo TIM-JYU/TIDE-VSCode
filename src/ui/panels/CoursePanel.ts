@@ -73,7 +73,7 @@ export default class CoursePanel {
    */
   public sendCourseListMessage() {
     let courseArray = ExtensionStateManager.getCourses()
-    console.log(courseArray)
+    console.log('sending to courses webview', courseArray)
 
     // TODO: #refactor# type: 'json' ???
     this.panel?.webview.postMessage({ type: 'json', value: courseArray })

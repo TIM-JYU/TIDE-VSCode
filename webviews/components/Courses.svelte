@@ -5,6 +5,7 @@
    * @license MIT
    * @date 22.3.2024
    */
+
   import CourseList from './CourseList.svelte'
   import { onMount } from 'svelte'
   import {
@@ -15,7 +16,7 @@
   } from '../common/types'
 
   let downloadPath: string = ''
-  let courses: Array<Course>
+  let courses: Array<Course> = []
   let activeCoursesExpanded = true
   let hiddenCoursesExpanded = false
   let loginData: LoginData
@@ -31,7 +32,7 @@
   onMount(() => {
     window.addEventListener('message', (event) => {
       const message = event.data
-      if (message && message.command === 'setPathResult') {
+      if (message && message.command === MessageType.SetDownloadPathResult) {
         downloadPath = message.path
       } else if (message && message.type === 'json') {
         courses = message.value
@@ -41,7 +42,7 @@
     })
     tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
   })
-
+    
   /**
    * Toggles the visibility of courses based on their status.
    * @param {string} status - Tells if the course status is "active" or "hidden".
@@ -54,12 +55,12 @@
 
   /**
    * Updates changes in courses to globalState.
-   * @param coursesJson - courses json array.
+   * @param courses - courses json array.
    */
-  function updateCoursesToGlobalState(coursesJson) {
+  function updateCoursesToGlobalState(courses: Array<Course>) {
     tsvscode.postMessage({
       type: MessageType.UpdateCoursesToGlobalState,
-      value: coursesJson,
+      value: courses,
     })
   }
 
@@ -80,7 +81,7 @@
    * Toggles the expanded/collapsed state of a course information panel.
    * @param {string} courseId - - The unique identifier of the course.
    */
-  function toggleCourse(courseId) {
+  function toggleCourse(courseId: number) {
     const courseIndex = courses.findIndex((course) => course.id === courseId)
     if (courseIndex !== -1) {
       courses[courseIndex].expanded = !courses[courseIndex].expanded
@@ -129,7 +130,7 @@
     })
   }
 
-  $: isLoggedIn = loginData.isLogged ?? false
+  $: isLoggedIn = loginData?.isLogged ?? false
 </script>
 
 <!--

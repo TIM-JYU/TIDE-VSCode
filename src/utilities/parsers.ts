@@ -1,10 +1,10 @@
 import Tide from '../api/tide'
-import { Course, Task } from '../common/types'
+import { Course, Task, TimData } from '../common/types'
 
 /**
  * Parses courses from a json string
  *
- * @param data - A JSON string with the data
+ * @param data - A JSON string containing the data
  * @returns A promise with an array of courses
  */
 export async function parseCoursesFromJsonString(
@@ -23,12 +23,12 @@ export async function parseCoursesFromJsonString(
 /**
  * Parses tasks from a json string
  *
- * @param data - A JSON string with the data
- * @returns A promise with an array of tasks
+ * @param data - A JSON string containing the data
+ * @returns An array of tasks
  */
-export async function parseTasksFromJsonString(
-  data: string,
-): Promise<Array<Task>> {
-  // TODO: What info on tasks is required? Currently only the length of the array is used else where in code.
-  return JSON.parse(data).map((_task: Task) => {})
+export function parseTasksFromJsonString(data: string): Array<Task> {
+  // TODO: What info on tasks is required? Currently only the length of the array is used elsewhere in code.
+  return JSON.parse(data).map((_task: Task) => {
+    return { task_doc_id: _task.task_doc_id }
+  })
 }

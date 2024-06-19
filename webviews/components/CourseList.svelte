@@ -9,15 +9,15 @@
   import MenuItem from './MenuItem.svelte'
   import { type Course, type CourseStatus } from '../common/types'
 
-  export let status: CourseStatus // "active" or "hidden"
-  export let courses: Array<Course> // array of courses
+  export let status: CourseStatus
+  export let courses: Array<Course>
   export let moveCourse // function to move a course between lists
   export let downloadTaskSet // function to download a task set
   export let openWorkspace // function to open a workspace for task set
-  export let isExpanded // "true" or "false"
+  export let isExpanded: boolean
   export let toggle // function to hide or show "active" or "hidden" category for courses
   export let toggleCourse // function to collapse or expand the course information
-  export let isLoggedIn
+  export let isLoggedIn: boolean
 
   /**
    * Gets the opposite course status.
@@ -88,13 +88,13 @@ or opening workspaces.
                   <td>{taskset.name}</td>
                   <td>{taskset.tasks.length}</td>
                   <!-- <td>6/8</td> -->
-                  <td
-                    ><button
+                  <td>
+                    <button
                       class="download-button"
                       on:click={() => downloadTaskSet(taskset.path)}
                       disabled={!isLoggedIn}>Download</button
-                    ></td
-                  >
+                    >
+                  </td>
                   <td
                     ><button
                       class="open-workspace"

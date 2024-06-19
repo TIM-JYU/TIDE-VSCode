@@ -7,11 +7,11 @@
    */
 
   import { onMount } from 'svelte'
-  import { MessageType } from '../common/types'
+  import { MessageType, type LoginData, type TimData } from '../common/types'
 
   // TODO: timdata type
-  let timData: unknown = null
-  let loginData = {}
+  let timData: TimData
+  let loginData: LoginData
   let isLoggedIn = false
 
   /**
@@ -81,7 +81,7 @@
 This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
 -->
 
-{#if timData === ''}
+{#if timData === null}
   <p>
     Task Panel only shows information when you have a TIM task document open in
     the text editor. If you are sure you have a TIM task open, try clicking the
@@ -93,11 +93,11 @@ This component manages the display of task information and interaction with task
 {:else}
   <div class="task-panel">
     {#if timData.header !== null}
-      <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
+      <h1>{workspaceName(timData.path)} - {timData.ideTaskId}</h1>
       <h2>{timData.header}</h2>
     {:else}
-      <h1>{workspaceName(timData.path)} - {timData.ide_task_id}</h1>
-      <h2>{timData.task_files[0].file_name}</h2>
+      <h1>{workspaceName(timData.path)} - {timData.ideTaskId}</h1>
+      <h2>{timData.taskFiles[0].file_name}</h2>
     {/if}
     <div class="instructions">
       {#if timData.stem !== null}
@@ -134,10 +134,10 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
-    {#if timData.task_files.length < 2}
+    {#if timData.taskFiles.length < 2}
       <div class="reset-section">
         <button
-          on:click={() => resetExercise(timData.path, timData.ide_task_id)}
+          on:click={() => resetExercise(timData.path, timData.ideTaskId)}
           disabled={!isLoggedIn}>Reset Exercise</button
         >
         <!-- <button>Fetch Latest Answer</button> -->

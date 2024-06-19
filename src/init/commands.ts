@@ -78,6 +78,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const timDataContent = await vscode.workspace.fs.readFile(
         vscode.Uri.joinPath(currentDirectory, '.timdata'),
       )
+
       // Convert the content to a string.
       const timDataString = timDataContent.toString()
       const timDataJson = JSON.parse(timDataString)

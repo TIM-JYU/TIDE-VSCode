@@ -1,7 +1,4 @@
-export interface LoginData {
-  isLogged: boolean
-}
-
+// TODO: snake_case to camelCase conversion (either when parsing in ide code or when sending in cli code) to follow typescript naming conventions
 export type CourseStatus = 'active' | 'hidden'
 
 /**
@@ -9,32 +6,32 @@ export type CourseStatus = 'active' | 'hidden'
  */
 export interface Course {
   /**
-   * Course name.
+   * Name of the course.
    */
   name: string
 
   /**
-   * Course ID.
+   * ID of the course.
    */
   id: number
 
   /**
-   * Course virtual path in TIM.
+   * The course's virtual path in TIM.
    */
   path: string
 
   /**
-   * List of task sets in the course defined in TIM.
+   * List of task sets that are defined as part of the course in TIM.
    */
   task_docs: Array<TaskSet>
 
   /**
-   * User specific status for the course
+   * User specific status for the course.
    */
   status: CourseStatus
 
   /**
-   * Whether or not the course is expanded in the course list
+   * Whether or not the course is expanded in the course list.
    */
   expanded: boolean
   // TODO: does the thing above belong here / is it necessary to keep track of ui state over sessions
@@ -45,17 +42,17 @@ export interface Course {
  */
 export interface TaskSet {
   /**
-   * Task name.
+   * Name of the task.
    */
   name: string
 
   /**
-   * Doc ID, where task/csPlugin belongs to.
+   * ID of the document containing the task/csPlugin.
    */
-  docId: number
+  doc_id: number
 
   /**
-   * Task virtual path in TIM.
+   * Task set's virtual path in TIM.
    */
   path: string
 
@@ -68,9 +65,54 @@ export interface TaskSet {
 /**
  * Represents a single task
  */
-export interface Task {}
+export interface Task {
+  // TODO: what data belongs here? current and max points? Data coming from
+  // Following is printed by CLI tool:
+  //
+  // doc_id:
+  // 639244
+  // header:
+  // null
+  // ide_task_id:
+  // 't8'
+  // path:
+  // 'kurssit/tie/ohj2/2024k/demot/DemoC1'
+  // stem:
+  // null
+  // task_files:
+  // (1) [{…}]
+  // type:
+  // 'c++/comtest'
+}
 
-export interface TimData {}
+/**
+ * Data included in .timdata
+ */
+export interface TimData {
+  path: string
+  type: string
+  doc_id: number
+  ide_task_id: string
+  task_files: TaskFile[]
+  stem: string | null
+  header: string | null
+}
+
+export interface TaskFile {
+  task_id_ext: string
+  content: string
+  file_name: string
+  source: string
+  user_input: string
+  user_args: string
+}
+
+/**
+ * Data associated with logged in user
+ */
+export interface LoginData {
+  isLogged: boolean
+}
 
 /**
  *  An enum to avoid typo potholes
