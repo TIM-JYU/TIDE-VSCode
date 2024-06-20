@@ -10,6 +10,7 @@
 import * as vscode from 'vscode'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
+import UiController from '../ui/UiController'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
   let lastActiveEditor: vscode.TextEditor | undefined
@@ -26,7 +27,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
         if (editor.document && editor.document.uri.scheme === 'file') {
           lastActiveEditor = editor
 
-          vscode.commands.executeCommand('tide.showTaskPanel')
+          UiController.showTaskPanel()
         }
       }
     },

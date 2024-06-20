@@ -10,6 +10,7 @@ import * as vscode from 'vscode'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { LoginData, MessageType } from '../../common/types'
+import path from 'path'
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -181,10 +182,10 @@ export default class CoursePanel {
           const taskSetPath = data.taskSetPath
           const downloadPath =
             ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
-          let folder = downloadPath + '/' + taskSetName
+          let directory = path.join(downloadPath, taskSetName)
           vscode.commands.executeCommand(
             'vscode.openFolder',
-            vscode.Uri.file(folder),
+            vscode.Uri.file(directory),
           )
           break
         }

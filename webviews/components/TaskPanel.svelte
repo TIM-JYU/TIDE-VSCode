@@ -8,8 +8,8 @@
 
   import { onMount } from 'svelte'
   import { MessageType, type LoginData, type TimData } from '../common/types'
+  import path from 'path'
 
-  // TODO: timdata type
   let timData: TimData
   let loginData: LoginData
   let isLoggedIn = false
@@ -35,18 +35,8 @@
   function submitTask() {
     tsvscode.postMessage({
       type: MessageType.SubmitTask,
-      value: {},
+      value: path.join(timData.path, timData.ide_task_id)
     })
-  }
-
-  /**
-   * Parses the current workspace's name from tide path
-   * @param name - tide path
-   */
-  function workspaceName(name: string) {
-    const lastIndex = name.lastIndexOf('/')
-    name = name.substring(lastIndex + 1, name.length)
-    return name
   }
 
   /**
@@ -63,7 +53,7 @@
    * Resets the task file to it's initial stage from TIM.
    * @param taskId ide task id of the task
    */
-  function resetExercise(path: string, taskId: number) {
+  function resetExercise(path: string, taskId: string) {
     tsvscode.postMessage({
       type: MessageType.ResetExercise,
       value: {
@@ -93,11 +83,11 @@ This component manages the display of task information and interaction with task
 {:else}
   <div class="task-panel">
     {#if timData.header !== null}
-      <h1>{workspaceName(timData.path)} - {timData.ideTaskId}</h1>
+      <h1>{path.basename(timData.path)} - {timData.ide_task_id}</h1>
       <h2>{timData.header}</h2>
     {:else}
-      <h1>{workspaceName(timData.path)} - {timData.ideTaskId}</h1>
-      <h2>{timData.taskFiles[0].file_name}</h2>
+      <h1>{path.basename(timData.path)} - {timData.ide_task_id}</h1>
+      <h2>{timData.task_files[0].file_name}</h2>
     {/if}
     <div class="instructions">
       {#if timData.stem !== null}
@@ -134,10 +124,10 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
-    {#if timData.taskFiles.length < 2}
+    {#if timData.task_files.length < 2}
       <div class="reset-section">
         <button
-          on:click={() => resetExercise(timData.path, timData.ideTaskId)}
+          on:click={() => resetExercise(timData.path, timData.ide_task_id)}
           disabled={!isLoggedIn}>Reset Exercise</button
         >
         <!-- <button>Fetch Latest Answer</button> -->

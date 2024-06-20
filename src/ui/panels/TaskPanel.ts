@@ -9,12 +9,11 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData, MessageType } from '../../common/types'
+import { LoginData, MessageType, TimData } from '../../common/types'
+import path from 'path'
 
 export default class TaskPanel {
   public static currentPanel: TaskPanel | undefined
-  private timData: string = ''
-  private submitPath: string = ''
 
   private static readonly fileNamePrefix = 'TaskPanel'
   private static readonly viewType = 'TaskPanel'
@@ -27,23 +26,10 @@ export default class TaskPanel {
 
   public static createOrShow(
     extensionUri: vscode.Uri,
-    timDataContent: string,
-    currentDirectory: string,
   ) {
-    const column = vscode.ViewColumn.Two
-
     // If we already have a panel, show it.
     if (TaskPanel.currentPanel) {
-      TaskPanel.currentPanel.submitPath = currentDirectory
-      TaskPanel.currentPanel.timData = timDataContent
-      TaskPanel.currentPanel.update(
-        TaskPanel.currentPanel.timData,
-        currentDirectory,
-      ) // Update the panel with the new timDataContent
-      TaskPanel.currentPanel.panel.webview.postMessage({
-        command: MessageType.UpdateTimData,
-        data: timDataContent,
-      })
+      TaskPanel.currentPanel.update()
       return
     }
 
@@ -57,25 +43,16 @@ export default class TaskPanel {
       },
       getWebviewOptions(extensionUri),
     )
-    TaskPanel.currentPanel = new TaskPanel(
-      panel,
-      extensionUri,
-      timDataContent,
-      currentDirectory,
-    )
+    TaskPanel.currentPanel = new TaskPanel(panel, extensionUri)
   }
 
   public static revive(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri,
-    timDataContent: string,
-    currentDirectory: string,
   ) {
     TaskPanel.currentPanel = new TaskPanel(
       panel,
       extensionUri,
-      timDataContent,
-      currentDirectory,
     )
   }
 
@@ -89,13 +66,9 @@ export default class TaskPanel {
   private constructor(
     panel: vscode.WebviewPanel,
     extensionUri: vscode.Uri,
-    timData: string,
-    currentDirectory: string,
   ) {
     this.panel = panel
     this.extensionUri = extensionUri
-    this.timData = timData
-    this.submitPath = currentDirectory
 
     // subscribe to changes in login data
     this.disposables.push(
@@ -106,7 +79,7 @@ export default class TaskPanel {
     )
 
     // Set the webview's initial html content.
-    this.update(this.timData, this.submitPath)
+    this.update()
 
     // Listen for when the panel is disposed.
     // This happens when the user closes the panel or when the panel is closed programmatically.
@@ -116,7 +89,7 @@ export default class TaskPanel {
     this.panel.onDidChangeViewState(
       (e) => {
         if (this.panel.visible) {
-          this.update(this.timData, this.submitPath)
+          this.update()
         }
       },
       null,
@@ -141,7 +114,7 @@ export default class TaskPanel {
           break
         }
         case MessageType.SubmitTask: {
-          vscode.commands.executeCommand('tide.submitTask', this.submitPath)
+          vscode.commands.executeCommand('tide.submitTask', data.value)
           break
         }
         case MessageType.ShowOutput: {
@@ -202,12 +175,43 @@ export default class TaskPanel {
     }
   }
 
-  private update(timDataContent: string, currentDirectory: string) {
+  /** 
+   * 
+   * 
+   */
+  private async getTimData(): Promise<TimData | undefined> {
+    const currentTextEditor = vscode.window.activeTextEditor
+    switch (currentTextEditor) {
+      case undefined: {
+        return undefined
+      }
+
+      default: {
+        try {
+          // activeTextEditor banged! because the case of undefined is handled above
+          const filePath = path.dirname(vscode.window.activeTextEditor!.document.fileName)
+          const timDataContent = await vscode.workspace.fs.readFile(
+            vscode.Uri.joinPath(vscode.Uri.file(filePath), '.timdata'),
+          )
+
+          const timData: TimData = JSON.parse(timDataContent.toString())
+
+          return timData
+        } catch {
+          return undefined
+        }
+      }
+    }
+
+  }
+
+  private async update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
+    const timData: TimData | undefined = await this.getTimData()
     this.panel.webview.postMessage({
       type: MessageType.UpdateTimData,
-      value: timDataContent,
+      value: timData,
     })
   }
 

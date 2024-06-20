@@ -22,8 +22,8 @@ export default class UiController {
    * @param timDataJson - .timdata file from the task.
    * @param submitPath - the path that is needed if answer is submitted.
    */
-  static showTaskPanel(timDataJson: string, submitPath: string) {
-    TaskPanel.createOrShow(this.ctx.extensionUri, timDataJson, submitPath)
+  static showTaskPanel() {
+    TaskPanel.createOrShow(this.ctx.extensionUri)
   }
 
   /**

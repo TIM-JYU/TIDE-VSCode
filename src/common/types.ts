@@ -115,24 +115,25 @@ export interface LoginData {
 }
 
 /**
- *  An enum to avoid typo potholes
+ * "type" values for messages sent between panels and webviews
  */
 export enum MessageType {
-  DownloadTaskSet = 'downloadTaskSet',
-  Login = 'login',
-  LoginData = 'loginData',
-  Logout = 'logout',
-  OnError = 'onError',
-  OnInfo = 'onInfo',
-  OpenSettings = 'openSettings',
-  OpenWorkspace = 'openWorkspace',
-  RequestLoginData = 'requestLoginData',
-  ResetExercise = 'resetExercise',
-  SetDownloadPath = 'setDownloadPath',
-  SetDownloadPathResult = 'setDownloadPathResult',
-  ShowCourses = 'showCourses',
-  ShowOutput = 'showOutput',
-  SubmitTask = 'submitTask',
-  UpdateCoursesToGlobalState = 'updateCoursesToGlobalState',
-  UpdateTimData = 'updateTimData',
+  // Starts from 1 to avoid mayhem caused by possible comparison to 0
+  DownloadTaskSet = 1,
+  Login,
+  LoginData,
+  Logout,
+  OnError,
+  OnInfo,
+  OpenSettings,
+  OpenWorkspace,
+  RequestLoginData,
+  ResetExercise,
+  SetDownloadPath,
+  SetDownloadPathResult,
+  ShowCourses,
+  ShowOutput,
+  SubmitTask,
+  UpdateCoursesToGlobalState,
+  UpdateTimData,
 }
