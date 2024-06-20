@@ -1,8 +1,8 @@
 import * as _vscode from "vscode";
-import { MessageType } from "./common/types";
+import { MessageType, type WebviewMessage } from "./common/types";
 
 declare global {
 	const tsvscode: {
-		postMessage: ({ type: MessageType, value: unknown }) => void;
+		postMessage: ({ type: MessageType, value: any }: WebviewMessage) => void;
 	};
 }

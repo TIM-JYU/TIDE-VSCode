@@ -13,6 +13,7 @@
     type CourseStatus,
     type LoginData,
     MessageType,
+    type WebviewMessage,
   } from '../common/types'
 
   let downloadPath: string = ''
@@ -31,18 +32,22 @@
    */
   onMount(() => {
     window.addEventListener('message', (event) => {
-      const message = event.data
-      if (message && message.command === MessageType.SetDownloadPathResult) {
-        downloadPath = message.path
-      } else if (message && message.type === 'json') {
-        courses = message.value
-      } else if (message.type === MessageType.LoginData) {
-        loginData = message.value
+      const message: WebviewMessage = event.data
+      switch (message.type) {
+        case MessageType.SetDownloadPathResult: {
+          downloadPath = message.value
+        }
+        case MessageType.CourseData: {
+          courses = message.value
+        }
+        case MessageType.LoginData: {
+          loginData = message.value
+        }
       }
     })
     tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
   })
-    
+
   /**
    * Toggles the visibility of courses based on their status.
    * @param {string} status - Tells if the course status is "active" or "hidden".

@@ -66,6 +66,7 @@ export interface TaskSet {
  * Represents a single task
  */
 export interface Task {
+  task_doc_id: number
   // TODO: what data belongs here? current and max points? Data coming from
   // Following is printed by CLI tool:
   //
@@ -114,12 +115,23 @@ export interface LoginData {
   isLogged: boolean
 }
 
+
+
+/**
+ * Messages sent between panels and webviews
+ */
+export interface WebviewMessage {
+    type: MessageType
+    value: any
+}
+
 /**
  * "type" values for messages sent between panels and webviews
  */
 export enum MessageType {
   // Starts from 1 to avoid mayhem caused by possible comparison to 0
-  DownloadTaskSet = 1,
+  CourseData = 1,
+  DownloadTaskSet,
   Login,
   LoginData,
   Logout,

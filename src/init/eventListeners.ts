@@ -27,6 +27,8 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
         if (editor.document && editor.document.uri.scheme === 'file') {
           lastActiveEditor = editor
 
+          // TODO: Do not open the task panel if .timdata is not present in the same directory (might get annoying if you use vscode for things other than programming courses)
+
           UiController.showTaskPanel()
         }
       }

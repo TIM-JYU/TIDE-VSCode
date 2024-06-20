@@ -57,8 +57,8 @@ export default class CoursePanel {
       .getConfiguration()
       .get('TIM-IDE.fileDownloadPath')
     this.panel.webview.postMessage({
-      command: MessageType.SetDownloadPathResult,
-      path: initialPath ? initialPath : null,
+      type: MessageType.SetDownloadPathResult,
+      value: initialPath ? initialPath : null,
     })
   }
 
@@ -146,8 +146,8 @@ export default class CoursePanel {
           }
           // Send the selected path back to the webview
           this.panel.webview.postMessage({
-            command: MessageType.SetDownloadPathResult,
-            path: newPath ? newPath[0].fsPath : null,
+            type: MessageType.SetDownloadPathResult,
+            value: newPath ? newPath[0].fsPath : null,
           })
           // Update the configuration with the new path
           const updatedPath = newPath ? newPath[0].fsPath : null
@@ -228,8 +228,8 @@ export default class CoursePanel {
     this.panel.webview.html = this.getHtmlForWebview(webview)
     const path = ExtensionStateManager.getDownloadPath()
     this.panel.webview.postMessage({
-      command: MessageType.SetDownloadPathResult,
-      path: path ? path : null,
+      type: MessageType.SetDownloadPathResult,
+      value: path ? path : null,
     })
   }
   private getHtmlForWebview(webview: vscode.Webview) {
