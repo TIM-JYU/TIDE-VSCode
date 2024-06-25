@@ -13,6 +13,7 @@ export async function parseCoursesFromJsonString(
   const courses: Array<Course> = JSON.parse(data)
   courses.forEach((c) => {
     c.status = 'active'
+    c.expanded = true
     c.task_docs.forEach(
       async (t) => (t.tasks = await Tide.getTaskListForTaskSetPath(t.path)),
     )

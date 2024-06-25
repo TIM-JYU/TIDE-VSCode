@@ -12,7 +12,6 @@
     type Course,
     type CourseStatus,
     type LoginData,
-    MessageType,
     type WebviewMessage,
   } from '../common/types'
 
@@ -33,19 +32,23 @@
   onMount(() => {
     window.addEventListener('message', (event) => {
       const message: WebviewMessage = event.data
+
       switch (message.type) {
-        case MessageType.SetDownloadPathResult: {
+        case 'SetDownloadPathResult': {
           downloadPath = message.value
+          break
         }
-        case MessageType.CourseData: {
+        case 'CourseData': {
           courses = message.value
+          break
         }
-        case MessageType.LoginData: {
+        case 'LoginData': {
           loginData = message.value
+          break
         }
       }
     })
-    tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
+    tsvscode.postMessage({ type: 'RequestLoginData', value: undefined })
   })
 
   /**
@@ -64,7 +67,7 @@
    */
   function updateCoursesToGlobalState(courses: Array<Course>) {
     tsvscode.postMessage({
-      type: MessageType.UpdateCoursesToGlobalState,
+      type: 'UpdateCoursesToGlobalState',
       value: courses,
     })
   }
@@ -87,6 +90,8 @@
    * @param {string} courseId - - The unique identifier of the course.
    */
   function toggleCourse(courseId: number) {
+    // TODO: is it necessary to keep expanded state in permanent storage?
+
     const courseIndex = courses.findIndex((course) => course.id === courseId)
     if (courseIndex !== -1) {
       courses[courseIndex].expanded = !courses[courseIndex].expanded
@@ -100,7 +105,7 @@
    */
   function directoryNotSet() {
     tsvscode.postMessage({
-      type: MessageType.OnError,
+      type: 'OnError',
       value: 'Directory for downloading tasks must be set',
     })
   }
@@ -116,7 +121,7 @@
     }
 
     tsvscode.postMessage({
-      type: MessageType.DownloadTaskSet,
+      type: 'DownloadTaskSet',
       value: taskSetPath,
     })
   }
@@ -127,7 +132,7 @@
    */
   function openWorkspace(taskSetName: string, taskSetPath: string) {
     tsvscode.postMessage({
-      type: MessageType.OpenWorkspace,
+      type: 'OpenWorkspace',
       value: {
         taskSetName,
         taskSetPath,
@@ -146,12 +151,14 @@ updates the courses' status, and handles downloading task sets and opening works
 
 <h1>My Courses</h1>
 
+<h3>{JSON.stringify(courses)}</h3>
+
 <p>Current directory for downloading files: {downloadPath}</p>
 
 <button
   on:click={() => {
     tsvscode.postMessage({
-      type: MessageType.SetDownloadPath,
+      type: 'SetDownloadPath',
       value: '',
     })
   }}>Set directory</button
@@ -168,7 +175,7 @@ updates the courses' status, and handles downloading task sets and opening works
     toggle={toggleVisibility}
     {toggleCourse}
     status={'active'}
-    courses={courses.filter((c) => c.status == 'active')}
+    courses={courses.filter((c) => c.status === 'active')}
     {moveCourse}
     {downloadTaskSet}
     {openWorkspace}
@@ -180,7 +187,7 @@ updates the courses' status, and handles downloading task sets and opening works
     toggle={toggleVisibility}
     {toggleCourse}
     status={'hidden'}
-    courses={courses.filter((c) => c.status == 'hidden')}
+    courses={courses.filter((c) => c.status === 'hidden')}
     {moveCourse}
     {downloadTaskSet}
     {openWorkspace}

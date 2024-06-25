@@ -7,7 +7,7 @@
    */
 
   import { onMount } from 'svelte'
-  import { type LoginData, MessageType } from '../common/types'
+  import { type LoginData } from '../common/types'
   let isLoggedIn = false
   let loginData: LoginData
 
@@ -17,12 +17,12 @@
   onMount(() => {
     window.addEventListener('message', (event) => {
       const message = event.data
-      if (message && message.type === MessageType.LoginData) {
+      if (message && message.type === 'LoginData') {
         loginData = message.value
       }
     })
 
-    tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
+    tsvscode.postMessage({ type: 'RequestLoginData', value: '' })
   })
 
   /**
@@ -30,7 +30,7 @@
    */
   function handleLogin() {
     tsvscode.postMessage({
-      type: MessageType.Login,
+      type: 'Login',
       value: '',
     })
   }
@@ -40,7 +40,7 @@
    */
   function handleLogout() {
     tsvscode.postMessage({
-      type: MessageType.Logout,
+      type: 'Logout',
       value: '',
     })
   }
@@ -63,7 +63,7 @@ It listens for messages from the extension to handle login and logout functional
         <button
           on:click={() => {
             tsvscode.postMessage({
-              type: MessageType.ShowCourses,
+              type: 'ShowCourses',
               value: '',
             })
           }}>My Courses</button
@@ -77,7 +77,7 @@ It listens for messages from the extension to handle login and logout functional
       <button
         on:click={() => {
           tsvscode.postMessage({
-            type: MessageType.OpenSettings,
+            type: 'OpenSettings',
             value: '',
           })
         }}>Settings</button

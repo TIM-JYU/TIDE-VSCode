@@ -64,6 +64,11 @@
 				"category": "TIM-IDE"
 			},
 			{
+				"command": "tide.clearCourseCache",
+				"title": "Clear local course metadata",
+				"category": "TIM-IDE"
+			},
+			{
 				"command": "tide.updateCoursesFromTim",
 				"title": "Update courses from TIM",
 				"category": "TIM-IDE"

@@ -7,73 +7,96 @@
    */
 
   import { onMount } from 'svelte'
-  import { MessageType, type LoginData, type TimData } from '../common/types'
+  import {
+    type LoginData,
+    type TimData,
+    type WebviewMessage,
+  } from '../common/types'
   import path from 'path'
 
-  let timData: TimData
-  let loginData: LoginData
+  let timData: TimData | undefined
+  let loginData: LoginData | undefined
   let isLoggedIn = false
+  // let messages: Array<string> = []
 
   /**
    * Listens for messages from CoursePanel.ts.
    */
   onMount(() => {
     window.addEventListener('message', (event) => {
-      const message = event.data
+      const message: WebviewMessage = event.data
+     // messages = [...messages, JSON.stringify(message)]
       switch (message.type) {
-        case MessageType.UpdateTimData: {
+        case 'UpdateTimData': {
           timData = message.value
+          break
         }
-        case MessageType.LoginData: {
+        case 'LoginData': {
           loginData = message.value
+          break
         }
       }
     })
-    tsvscode.postMessage({ type: MessageType.RequestLoginData, value: '' })
+    // tsvscode.postMessage({ type: 'RequestLoginData', value: undefined })
   })
 
   /**
    * Sends message to TaskPanel about submitting exercise
    */
-  function submitTask() {
-    tsvscode.postMessage({
-      type: MessageType.SubmitTask,
-      value: path.join(timData.path, timData.ide_task_id),
-    })
-  }
+  // TODO: Broken
+  //  function submitTask() {
+  //    tsvscode.postMessage({
+  //      type: 'SubmitTask',
+  //      value: path.join(timData.path, timData.ide_task_id),
+  //    })
+  //  }
 
+  // TODO: Broken
   /**
    * Shows the output console
    */
-  function showOutput() {
-    tsvscode.postMessage({
-      type: MessageType.ShowOutput,
-      value: {},
-    })
-  }
+  //  function showOutput() {
+  //    tsvscode.postMessage({
+  //      type: 'ShowOutput',
+  //      value: undefined,
+  //    })
+  //  }
 
   /**
    * Resets the task file to it's initial stage from TIM.
    * @param taskId ide task id of the task
    */
-  function resetExercise(path: string, taskId: string) {
-    tsvscode.postMessage({
-      type: MessageType.ResetExercise,
-      value: {
-        path,
-        taskId,
-      },
-    })
+  function resetExercise() {
+    if (timData) {
+      tsvscode.postMessage({
+        type: 'ResetExercise',
+        value: {
+          path: timData.path,
+          taskId: timData.ide_task_id,
+        },
+      })
+    }
   }
 
-  $: workspace = path.basename(timData.path)
-  $: isLoggedIn = loginData.isLogged ?? false
+  $: workspace = '// TODO: workspace placeholder'
+  $: isLoggedIn = loginData?.isLogged ?? false
 </script>
 
 <!--
 @component
 This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
 -->
+
+<h1>loginData</h1>
+<h3>{JSON.stringify(loginData)}</h3>
+
+<!--
+<h1>login data messages</h1>
+{#each messages as msg}
+<p>{msg}</p>
+{/each}
+-->
+
 
 {#if timData === null}
   <p>
@@ -115,10 +138,10 @@ This component manages the display of task information and interaction with task
       </p>
       <button
         class="submit-exercise"
-        on:click={() => submitTask()}
+        on:click={submitTask}
         disabled={!isLoggedIn}>Submit Exercise</button
       >
-      <button on:click={() => showOutput()}>Show Output</button>
+      <button on:click={showOutput}>Show Output</button>
       <!-- <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
@@ -130,9 +153,8 @@ This component manages the display of task information and interaction with task
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
     {#if timData.task_files.length < 2}
       <div class="reset-section">
-        <button
-          on:click={() => resetExercise(timData.path, timData.ide_task_id)}
-          disabled={!isLoggedIn}>Reset Exercise</button
+        <button on:click={resetExercise} disabled={!isLoggedIn}
+          >Reset Exercise</button
         >
         <!-- <button>Fetch Latest Answer</button> -->
       </div>

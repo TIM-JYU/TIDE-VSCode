@@ -43,7 +43,7 @@ or opening workspaces.
   {#each courses as course (course.id)}
     <div class="course-box">
       <header>
-        <p clss="courseTitle">{course.name}</p>
+        <p class="courseTitle">{course.name}</p>
         <Menu>
           <span slot="toggle">&#8942;</span>
           <MenuItem slot="menucontent">

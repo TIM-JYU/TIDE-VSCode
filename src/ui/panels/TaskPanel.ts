@@ -9,8 +9,10 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData, MessageType, TimData } from '../../common/types'
+import { LoginData, MessageType, TimData, WebviewMessage } from '../../common/types'
 import path from 'path'
+import Logger from '../../utilities/logger'
+import { log } from 'console'
 
 export default class TaskPanel {
   public static currentPanel: TaskPanel | undefined
@@ -23,6 +25,10 @@ export default class TaskPanel {
   private readonly panel: vscode.WebviewPanel
   private readonly extensionUri: vscode.Uri
   private disposables: vscode.Disposable[] = []
+
+  private static lastActiveTextEditor: vscode.TextEditor
+  private static loginData: LoginData
+
 
   public static createOrShow(
     extensionUri: vscode.Uri,
@@ -44,6 +50,7 @@ export default class TaskPanel {
       getWebviewOptions(extensionUri),
     )
     TaskPanel.currentPanel = new TaskPanel(panel, extensionUri)
+    TaskPanel.currentPanel.update()
   }
 
   public static revive(
@@ -56,11 +63,9 @@ export default class TaskPanel {
     )
   }
 
-  private sendLoginData(loginData: LoginData) {
-    this.panel.webview.postMessage({
-      type: MessageType.LoginData,
-      value: loginData,
-    })
+  private updateLoginData(loginData: LoginData) {
+    TaskPanel.loginData = loginData
+    this.sendLoginData()
   }
 
   private constructor(
@@ -74,7 +79,7 @@ export default class TaskPanel {
     this.disposables.push(
       ExtensionStateManager.subscribe(
         'loginData',
-        this.sendLoginData.bind(this),
+        this.updateLoginData.bind(this),
       ),
     )
 
@@ -97,34 +102,34 @@ export default class TaskPanel {
     )
 
     // Handle messages from the webview.
-    this.panel.webview.onDidReceiveMessage(async (data) => {
-      switch (data.type) {
-        case MessageType.OnInfo: {
-          if (!data.value) {
+    this.panel.webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
+      switch (msg.type) {
+        case 'OnInfo': {
+          if (!msg.value) {
             return
           }
-          vscode.window.showInformationMessage(data.value)
+          vscode.window.showInformationMessage(msg.value)
           break
         }
-        case MessageType.OnError: {
-          if (!data.value) {
+        case 'OnError': {
+          if (!msg.value) {
             return
           }
-          vscode.window.showErrorMessage(data.value)
+          vscode.window.showErrorMessage(msg.value)
           break
         }
-        case MessageType.SubmitTask: {
-          vscode.commands.executeCommand('tide.submitTask', data.value)
+        case 'SubmitTask': {
+          vscode.commands.executeCommand('tide.submitTask', msg.value)
           break
         }
-        case MessageType.ShowOutput: {
+        case 'ShowOutput': {
           vscode.commands.executeCommand('workbench.action.output.toggleOutput')
           vscode.commands.executeCommand(
             'workbench.action.focusFirstEditorGroup',
           )
           break
         }
-        case MessageType.ResetExercise: {
+        case 'ResetExercise': {
           vscode.window
             .showInformationMessage(
               'Are you sure you want to reset exercise? All unsubmitted changes will be lost.',
@@ -133,8 +138,8 @@ export default class TaskPanel {
             )
             .then((answer) => {
               if (answer === 'Continue') {
-                let taskSetPath = data.path
-                let taskId = data.taskId
+                let taskSetPath = msg.value.path
+                let taskId = msg.value.taskId
                 let fileLocation =
                   ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
                 vscode.commands.executeCommand(
@@ -147,8 +152,8 @@ export default class TaskPanel {
             })
           break
         }
-        case MessageType.RequestLoginData: {
-          this.sendLoginData(ExtensionStateManager.getLoginData())
+        case 'RequestLoginData': {
+            this.sendLoginData()
         }
       }
     })
@@ -175,8 +180,11 @@ export default class TaskPanel {
     }
   }
 
+  public static updateLastActiveEditor(editor: vscode.TextEditor) {
+    this.lastActiveTextEditor = editor
+  }
+
   /** 
-   * 
    * 
    */
   private async getTimData(): Promise<TimData | undefined> {
@@ -189,11 +197,11 @@ export default class TaskPanel {
       default: {
         try {
           // activeTextEditor banged! because the case of undefined is handled above
-          const filePath = path.dirname(vscode.window.activeTextEditor!.document.fileName)
-          const timDataContent = await vscode.workspace.fs.readFile(
-            vscode.Uri.joinPath(vscode.Uri.file(filePath), '.timdata'),
-          )
-
+          const doc = currentTextEditor.document
+          const currentFile = doc.fileName
+          const currentDir = path.dirname(currentFile)
+          const timDataPath = path.join(currentDir, '.timdata')
+          const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
           const timData: TimData = JSON.parse(timDataContent.toString())
 
           return timData
@@ -205,14 +213,23 @@ export default class TaskPanel {
 
   }
 
+  private async sendLoginData() {
+    const loginDataMsg: WebviewMessage = { type: 'LoginData', value: TaskPanel.loginData }
+    await this.panel.webview.postMessage(loginDataMsg)
+  }
+
+  private async sendTimData() {
+    const timData: TimData | undefined = await this.getTimData()
+    const timDataMsg: WebviewMessage = { type: 'UpdateTimData', value: timData }
+    await this.panel.webview.postMessage(timDataMsg)
+  }
+
   private async update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
-    const timData: TimData | undefined = await this.getTimData()
-    this.panel.webview.postMessage({
-      type: MessageType.UpdateTimData,
-      value: timData,
-    })
+    // TODO: For one reason or another the message sent by sendLoginData() doesn't appear in the webview if the function isn't run BEFORE sendTimData() 
+    await this.sendLoginData()
+    await this.sendTimData()
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {

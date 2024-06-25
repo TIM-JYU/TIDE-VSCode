@@ -11,6 +11,7 @@ import * as vscode from 'vscode'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
 import UiController from '../ui/UiController'
+import TaskPanel from '../ui/panels/TaskPanel'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
   let lastActiveEditor: vscode.TextEditor | undefined

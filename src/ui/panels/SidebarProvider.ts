@@ -9,8 +9,9 @@ exports
  */
 import * as vscode from 'vscode'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData, MessageType } from '../../common/types'
+import { LoginData, MessageType, WebviewMessage } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
+import Logger from '../../utilities/logger'
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView
@@ -26,7 +27,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
    */
   public sendLoginValue(loginData: LoginData) {
     this._view?.webview.postMessage({
-      type: MessageType.LoginData,
+      type: 'LoginData',
       value: loginData,
     })
   }
@@ -43,39 +44,39 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
-    webviewView.webview.onDidReceiveMessage(async (data) => {
-      switch (data.type) {
-        case 'onInfo': {
-          if (!data.value) {
+    webviewView.webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
+      switch (msg.type) {
+        case 'OnInfo': {
+          if (!msg.value) {
             return
           }
-          vscode.window.showInformationMessage(data.value)
+          vscode.window.showInformationMessage(msg.value)
           break
         }
-        case 'onError': {
-          if (!data.value) {
+        case 'OnError': {
+          if (!msg.value) {
             return
           }
-          vscode.window.showErrorMessage(data.value)
+          vscode.window.showErrorMessage(msg.value)
           break
         }
-        case 'showCourses': {
+        case 'ShowCourses': {
           vscode.commands.executeCommand('tide.showCourses')
           break
         }
-        case 'openSettings': {
+        case 'OpenSettings': {
           vscode.commands.executeCommand('tide.openSettings')
           break
         }
-        case 'login': {
+        case 'Login': {
           vscode.commands.executeCommand('tide.login')
           break
         }
-        case 'logout': {
+        case 'Logout': {
           vscode.commands.executeCommand('tide.logout')
           break
         }
-        case MessageType.RequestLoginData: {
+        case 'RequestLoginData': {
           this.sendLoginValue(ExtensionStateManager.getLoginData())
         }
       }

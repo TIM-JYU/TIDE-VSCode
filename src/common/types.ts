@@ -128,24 +128,22 @@ export interface WebviewMessage {
 /**
  * "type" values for messages sent between panels and webviews
  */
-export enum MessageType {
-  // Starts from 1 to avoid mayhem caused by possible comparison to 0
-  CourseData = 1,
-  DownloadTaskSet,
-  Login,
-  LoginData,
-  Logout,
-  OnError,
-  OnInfo,
-  OpenSettings,
-  OpenWorkspace,
-  RequestLoginData,
-  ResetExercise,
-  SetDownloadPath,
-  SetDownloadPathResult,
-  ShowCourses,
-  ShowOutput,
-  SubmitTask,
-  UpdateCoursesToGlobalState,
-  UpdateTimData,
-}
+export type MessageType =
+  'CourseData' |
+  'DownloadTaskSet' |
+  'Login' |
+  'LoginData' |
+  'Logout' |
+  'OnError' |
+  'OnInfo' |
+  'OpenSettings' |
+  'OpenWorkspace' |
+  'RequestLoginData' |
+  'ResetExercise' |
+  'SetDownloadPath' |
+  'SetDownloadPathResult' |
+  'ShowCourses' |
+  'ShowOutput' |
+  'SubmitTask' |
+  'UpdateCoursesToGlobalState' |
+  'UpdateTimData' 

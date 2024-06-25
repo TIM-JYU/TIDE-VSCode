@@ -49,10 +49,11 @@ export default class ExtensionStateManager {
    * @param courses - An array containing the course data to be stored.
    */
   public static setCourses(courses: Array<Course>) {
-    // this.writeToGlobalState("courses", courses);
+    this.writeToGlobalState('courses', courses)
 
     // TODO: this is temporary solution until fetching course data during a vscode session in implemented
-    this.courses = courses
+    // this.courses = courses
+    // this.notifySubscribers('courses', this.courses)
   }
 
   /**
@@ -60,10 +61,10 @@ export default class ExtensionStateManager {
    * @returns Courses from the global state.
    */
   public static getCourses(): Array<Course> {
-    // return this.readFromGlobalState("courses");
+    return this.readFromGlobalState('courses')
 
     // TODO: temporary solution until fetching course data during a vscode session in implemented
-    return this.courses
+    // return this.courses
   }
 
   /**
@@ -141,7 +142,7 @@ export default class ExtensionStateManager {
     const prefixedKey = this.prefixedKey(key)
     const value: string = this.globalState.get(prefixedKey) || ''
     Logger.debug(
-      `Found value "${value}" for key "${prefixedKey}" from globalState.`,
+      `Found value ${JSON.stringify(value)} for key "${prefixedKey}" from globalState.`,
     )
     return value
   }
@@ -195,9 +196,9 @@ export default class ExtensionStateManager {
    * @param {string} key - The key whose subscribers are notified
    * @param {string} value - The new value of the key
    */
-  private static notifySubscribers(key: string, value: string) {
+  private static notifySubscribers(key: string, value: unknown) {
     Logger.debug(
-      `Notifying subscribers of the following new value "${key}": "${value}" `,
+      'Notifying subscribers of the following new value', key, value,
     )
     this.subscribers
       .filter((subscriber) => subscriber.key === key)
@@ -220,3 +221,8 @@ interface SubscriptionObject {
 interface NotifyFunction {
   (newValue: any): void
 }
+
+type StateKey = 
+    'courses' | 
+    'downloadPath' |
+    'loginData'  

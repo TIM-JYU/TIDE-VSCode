@@ -84,9 +84,10 @@ export default class Logger {
    *
    * @param msg - The message to be logged
    */
-  static debug(msg: string) {
+  static debug(...args: unknown[]) {
     // TODO: Add a boolean for debug mode to the class. When turned off the debug method return without logging.
-    this.log(msg, LogLevel.Debug)
+    // this.log(msg, LogLevel.Debug)
+    console.log(args)
   }
 
   private static log(msg: string, level: LogLevel) {
