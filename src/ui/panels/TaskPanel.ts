@@ -153,7 +153,7 @@ export default class TaskPanel {
           break
         }
         case 'RequestLoginData': {
-            this.sendLoginData()
+          this.sendLoginData()
         }
       }
     })
@@ -227,7 +227,7 @@ export default class TaskPanel {
   private async update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
-    // TODO: For one reason or another the message sent by sendLoginData() doesn't appear in the webview if the function isn't run BEFORE sendTimData() 
+    // TODO: Race condition. Webview doesn't receive messages while it's updating. Effect in work if sendTimData is called right before sendLoginData. Current implementation is prone to it too, but logindata message is so small, it's not happening in practice
     await this.sendLoginData()
     await this.sendTimData()
   }
