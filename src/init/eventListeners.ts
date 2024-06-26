@@ -50,6 +50,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
         .get('TIM-IDE.fileDownloadPath')
 
       // Update ExtensionStateManager with the new path
+      // TODO: Why is the download path stored in ExtensionStateManager?
       if (typeof newPath === 'string') {
         ExtensionStateManager.setDownloadPath(newPath)
       } else {

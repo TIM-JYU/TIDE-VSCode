@@ -12,7 +12,6 @@
     type TimData,
     type WebviewMessage,
   } from '../common/types'
-  import path from 'path'
 
   let timData: TimData
   let loginData: LoginData
