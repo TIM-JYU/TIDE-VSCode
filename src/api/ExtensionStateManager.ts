@@ -47,7 +47,7 @@ export default class ExtensionStateManager {
    */
   public static setCourses(courses: Array<Course>) {
     // TODO: Currently overwrites the courses, implement functionality to combine new data with existing data
-    // TODO: Weird bug where a taskset's tasks aren't saved to global state between vscode sessions
+    // TODO: Weird bug where a taskset's tasks (an array) aren't saved to global state between vscode sessions, but it is there for the session after the course data has been fetched from TIM
     this.writeToGlobalState('courses', courses)
   }
 

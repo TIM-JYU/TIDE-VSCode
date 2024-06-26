@@ -26,7 +26,6 @@ export function activate(ctx: vscode.ExtensionContext) {
   init.registerCommands(ctx)
   init.registerEventListeners(ctx)
 
-  // TODO: does this action belong here in code and in order of actions?
   vscode.commands.executeCommand('tide.updateCoursesFromTim')
 
   // Creates and registers the side menu on the left
