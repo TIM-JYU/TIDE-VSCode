@@ -112,7 +112,10 @@ export default class TaskPanel {
           break
         }
         case 'SubmitTask': {
-          vscode.commands.executeCommand('tide.submitTask', path.dirname(TaskPanel.lastActiveTextEditor.document.fileName))
+          vscode.commands.executeCommand(
+            'tide.submitTask',
+            path.dirname(TaskPanel.lastActiveTextEditor.document.fileName),
+          )
           break
         }
         case 'ShowOutput': {
