@@ -21,9 +21,6 @@ export default class ExtensionStateManager {
   }
   private static KEY_PREFIX = 'tide'
 
-  // TODO: temporary solution until fetching course data during a vscode session in implemented
-  private static courses: Array<Course> = []
-
   static setContext(ctx: vscode.ExtensionContext) {
     this.globalState = ctx.globalState
   }
@@ -49,11 +46,9 @@ export default class ExtensionStateManager {
    * @param courses - An array containing the course data to be stored.
    */
   public static setCourses(courses: Array<Course>) {
+    // TODO: Currently overwrites the courses, implement functionality to combine new data with existing data
+    // TODO: Weird bug where a taskset's tasks aren't saved to global state between vscode sessions
     this.writeToGlobalState('courses', courses)
-
-    // TODO: this is temporary solution until fetching course data during a vscode session in implemented
-    // this.courses = courses
-    // this.notifySubscribers('courses', this.courses)
   }
 
   /**
@@ -62,9 +57,6 @@ export default class ExtensionStateManager {
    */
   public static getCourses(): Array<Course> {
     return this.readFromGlobalState('courses')
-
-    // TODO: temporary solution until fetching course data during a vscode session in implemented
-    // return this.courses
   }
 
   /**
@@ -125,7 +117,7 @@ export default class ExtensionStateManager {
    */
   private static writeToGlobalState(key: string, value: any) {
     Logger.debug(
-      `Writing to globalState: "${this.prefixedKey(key)}": "${value}"`,
+      `Writing to globalState: "${this.prefixedKey(key)}": `, value,
     )
     this.globalState.update(this.prefixedKey(key), value)
     this.notifySubscribers(key, value)
@@ -140,9 +132,9 @@ export default class ExtensionStateManager {
    */
   private static readFromGlobalState(key: string): any {
     const prefixedKey = this.prefixedKey(key)
-    const value: string = this.globalState.get(prefixedKey) || ''
+    const value: any = this.globalState.get(prefixedKey)
     Logger.debug(
-      `Found value ${JSON.stringify(value)} for key "${prefixedKey}" from globalState.`,
+      `Found the following value from key "${prefixedKey}"`, value
     )
     return value
   }
@@ -171,6 +163,7 @@ export default class ExtensionStateManager {
       },
     }
 
+    // TODO: is sending the info when subscribing ok?
     onValueChange(this.readFromGlobalState(key))
 
     return vscode.Disposable.from(disposableObject)
@@ -222,6 +215,7 @@ interface NotifyFunction {
   (newValue: any): void
 }
 
+// TODO: Refactor from using string to using type StateKey for referring to keys
 type StateKey = 
     'courses' | 
     'downloadPath' |

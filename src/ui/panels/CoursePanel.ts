@@ -11,6 +11,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import path from 'path'
+import Logger from '../../utilities/logger'
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -28,7 +29,7 @@ export default class CoursePanel {
     // If we already have a panel, show it.
     if (CoursePanel.currentPanel) {
       CoursePanel.currentPanel.panel.reveal(this.preferredColumn)
-      CoursePanel.currentPanel.updateCourseDataFromExtensionState()
+      CoursePanel.currentPanel.update()
       return CoursePanel.currentPanel
     }
 
@@ -43,8 +44,7 @@ export default class CoursePanel {
     CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
 
     // Send initial file download path and courses to the webview.
-    CoursePanel.currentPanel.sendInitialPath()
-    CoursePanel.currentPanel.updateCourseDataFromExtensionState()
+    CoursePanel.currentPanel.update()
 
     return CoursePanel.currentPanel
   }
@@ -63,24 +63,25 @@ export default class CoursePanel {
   }
 
   private sendCourseData(courseData: Array<Course>) {
-    this.panel.webview.postMessage({
+    const msg: WebviewMessage = {
       type: 'CourseData',
       value: courseData
-    })
+    }
+    this.panel.webview.postMessage(msg)
   }
 
   private sendLoginData(loginData: LoginData) {
-    this.panel.webview.postMessage({
+    const msg: WebviewMessage = {
       type: 'LoginData',
-      value: loginData,
-    })
+      value: loginData
+    }
+    this.panel.webview.postMessage(msg)
   }
 
   public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
 
-    CoursePanel.currentPanel.sendInitialPath()
-    CoursePanel.currentPanel.updateCourseDataFromExtensionState()
+    CoursePanel.currentPanel.update()
   }
 
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -210,12 +211,6 @@ export default class CoursePanel {
     }
   }
 
-  private updateCourseDataFromExtensionState() {
-    const courses = ExtensionStateManager.getCourses()
-    const message: WebviewMessage = { type: 'CourseData', value: courses }
-    this.panel.webview.postMessage(message)
-  }
-
   /**
    * Handles the panel visibility in case tabs are switched.
    * Ensures that courses doesn't look empty when user opens My Courses tab again.
@@ -224,7 +219,7 @@ export default class CoursePanel {
     this.panel.onDidChangeViewState(() => {
       if (this.panel.visible) {
         // Panel became visible, refresh content
-        this.updateCourseDataFromExtensionState()
+        this.update()
       }
     })
   }
@@ -233,11 +228,17 @@ export default class CoursePanel {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
     const path = ExtensionStateManager.getDownloadPath()
+    this.sendInitialPath()
     this.panel.webview.postMessage({
       type: 'SetDownloadPathResult',
       value: path ? path : null,
     })
+    const loginData = ExtensionStateManager.getLoginData()
+    this.sendLoginData(loginData)
+    const courses = ExtensionStateManager.getCourses()
+    this.sendCourseData(courses)
   }
+
   private getHtmlForWebview(webview: vscode.Webview) {
     return getDefaultHtmlForWebview(
       webview,

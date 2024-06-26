@@ -27,9 +27,11 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
       if (editor && editor !== lastActiveEditor) {
         if (editor.document && editor.document.uri.scheme === 'file') {
           lastActiveEditor = editor
+          
+          // TODO: Duplicate data, turn this in to a class and let TaskPanel query the editor here
+          TaskPanel.updateLastActiveEditor(lastActiveEditor)
 
           // TODO: Do not open the task panel if .timdata is not present in the same directory (might get annoying if you use vscode for things other than programming courses)
-
           UiController.showTaskPanel()
         }
       }

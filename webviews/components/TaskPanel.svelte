@@ -17,7 +17,6 @@
   let timData: TimData | undefined
   let loginData: LoginData | undefined
   let isLoggedIn = false
-  // let messages: Array<string> = []
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -25,7 +24,6 @@
   onMount(() => {
     window.addEventListener('message', (event) => {
       const message: WebviewMessage = event.data
-     // messages = [...messages, JSON.stringify(message)]
       switch (message.type) {
         case 'UpdateTimData': {
           timData = message.value
@@ -87,18 +85,7 @@
 This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
 -->
 
-<h1>loginData</h1>
-<h3>{JSON.stringify(loginData)}</h3>
-
-<!--
-<h1>login data messages</h1>
-{#each messages as msg}
-<p>{msg}</p>
-{/each}
--->
-
-
-{#if timData === null}
+{#if timData === undefined}
   <p>
     Task Panel only shows information when you have a TIM task document open in
     the text editor. If you are sure you have a TIM task open, try clicking the

@@ -32,7 +32,6 @@
   onMount(() => {
     window.addEventListener('message', (event) => {
       const message: WebviewMessage = event.data
-
       switch (message.type) {
         case 'SetDownloadPathResult': {
           downloadPath = message.value
@@ -48,7 +47,6 @@
         }
       }
     })
-    tsvscode.postMessage({ type: 'RequestLoginData', value: undefined })
   })
 
   /**
@@ -150,8 +148,6 @@ updates the courses' status, and handles downloading task sets and opening works
 -->
 
 <h1>My Courses</h1>
-
-<h3>{JSON.stringify(courses)}</h3>
 
 <p>Current directory for downloading files: {downloadPath}</p>
 

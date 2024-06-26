@@ -176,7 +176,6 @@ export default class TaskPanel {
   public static dispose() {
     if (TaskPanel.currentPanel) {
       TaskPanel.currentPanel.dispose()
-      TaskPanel.currentPanel = undefined
     }
   }
 
@@ -188,8 +187,7 @@ export default class TaskPanel {
    * 
    */
   private async getTimData(): Promise<TimData | undefined> {
-    const currentTextEditor = vscode.window.activeTextEditor
-    switch (currentTextEditor) {
+    switch (TaskPanel.lastActiveTextEditor) {
       case undefined: {
         return undefined
       }
@@ -197,7 +195,7 @@ export default class TaskPanel {
       default: {
         try {
           // activeTextEditor banged! because the case of undefined is handled above
-          const doc = currentTextEditor.document
+          const doc = TaskPanel.lastActiveTextEditor.document
           const currentFile = doc.fileName
           const currentDir = path.dirname(currentFile)
           const timDataPath = path.join(currentDir, '.timdata')
@@ -214,7 +212,8 @@ export default class TaskPanel {
   }
 
   private async sendLoginData() {
-    const loginDataMsg: WebviewMessage = { type: 'LoginData', value: TaskPanel.loginData }
+    const loginData = ExtensionStateManager.getLoginData()
+    const loginDataMsg: WebviewMessage = { type: 'LoginData', value: loginData }
     await this.panel.webview.postMessage(loginDataMsg)
   }
 
@@ -228,6 +227,7 @@ export default class TaskPanel {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
     // TODO: Race condition. Webview doesn't receive messages while it's updating. Effect in work if sendTimData is called right before sendLoginData. Current implementation is prone to it too, but logindata message is so small, it's not happening in practice
+    // Maybe not a race condition? This behavior doesn't exist in coursepanel with similar code.
     await this.sendLoginData()
     await this.sendTimData()
   }
