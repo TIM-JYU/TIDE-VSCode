@@ -14,8 +14,8 @@
   } from '../common/types'
   import path from 'path'
 
-  let timData: TimData | undefined
-  let loginData: LoginData | undefined
+  let timData: TimData
+  let loginData: LoginData
   let isLoggedIn = false
 
   /**
@@ -35,30 +35,29 @@
         }
       }
     })
-    // tsvscode.postMessage({ type: 'RequestLoginData', value: undefined })
   })
 
   /**
    * Sends message to TaskPanel about submitting exercise
    */
-  // TODO: Broken
-  //  function submitTask() {
-  //    tsvscode.postMessage({
-  //      type: 'SubmitTask',
-  //      value: path.join(timData.path, timData.ide_task_id),
-  //    })
-  //  }
+  function submitTask() {
+    const msg: WebviewMessage = {
+      type: 'SubmitTask',
+      value: undefined,
+    }
+    tsvscode.postMessage(msg)
+  }
 
-  // TODO: Broken
   /**
    * Shows the output console
    */
-  //  function showOutput() {
-  //    tsvscode.postMessage({
-  //      type: 'ShowOutput',
-  //      value: undefined,
-  //    })
-  //  }
+  function showOutput() {
+    const msg: WebviewMessage = {
+      type: 'ShowOutput',
+      value: undefined,
+    }
+    tsvscode.postMessage(msg)
+  }
 
   /**
    * Resets the task file to it's initial stage from TIM.
