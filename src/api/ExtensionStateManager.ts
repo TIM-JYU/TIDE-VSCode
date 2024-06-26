@@ -116,9 +116,7 @@ export default class ExtensionStateManager {
    * @param {string} value - Value to write
    */
   private static writeToGlobalState(key: string, value: any) {
-    Logger.debug(
-      `Writing to globalState: "${this.prefixedKey(key)}": `, value,
-    )
+    Logger.debug(`Writing to globalState: "${this.prefixedKey(key)}": `, value)
     this.globalState.update(this.prefixedKey(key), value)
     this.notifySubscribers(key, value)
   }
@@ -133,9 +131,7 @@ export default class ExtensionStateManager {
   private static readFromGlobalState(key: string): any {
     const prefixedKey = this.prefixedKey(key)
     const value: any = this.globalState.get(prefixedKey)
-    Logger.debug(
-      `Found the following value from key "${prefixedKey}"`, value
-    )
+    Logger.debug(`Found the following value from key "${prefixedKey}"`, value)
     return value
   }
 
@@ -190,9 +186,7 @@ export default class ExtensionStateManager {
    * @param {string} value - The new value of the key
    */
   private static notifySubscribers(key: string, value: unknown) {
-    Logger.debug(
-      'Notifying subscribers of the following new value', key, value,
-    )
+    Logger.debug('Notifying subscribers of the following new value', key, value)
     this.subscribers
       .filter((subscriber) => subscriber.key === key)
       .forEach((subscriber) => subscriber.onValueChange(value))
@@ -216,7 +210,4 @@ interface NotifyFunction {
 }
 
 // TODO: Refactor from using string to using type StateKey for referring to keys
-type StateKey = 
-    'courses' | 
-    'downloadPath' |
-    'loginData'  
+type StateKey = 'courses' | 'downloadPath' | 'loginData'

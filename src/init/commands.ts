@@ -129,13 +129,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.debug', () => { }),
+    vscode.commands.registerCommand('tide.debug', () => {}),
   )
 
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.clearCourseCache', () => {
-        ExtensionStateManager.setCourses([])
+      ExtensionStateManager.setCourses([])
     }),
   )
 }
-

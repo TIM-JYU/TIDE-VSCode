@@ -65,7 +65,7 @@ export default class CoursePanel {
   private sendCourseData(courseData: Array<Course>) {
     const msg: WebviewMessage = {
       type: 'CourseData',
-      value: courseData
+      value: courseData,
     }
     this.panel.webview.postMessage(msg)
   }
@@ -73,7 +73,7 @@ export default class CoursePanel {
   private sendLoginData(loginData: LoginData) {
     const msg: WebviewMessage = {
       type: 'LoginData',
-      value: loginData
+      value: loginData,
     }
     this.panel.webview.postMessage(msg)
   }
@@ -96,8 +96,8 @@ export default class CoursePanel {
       ),
       ExtensionStateManager.subscribe(
         'courses',
-        this.sendCourseData.bind(this)
-      )
+        this.sendCourseData.bind(this),
+      ),
     )
 
     // Set the webview's initial html content

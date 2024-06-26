@@ -9,7 +9,12 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData, MessageType, TimData, WebviewMessage } from '../../common/types'
+import {
+  LoginData,
+  MessageType,
+  TimData,
+  WebviewMessage,
+} from '../../common/types'
 import path from 'path'
 import Logger from '../../utilities/logger'
 import { log } from 'console'
@@ -29,10 +34,7 @@ export default class TaskPanel {
   private static lastActiveTextEditor: vscode.TextEditor
   private static loginData: LoginData
 
-
-  public static createOrShow(
-    extensionUri: vscode.Uri,
-  ) {
+  public static createOrShow(extensionUri: vscode.Uri) {
     // If we already have a panel, show it.
     if (TaskPanel.currentPanel) {
       TaskPanel.currentPanel.update()
@@ -53,14 +55,8 @@ export default class TaskPanel {
     TaskPanel.currentPanel.update()
   }
 
-  public static revive(
-    panel: vscode.WebviewPanel,
-    extensionUri: vscode.Uri,
-  ) {
-    TaskPanel.currentPanel = new TaskPanel(
-      panel,
-      extensionUri,
-    )
+  public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    TaskPanel.currentPanel = new TaskPanel(panel, extensionUri)
   }
 
   private updateLoginData(loginData: LoginData) {
@@ -68,10 +64,7 @@ export default class TaskPanel {
     this.sendLoginData()
   }
 
-  private constructor(
-    panel: vscode.WebviewPanel,
-    extensionUri: vscode.Uri,
-  ) {
+  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this.panel = panel
     this.extensionUri = extensionUri
 
@@ -183,8 +176,8 @@ export default class TaskPanel {
     this.lastActiveTextEditor = editor
   }
 
-  /** 
-   * 
+  /**
+   *
    */
   private async getTimData(): Promise<TimData | undefined> {
     switch (TaskPanel.lastActiveTextEditor) {
@@ -199,7 +192,9 @@ export default class TaskPanel {
           const currentFile = doc.fileName
           const currentDir = path.dirname(currentFile)
           const timDataPath = path.join(currentDir, '.timdata')
-          const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
+          const timDataContent = await vscode.workspace.fs.readFile(
+            vscode.Uri.file(timDataPath),
+          )
           const timData: TimData = JSON.parse(timDataContent.toString())
 
           return timData
@@ -208,7 +203,6 @@ export default class TaskPanel {
         }
       }
     }
-
   }
 
   private async sendLoginData() {

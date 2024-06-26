@@ -115,35 +115,33 @@ export interface LoginData {
   isLogged: boolean
 }
 
-
-
 /**
  * Messages sent between panels and webviews
  */
 export interface WebviewMessage {
-    type: MessageType
-    value: any
+  type: MessageType
+  value: any
 }
 
 /**
  * "type" values for messages sent between panels and webviews
  */
 export type MessageType =
-  'CourseData' |
-  'DownloadTaskSet' |
-  'Login' |
-  'LoginData' |
-  'Logout' |
-  'OnError' |
-  'OnInfo' |
-  'OpenSettings' |
-  'OpenWorkspace' |
-  'RequestLoginData' |
-  'ResetExercise' |
-  'SetDownloadPath' |
-  'SetDownloadPathResult' |
-  'ShowCourses' |
-  'ShowOutput' |
-  'SubmitTask' |
-  'UpdateCoursesToGlobalState' |
-  'UpdateTimData' 
+  | 'CourseData'
+  | 'DownloadTaskSet'
+  | 'Login'
+  | 'LoginData'
+  | 'Logout'
+  | 'OnError'
+  | 'OnInfo'
+  | 'OpenSettings'
+  | 'OpenWorkspace'
+  | 'RequestLoginData'
+  | 'ResetExercise'
+  | 'SetDownloadPath'
+  | 'SetDownloadPathResult'
+  | 'ShowCourses'
+  | 'ShowOutput'
+  | 'SubmitTask'
+  | 'UpdateCoursesToGlobalState'
+  | 'UpdateTimData'
