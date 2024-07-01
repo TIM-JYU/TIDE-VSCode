@@ -48,10 +48,11 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
         s.includes(BYCODEBEGIN),
       )
     }
+
     if (
       !event.textEditor.document.lineAt(bycodeEndLine).text.includes(BYCODEEND)
     ) {
-      bycodeBeginLine = getDocLines(document).findIndex((s) =>
+      bycodeEndLine = getDocLines(document).findIndex((s) =>
         s.includes(BYCODEEND),
       )
     }
@@ -62,8 +63,11 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
     const selectionEndLine: number = Math.max(
       ...event.selections.map((s) => s.end.line),
     )
+
     Logger.debug('s-start:', selectionBeginLine, 's-end:', selectionEndLine)
     Logger.debug('b-start:', bycodeBeginLine, 'b-end:', bycodeEndLine)
+
+    updateBaseDecorations(event.textEditor, bycodeBeginLine, bycodeEndLine)
 
     if (
       selectionBeginLine > bycodeBeginLine &&
@@ -72,13 +76,112 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
       vscode.commands.executeCommand(
         'workbench.action.files.setActiveEditorWriteableInSession',
       )
+      event.textEditor.setDecorations(
+        notInsideBycodeNotificationDecorationType,
+        [],
+      )
     } else {
       vscode.commands.executeCommand(
         'workbench.action.files.setActiveEditorReadonlyInSession',
       )
+      event.textEditor.setDecorations(
+        notInsideBycodeNotificationDecorationType,
+        [
+          {
+            range: new vscode.Range(
+              new vscode.Position(selectionBeginLine, 0),
+              new vscode.Position(selectionEndLine, 0),
+            ),
+            hoverMessage: 'Tätä riviä ei ole tarkoitus muokata.',
+          },
+        ],
+      )
     }
   }
 }
+
+const updateBaseDecorations = (
+  editor: vscode.TextEditor,
+  bycodeBegin: number,
+  bycodeEnd: number,
+) => {
+  // decorations for areas outside of bycode
+  const beforeBycode = new vscode.Range(
+    new vscode.Position(0, 0),
+    new vscode.Position(bycodeBegin, 0),
+  )
+  const afterBycode = new vscode.Range(
+    new vscode.Position(bycodeEnd, 0),
+    new vscode.Position(editor.document.lineCount - 1, 0),
+  )
+  const decorations = [{ range: beforeBycode }, { range: afterBycode }]
+  editor.setDecorations(outsideBycodeDecorationType, decorations)
+
+  // decorations for bycode lines
+  editor.setDecorations(bycodeBeginDecorationType, [
+    {
+      range: new vscode.Range(
+        new vscode.Position(bycodeBegin, 0),
+        new vscode.Position(bycodeBegin, 0),
+      ),
+    },
+  ])
+  editor.setDecorations(bycodeEndDecorationType, [
+    {
+      range: new vscode.Range(
+        new vscode.Position(bycodeEnd, 0),
+        new vscode.Position(bycodeEnd, 0),
+      ),
+    },
+  ])
+}
+
+const outsideBycodeDecorationType =
+  vscode.window.createTextEditorDecorationType({
+    isWholeLine: true,
+    light: {
+      backgroundColor: '#eff0f1',
+    },
+    dark: {
+      backgroundColor: '#161514',
+    },
+  })
+
+const notInsideBycodeNotificationDecorationType =
+  vscode.window.createTextEditorDecorationType({
+    isWholeLine: true,
+    // TODO: this is here just for example, replace with actual implementation if necessary
+    gutterIconPath: '/home/hannes/work/temp/exclam.svg',
+  })
+
+const bycodeBeginDecorationType = vscode.window.createTextEditorDecorationType({
+  isWholeLine: true,
+  borderWidth: '0 0 2px 0',
+  borderColor: 'green',
+  borderStyle: 'solid',
+})
+
+const bycodeEndDecorationType = vscode.window.createTextEditorDecorationType({
+  isWholeLine: true,
+  borderWidth: '2px 0 0 0',
+  borderColor: 'green',
+  borderStyle: 'solid',
+})
+
+const insideBycodeDecorationType = vscode.window.createTextEditorDecorationType(
+  {
+    overviewRulerColor: 'blue',
+    overviewRulerLane: vscode.OverviewRulerLane.Right,
+    isWholeLine: true,
+    light: {
+      backgroundColor: '#eff0f1',
+    },
+    dark: {
+      backgroundColor: '#161514',
+    },
+    outline: 'width: 3px',
+  },
+)
 
 export function isBycodeTaskFile(document: vscode.TextDocument): boolean {
   const docText: string = document.getText()
