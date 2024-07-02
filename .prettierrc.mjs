@@ -4,7 +4,7 @@ const config = {
   trailingComma: "all",
   singleQuote: true,
   tabWidth: 2,
-  printWidth: 80,
+  printWidth: 100,
   jsxSingleQuote: false,
   bracketSpacing: true,
   plugins: ["prettier-plugin-svelte"],
