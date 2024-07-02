@@ -1,6 +1,8 @@
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
 
+// TODO: more descriptive var name, function names, file name
+// editableArea / editableCodeArea
 const BYCODEBEGIN = 'BYCODEBEGIN'
 const BYCODEEND = 'BYCODEEND'
 
@@ -8,7 +10,7 @@ let editorTextChangeListener: vscode.Disposable | undefined
 
 export const bycodeEditorEventListener = {
   // blockBeginLineIndex = getBlockBeginLineIndex()
-  activate(ctx: vscode.ExtensionContext, document: vscode.TextDocument) {
+  activate: (ctx: vscode.ExtensionContext, document: vscode.TextDocument) => {
     editorTextChangeListener = vscode.window.onDidChangeTextEditorSelection(
       generateOnSelectionChange(document),
       null,
@@ -16,12 +18,11 @@ export const bycodeEditorEventListener = {
     )
   },
 
-  deactivate() {
+  deactivate: () => {
     editorTextChangeListener?.dispose()
   },
 }
 
-//
 const generateOnSelectionChange = (document: vscode.TextDocument) => {
   const getDocLines = (doc: vscode.TextDocument) => doc.getText().split(/\r?\n/)
   let docTextLines: Array<string> | undefined = getDocLines(document)
@@ -183,6 +184,7 @@ const insideBycodeDecorationType = vscode.window.createTextEditorDecorationType(
   },
 )
 
+// TODO? does this belong here
 export function isBycodeTaskFile(document: vscode.TextDocument): boolean {
   const docText: string = document.getText()
   return docText.includes(BYCODEBEGIN) && docText.includes(BYCODEEND)
