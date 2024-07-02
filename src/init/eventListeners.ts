@@ -12,10 +12,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
 import UiController from '../ui/UiController'
 import TaskPanel from '../ui/panels/TaskPanel'
-import {
-  bycodeEditorEventListener,
-  isBycodeTaskFile,
-} from '../editor/bycodeEditor'
+import { bycodeEditorEventListener, isBycodeTaskFile } from '../editor/bycodeEditor'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
   // TODO: Move to its own file in src/event-listeners
@@ -27,25 +24,23 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
    * when user activates or clicks the text document next to it right after closing.
    * If they click another text document open, the task panel opens.
    */
-  const textEditorListener = vscode.window.onDidChangeActiveTextEditor(
-    async (editor) => {
-      if (editor && editor !== lastActiveEditor) {
-        if (editor.document && editor.document.uri.scheme === 'file') {
-          lastActiveEditor = editor
+  const textEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+    if (editor && editor !== lastActiveEditor) {
+      if (editor.document && editor.document.uri.scheme === 'file') {
+        lastActiveEditor = editor
 
-          TaskPanel.updateLastActiveEditor(lastActiveEditor)
+        TaskPanel.updateLastActiveEditor(lastActiveEditor)
 
-          UiController.showTaskPanel()
+        UiController.showTaskPanel()
 
-          if (isBycodeTaskFile(editor.document)) {
-            bycodeEditorEventListener.activate(ctx, editor.document)
-          } else {
-            bycodeEditorEventListener.deactivate()
-          }
+        if (isBycodeTaskFile(editor.document)) {
+          bycodeEditorEventListener.activate(ctx, editor.document)
+        } else {
+          bycodeEditorEventListener.deactivate()
         }
       }
-    },
-  )
+    }
+  })
   ctx.subscriptions.push(textEditorListener)
 
   /**
@@ -54,9 +49,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
   vscode.workspace.onDidChangeConfiguration((event) => {
     if (event.affectsConfiguration('TIM-IDE.fileDownloadPath')) {
       // Get the new value of fileDownloadPath
-      const newPath = vscode.workspace
-        .getConfiguration()
-        .get('TIM-IDE.fileDownloadPath')
+      const newPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
 
       // Update ExtensionStateManager with the new path
       // TODO: Why is the download path stored in ExtensionStateManager?

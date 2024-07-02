@@ -18,8 +18,7 @@ import * as vscode from 'vscode'
  */
 export function getNonce(): string {
   let text = ''
-  const possible =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
@@ -32,9 +31,7 @@ export function getNonce(): string {
  * @param extensionUri - extensionUri used for generating the options
  * @returns Default webview options
  */
-export function getWebviewOptions(
-  extensionUri: vscode.Uri,
-): vscode.WebviewOptions {
+export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
   return {
     // Enable javascript in the webview
     enableScripts: true,

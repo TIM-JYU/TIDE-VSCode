@@ -30,9 +30,7 @@ export function activate(ctx: vscode.ExtensionContext) {
 
   // Creates and registers the side menu on the left
   const sidebarProvider = new SidebarProvider(ctx.extensionUri)
-  ctx.subscriptions.push(
-    vscode.window.registerWebviewViewProvider('tide-sidebar', sidebarProvider),
-  )
+  ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-sidebar', sidebarProvider))
 }
 
 // This method is called when your extension is deactivated

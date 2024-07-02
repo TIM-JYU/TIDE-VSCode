@@ -7,16 +7,12 @@ import { Course, Task, TimData } from '../common/types'
  * @param data - A JSON string containing the data
  * @returns A promise with an array of courses
  */
-export async function parseCoursesFromJsonString(
-  data: string,
-): Promise<Array<Course>> {
+export async function parseCoursesFromJsonString(data: string): Promise<Array<Course>> {
   const courses: Array<Course> = JSON.parse(data)
   courses.forEach((c) => {
     c.status = 'active'
     c.expanded = true
-    c.task_docs.forEach(
-      async (t) => (t.tasks = await Tide.getTaskListForTaskSetPath(t.path)),
-    )
+    c.task_docs.forEach(async (t) => (t.tasks = await Tide.getTaskListForTaskSetPath(t.path)))
   })
   return courses
 }

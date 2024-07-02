@@ -60,16 +60,11 @@ export default class Tide {
    * @param taskSetPath path to task set. Path can be found by executing cli courses command
    * @returns task data
    */
-  public static async getTaskListForTaskSetPath(
-    taskSetPath: string,
-  ): Promise<Array<Task>> {
+  public static async getTaskListForTaskSetPath(taskSetPath: string): Promise<Array<Task>> {
     let tasks: Array<Task> = []
-    await this.runAndHandle(
-      ['task', 'list', taskSetPath, '--json'],
-      async (data: string) => {
-        tasks = JSON.parse(data)
-      },
-    )
+    await this.runAndHandle(['task', 'list', taskSetPath, '--json'], async (data: string) => {
+      tasks = JSON.parse(data)
+    })
     return tasks
   }
 
@@ -77,16 +72,10 @@ export default class Tide {
    * Downloads task set from TIM; creates files for each task
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
-  public static async downloadTaskSet(
-    taskSetPath: string,
-    downloadPath: string,
-  ) {
-    this.runAndHandle(
-      ['task', 'create', taskSetPath, '-a', '-d', downloadPath],
-      (data: string) => {
-        Logger.debug(data)
-      },
-    )
+  public static async downloadTaskSet(taskSetPath: string, downloadPath: string) {
+    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
+      Logger.debug(data)
+    })
   }
 
   /**
@@ -95,12 +84,9 @@ export default class Tide {
    * @param {string} taskSetPath - path of the task set
    */
   public static async overwriteSetTasks(taskSetPath: string) {
-    this.runAndHandle(
-      ['task', 'create', '-a', '-f', taskSetPath],
-      (data: string) => {
-        Logger.debug(data)
-      },
-    )
+    this.runAndHandle(['task', 'create', '-a', '-f', taskSetPath], (data: string) => {
+      Logger.debug(data)
+    })
   }
 
   /**
@@ -109,11 +95,7 @@ export default class Tide {
    * @param ideTaskId - id/directory for the task that is going to be overwritten
    * @param fileLocation - path to the directory where user has loaded the task set
    */
-  public static async overwriteTask(
-    taskSetPath: string,
-    ideTaskId: string,
-    fileLocation: string,
-  ) {
+  public static async overwriteTask(taskSetPath: string, ideTaskId: string, fileLocation: string) {
     this.runAndHandle(
       ['task', 'create', taskSetPath, ideTaskId, '-f', '-d', fileLocation],
       (data: string) => {
@@ -139,10 +121,7 @@ export default class Tide {
    * @param args - arguments to run the executable with
    * @param handler - a handler function to be called after the executable exits
    */
-  private static async runAndHandle(
-    args: Array<string>,
-    handler: HandlerFunction,
-  ) {
+  private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
     const data = await this.spawnTideProcess(...args)
     handler(data)
   }
@@ -153,9 +132,7 @@ export default class Tide {
    * @param args - arguments to be passed to the executable
    * @returns the stdout of the executed process
    */
-  private static async spawnTideProcess(
-    ...args: Array<string>
-  ): Promise<string> {
+  private static async spawnTideProcess(...args: Array<string>): Promise<string> {
     Logger.debug(`Running cli with args "${args}"`)
     let buffer = ''
 
@@ -184,9 +161,7 @@ export default class Tide {
         if (code === 0) {
           resolve(buffer)
         } else {
-          reject(
-            new Error(`Process exited with code ${code} and signal ${signal}`),
-          )
+          reject(new Error(`Process exited with code ${code} and signal ${signal}`))
         }
       })
     })

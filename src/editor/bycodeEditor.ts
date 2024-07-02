@@ -29,74 +29,43 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
   // TODO: if performance optimization is needed, it could assumed that the line number of the line with BYCODEBEGIN will stay the same
   // because editing the preceding contents shouldn't be possible,
   // because of the read-only mode being activated when the cursor is above it
-  let bycodeBeginLine: number = docTextLines.findIndex((s) =>
-    s.includes(BYCODEBEGIN),
-  )
-  let bycodeEndLine: number = docTextLines.findIndex((s) =>
-    s.includes(BYCODEEND),
-  )
+  let bycodeBeginLine: number = docTextLines.findIndex((s) => s.includes(BYCODEBEGIN))
+  let bycodeEndLine: number = docTextLines.findIndex((s) => s.includes(BYCODEEND))
   Logger.debug('bycodebegin', bycodeBeginLine, 'bycodeend', bycodeEndLine)
   return function (event: vscode.TextEditorSelectionChangeEvent) {
     Logger.debug('ev', event)
 
     // TODO: optimize by using docTextLines variable and setting it to undefined at the end of this function
-    if (
-      !event.textEditor.document
-        .lineAt(bycodeBeginLine)
-        .text.includes(BYCODEBEGIN)
-    ) {
-      bycodeBeginLine = getDocLines(document).findIndex((s) =>
-        s.includes(BYCODEBEGIN),
-      )
+    if (!event.textEditor.document.lineAt(bycodeBeginLine).text.includes(BYCODEBEGIN)) {
+      bycodeBeginLine = getDocLines(document).findIndex((s) => s.includes(BYCODEBEGIN))
     }
 
-    if (
-      !event.textEditor.document.lineAt(bycodeEndLine).text.includes(BYCODEEND)
-    ) {
-      bycodeEndLine = getDocLines(document).findIndex((s) =>
-        s.includes(BYCODEEND),
-      )
+    if (!event.textEditor.document.lineAt(bycodeEndLine).text.includes(BYCODEEND)) {
+      bycodeEndLine = getDocLines(document).findIndex((s) => s.includes(BYCODEEND))
     }
 
-    const selectionBeginLine: number = Math.min(
-      ...event.selections.map((s) => s.start.line),
-    )
-    const selectionEndLine: number = Math.max(
-      ...event.selections.map((s) => s.end.line),
-    )
+    const selectionBeginLine: number = Math.min(...event.selections.map((s) => s.start.line))
+    const selectionEndLine: number = Math.max(...event.selections.map((s) => s.end.line))
 
     Logger.debug('s-start:', selectionBeginLine, 's-end:', selectionEndLine)
     Logger.debug('b-start:', bycodeBeginLine, 'b-end:', bycodeEndLine)
 
     updateBaseDecorations(event.textEditor, bycodeBeginLine, bycodeEndLine)
 
-    if (
-      selectionBeginLine > bycodeBeginLine &&
-      selectionEndLine < bycodeEndLine
-    ) {
-      vscode.commands.executeCommand(
-        'workbench.action.files.setActiveEditorWriteableInSession',
-      )
-      event.textEditor.setDecorations(
-        notInsideBycodeNotificationDecorationType,
-        [],
-      )
+    if (selectionBeginLine > bycodeBeginLine && selectionEndLine < bycodeEndLine) {
+      vscode.commands.executeCommand('workbench.action.files.setActiveEditorWriteableInSession')
+      event.textEditor.setDecorations(notInsideBycodeNotificationDecorationType, [])
     } else {
-      vscode.commands.executeCommand(
-        'workbench.action.files.setActiveEditorReadonlyInSession',
-      )
-      event.textEditor.setDecorations(
-        notInsideBycodeNotificationDecorationType,
-        [
-          {
-            range: new vscode.Range(
-              new vscode.Position(selectionBeginLine, 0),
-              new vscode.Position(selectionEndLine, 0),
-            ),
-            hoverMessage: 'Tätä riviä ei ole tarkoitus muokata.',
-          },
-        ],
-      )
+      vscode.commands.executeCommand('workbench.action.files.setActiveEditorReadonlyInSession')
+      event.textEditor.setDecorations(notInsideBycodeNotificationDecorationType, [
+        {
+          range: new vscode.Range(
+            new vscode.Position(selectionBeginLine, 0),
+            new vscode.Position(selectionEndLine, 0),
+          ),
+          hoverMessage: 'Tätä riviä ei ole tarkoitus muokata.',
+        },
+      ])
     }
   }
 }
@@ -129,31 +98,26 @@ const updateBaseDecorations = (
   ])
   editor.setDecorations(bycodeEndDecorationType, [
     {
-      range: new vscode.Range(
-        new vscode.Position(bycodeEnd, 0),
-        new vscode.Position(bycodeEnd, 0),
-      ),
+      range: new vscode.Range(new vscode.Position(bycodeEnd, 0), new vscode.Position(bycodeEnd, 0)),
     },
   ])
 }
 
-const outsideBycodeDecorationType =
-  vscode.window.createTextEditorDecorationType({
-    isWholeLine: true,
-    light: {
-      backgroundColor: '#eff0f1',
-    },
-    dark: {
-      backgroundColor: '#161514',
-    },
-  })
+const outsideBycodeDecorationType = vscode.window.createTextEditorDecorationType({
+  isWholeLine: true,
+  light: {
+    backgroundColor: '#eff0f1',
+  },
+  dark: {
+    backgroundColor: '#161514',
+  },
+})
 
-const notInsideBycodeNotificationDecorationType =
-  vscode.window.createTextEditorDecorationType({
-    isWholeLine: true,
-    // TODO: this is here just for example, replace with actual implementation if necessary
-    gutterIconPath: '/home/hannes/work/temp/exclam.svg',
-  })
+const notInsideBycodeNotificationDecorationType = vscode.window.createTextEditorDecorationType({
+  isWholeLine: true,
+  // TODO: this is here just for example, replace with actual implementation if necessary
+  gutterIconPath: '/home/hannes/work/temp/exclam.svg',
+})
 
 const bycodeBeginDecorationType = vscode.window.createTextEditorDecorationType({
   isWholeLine: true,
@@ -169,20 +133,18 @@ const bycodeEndDecorationType = vscode.window.createTextEditorDecorationType({
   borderStyle: 'solid',
 })
 
-const insideBycodeDecorationType = vscode.window.createTextEditorDecorationType(
-  {
-    overviewRulerColor: 'blue',
-    overviewRulerLane: vscode.OverviewRulerLane.Right,
-    isWholeLine: true,
-    light: {
-      backgroundColor: '#eff0f1',
-    },
-    dark: {
-      backgroundColor: '#161514',
-    },
-    outline: 'width: 3px',
+const insideBycodeDecorationType = vscode.window.createTextEditorDecorationType({
+  overviewRulerColor: 'blue',
+  overviewRulerLane: vscode.OverviewRulerLane.Right,
+  isWholeLine: true,
+  light: {
+    backgroundColor: '#eff0f1',
   },
-)
+  dark: {
+    backgroundColor: '#161514',
+  },
+  outline: 'width: 3px',
+})
 
 // TODO? does this belong here
 export function isBycodeTaskFile(document: vscode.TextDocument): boolean {

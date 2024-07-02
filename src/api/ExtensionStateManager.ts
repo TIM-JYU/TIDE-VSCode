@@ -146,10 +146,7 @@ export default class ExtensionStateManager {
    * @param {NotifyFunction} onValueChange - Callback function to call when a change happens
    * @returns {vscode.Disposable} A function for unsubscribing
    */
-  public static subscribe(
-    key: string,
-    onValueChange: NotifyFunction,
-  ): vscode.Disposable {
+  public static subscribe(key: string, onValueChange: NotifyFunction): vscode.Disposable {
     Logger.debug(`Someone subscribed to ${key}`)
     const subscriptionObject: SubscriptionObject = { key, onValueChange }
     this.subscribers.push(subscriptionObject)
@@ -173,9 +170,7 @@ export default class ExtensionStateManager {
    */
   static unsubscribe(subscriptionObject: SubscriptionObject) {
     Logger.debug(`Someone unsubscribed from ${subscriptionObject.key}`)
-    this.subscribers = this.subscribers.filter(
-      (subscriber) => subscriber !== subscriptionObject,
-    )
+    this.subscribers = this.subscribers.filter((subscriber) => subscriber !== subscriptionObject)
   }
 
   /**

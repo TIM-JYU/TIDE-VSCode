@@ -52,9 +52,7 @@ export default class CoursePanel {
    * Sends initial file download path to svelte file.
    */
   private sendInitialPath() {
-    const initialPath = vscode.workspace
-      .getConfiguration()
-      .get('TIM-IDE.fileDownloadPath')
+    const initialPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     this.panel.webview.postMessage({
       type: 'SetDownloadPathResult',
       value: initialPath ? initialPath : null,
@@ -89,14 +87,8 @@ export default class CoursePanel {
 
     // subscribe to changes in login data
     this.disposables.push(
-      ExtensionStateManager.subscribe(
-        'loginData',
-        this.sendLoginData.bind(this),
-      ),
-      ExtensionStateManager.subscribe(
-        'courses',
-        this.sendCourseData.bind(this),
-      ),
+      ExtensionStateManager.subscribe('loginData', this.sendLoginData.bind(this)),
+      ExtensionStateManager.subscribe('courses', this.sendCourseData.bind(this)),
     )
 
     // Set the webview's initial html content
@@ -130,13 +122,12 @@ export default class CoursePanel {
           break
         }
         case 'SetDownloadPath': {
-          let newPath: vscode.Uri[] | undefined =
-            await vscode.window.showOpenDialog({
-              canSelectFiles: false,
-              canSelectFolders: true,
-              canSelectMany: false,
-              openLabel: 'Select directory',
-            })
+          let newPath: vscode.Uri[] | undefined = await vscode.window.showOpenDialog({
+            canSelectFiles: false,
+            canSelectFolders: true,
+            canSelectMany: false,
+            openLabel: 'Select directory',
+          })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
             const previousPath = ExtensionStateManager.getDownloadPath()
@@ -153,23 +144,13 @@ export default class CoursePanel {
           const updatedPath = newPath ? newPath[0].fsPath : null
           vscode.workspace
             .getConfiguration()
-            .update(
-              'TIM-IDE.fileDownloadPath',
-              updatedPath,
-              vscode.ConfigurationTarget.Global,
-            )
+            .update('TIM-IDE.fileDownloadPath', updatedPath, vscode.ConfigurationTarget.Global)
           break
         }
         case 'DownloadTaskSet': {
           const taskSetPath = msg.value
-          const downloadPath = vscode.workspace
-            .getConfiguration()
-            .get('TIM-IDE.fileDownloadPath')
-          vscode.commands.executeCommand(
-            'tide.downloadTaskSet',
-            taskSetPath,
-            downloadPath,
-          )
+          const downloadPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+          vscode.commands.executeCommand('tide.downloadTaskSet', taskSetPath, downloadPath)
           break
         }
         case 'UpdateCoursesToGlobalState': {
@@ -180,13 +161,9 @@ export default class CoursePanel {
         case 'OpenWorkspace': {
           const taskSetName = msg.value.taskSetName
           const taskSetPath = msg.value.taskSetPath
-          const downloadPath =
-            ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
+          const downloadPath = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
           let directory = path.join(downloadPath, taskSetName)
-          vscode.commands.executeCommand(
-            'vscode.openFolder',
-            vscode.Uri.file(directory),
-          )
+          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(directory))
           break
         }
         case 'RequestLoginData': {
@@ -239,10 +216,6 @@ export default class CoursePanel {
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {
-    return getDefaultHtmlForWebview(
-      webview,
-      this.extensionUri,
-      CoursePanel.fileNamePrefix,
-    )
+    return getDefaultHtmlForWebview(webview, this.extensionUri, CoursePanel.fileNamePrefix)
   }
 }

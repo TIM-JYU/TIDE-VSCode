@@ -37,12 +37,9 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * Resets exercise.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand(
-      'tide.resetExercise',
-      (taskSetPath, taskId, downloadPath) => {
-        Tide.overwriteTask(taskSetPath, taskId, downloadPath)
-      },
-    ),
+    vscode.commands.registerCommand('tide.resetExercise', (taskSetPath, taskId, downloadPath) => {
+      Tide.overwriteTask(taskSetPath, taskId, downloadPath)
+    }),
   )
 
   /**
@@ -99,13 +96,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * @param downloadPath - The path where the task set will be downloaded.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand(
-      'tide.downloadTaskSet',
-      (taskSetPath, downloadPath) => {
-        Tide.downloadTaskSet(taskSetPath, downloadPath)
-        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
-      },
-    ),
+    vscode.commands.registerCommand('tide.downloadTaskSet', (taskSetPath, downloadPath) => {
+      Tide.downloadTaskSet(taskSetPath, downloadPath)
+      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
+    }),
   )
 
   /**

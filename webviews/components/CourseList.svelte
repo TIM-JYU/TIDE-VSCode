@@ -47,28 +47,21 @@ or opening workspaces.
         <Menu>
           <span slot="toggle">&#8942;</span>
           <MenuItem slot="menucontent">
-            <a
-              href="#?"
-              on:click={() => moveCourse(course, getOppositeStatus())}
-            >
+            <a href="#?" on:click={() => moveCourse(course, getOppositeStatus())}>
               Move to {getOppositeStatus()} courses
             </a>
           </MenuItem>
         </Menu>
       </header>
       <div>
-        <a class="link" href={'https://tim.jyu.fi/view/' + course.path}
-          >Open material page</a
-        >
+        <a class="link" href={'https://tim.jyu.fi/view/' + course.path}>Open material page</a>
       </div>
       <button
         class="expand-collapse-button"
         aria-expanded={course.expanded}
         on:click={() => toggleCourse(course.id)}
       >
-        <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}"
-          >&#9660;</span
-        >
+        <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
       </button>
       {#if course.expanded}
         <div class="course-content">

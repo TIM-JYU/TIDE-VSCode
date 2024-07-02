@@ -7,11 +7,7 @@
    */
 
   import { onMount } from 'svelte'
-  import {
-    type LoginData,
-    type TimData,
-    type WebviewMessage,
-  } from '../common/types'
+  import { type LoginData, type TimData, type WebviewMessage } from '../common/types'
 
   let timData: TimData
   let loginData: LoginData
@@ -85,9 +81,8 @@ This component manages the display of task information and interaction with task
 
 {#if timData === undefined}
   <p>
-    Task Panel only shows information when you have a TIM task document open in
-    the text editor. If you are sure you have a TIM task open, try clicking the
-    text editor to activate the document.
+    Task Panel only shows information when you have a TIM task document open in the text editor. If
+    you are sure you have a TIM task open, try clicking the text editor to activate the document.
   </p>
 {:else if !timData}
   <p>Loading...</p>
@@ -110,21 +105,15 @@ This component manages the display of task information and interaction with task
     </div>
 
     <div>
-      <a href={'https://tim.jyu.fi/view/' + timData.path}
-        >Open exercise in TIM</a
-      >
+      <a href={'https://tim.jyu.fi/view/' + timData.path}>Open exercise in TIM</a>
     </div>
 
     <hr />
 
     <div class="points-section">
-      <p>
-        Points: Information is not available. Please check task points from TIM.
-      </p>
-      <button
-        class="submit-exercise"
-        on:click={submitTask}
-        disabled={!isLoggedIn}>Submit Exercise</button
+      <p>Points: Information is not available. Please check task points from TIM.</p>
+      <button class="submit-exercise" on:click={submitTask} disabled={!isLoggedIn}
+        >Submit Exercise</button
       >
       <button on:click={showOutput}>Show Output</button>
       <!-- <p>Passed Tests</p>
@@ -138,9 +127,7 @@ This component manages the display of task information and interaction with task
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
     {#if timData.task_files.length < 2}
       <div class="reset-section">
-        <button on:click={resetExercise} disabled={!isLoggedIn}
-          >Reset Exercise</button
-        >
+        <button on:click={resetExercise} disabled={!isLoggedIn}>Reset Exercise</button>
         <!-- <button>Fetch Latest Answer</button> -->
       </div>
     {/if}

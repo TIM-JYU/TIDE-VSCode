@@ -9,12 +9,7 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import {
-  LoginData,
-  MessageType,
-  TimData,
-  WebviewMessage,
-} from '../../common/types'
+import { LoginData, MessageType, TimData, WebviewMessage } from '../../common/types'
 import path from 'path'
 import Logger from '../../utilities/logger'
 import { log } from 'console'
@@ -70,10 +65,7 @@ export default class TaskPanel {
 
     // subscribe to changes in login data
     this.disposables.push(
-      ExtensionStateManager.subscribe(
-        'loginData',
-        this.updateLoginData.bind(this),
-      ),
+      ExtensionStateManager.subscribe('loginData', this.updateLoginData.bind(this)),
     )
 
     // Set the webview's initial html content.
@@ -120,9 +112,7 @@ export default class TaskPanel {
         }
         case 'ShowOutput': {
           vscode.commands.executeCommand('workbench.action.output.toggleOutput')
-          vscode.commands.executeCommand(
-            'workbench.action.focusFirstEditorGroup',
-          )
+          vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup')
           break
         }
         case 'ResetExercise': {
@@ -136,8 +126,7 @@ export default class TaskPanel {
               if (answer === 'Continue') {
                 let taskSetPath = msg.value.path
                 let taskId = msg.value.taskId
-                let fileLocation =
-                  ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
+                let fileLocation = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
                 vscode.commands.executeCommand(
                   'tide.resetExercise',
                   taskSetPath,
@@ -195,9 +184,7 @@ export default class TaskPanel {
           const currentFile = doc.fileName
           const currentDir = path.dirname(currentFile)
           const timDataPath = path.join(currentDir, '.timdata')
-          const timDataContent = await vscode.workspace.fs.readFile(
-            vscode.Uri.file(timDataPath),
-          )
+          const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
           const timData: TimData = JSON.parse(timDataContent.toString())
 
           return timData
@@ -230,10 +217,6 @@ export default class TaskPanel {
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {
-    return getDefaultHtmlForWebview(
-      webview,
-      this.extensionUri,
-      TaskPanel.fileNamePrefix,
-    )
+    return getDefaultHtmlForWebview(webview, this.extensionUri, TaskPanel.fileNamePrefix)
   }
 }
