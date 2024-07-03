@@ -1,15 +1,13 @@
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
 
-// TODO: more descriptive var name, function names, file name
-// editableArea / editableCodeArea
-const BYCODEBEGIN = 'BYCODEBEGIN'
-const BYCODEEND = 'BYCODEEND'
+// TODO: support different keywords
+const EDITABLE_BEGIN = 'BYCODEBEGIN'
+const EDITABLE_END = 'BYCODEEND'
 
 let editorTextChangeListener: vscode.Disposable | undefined
 
-export const bycodeEditorEventListener = {
-  // blockBeginLineIndex = getBlockBeginLineIndex()
+export const editableAreaEventListener = {
   activate: (ctx: vscode.ExtensionContext, document: vscode.TextDocument) => {
     editorTextChangeListener = vscode.window.onDidChangeTextEditorSelection(
       generateOnSelectionChange(document),
@@ -23,25 +21,55 @@ export const bycodeEditorEventListener = {
   },
 }
 
+export const validateNoneditableArea = (document: vscode.TextDocument, originalTaskFileContent: string) => {
+  // empty lines are ignored
+  const noneditableDocumentLines = parseNoneditableLines(document.getText())
+  const noneditableOriginalLines = parseNoneditableLines(originalTaskFileContent)
+  if (noneditableDocumentLines.length !== noneditableOriginalLines.length) { return false }
+  return noneditableDocumentLines.every((value, idx) => {
+    value === noneditableOriginalLines[idx]
+  })
+}
+
+const parseNoneditableLines = (text: string): Array<string> => {
+  let insideEditable: boolean = false
+  return text
+    .split(/\r?\n/)
+    .filter((s) => s.length > 0)
+    .reduce((acc: Array<string>, cur: string) => {
+      if (cur.includes(EDITABLE_END)) {
+        insideEditable = false
+      }
+      if (insideEditable) {
+        return acc
+      }
+      if (cur.includes(EDITABLE_BEGIN)) {
+        insideEditable = true
+      }
+      return [...acc, cur]
+    }, [])
+}
+
 const generateOnSelectionChange = (document: vscode.TextDocument) => {
   const getDocLines = (doc: vscode.TextDocument) => doc.getText().split(/\r?\n/)
   let docTextLines: Array<string> | undefined = getDocLines(document)
   // TODO: if performance optimization is needed, it could assumed that the line number of the line with BYCODEBEGIN will stay the same
   // because editing the preceding contents shouldn't be possible,
   // because of the read-only mode being activated when the cursor is above it
-  let bycodeBeginLine: number = docTextLines.findIndex((s) => s.includes(BYCODEBEGIN))
-  let bycodeEndLine: number = docTextLines.findIndex((s) => s.includes(BYCODEEND))
+  let bycodeBeginLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_BEGIN))
+  let bycodeEndLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_END))
   Logger.debug('bycodebegin', bycodeBeginLine, 'bycodeend', bycodeEndLine)
-  return function (event: vscode.TextEditorSelectionChangeEvent) {
+  return function(event: vscode.TextEditorSelectionChangeEvent) {
     Logger.debug('ev', event)
+    Logger.debug('nel', parseNoneditableLines(event.textEditor.document.getText()))
 
     // TODO: optimize by using docTextLines variable and setting it to undefined at the end of this function
-    if (!event.textEditor.document.lineAt(bycodeBeginLine).text.includes(BYCODEBEGIN)) {
-      bycodeBeginLine = getDocLines(document).findIndex((s) => s.includes(BYCODEBEGIN))
+    if (!event.textEditor.document.lineAt(bycodeBeginLine).text.includes(EDITABLE_BEGIN)) {
+      bycodeBeginLine = getDocLines(document).findIndex((s) => s.includes(EDITABLE_BEGIN))
     }
 
-    if (!event.textEditor.document.lineAt(bycodeEndLine).text.includes(BYCODEEND)) {
-      bycodeEndLine = getDocLines(document).findIndex((s) => s.includes(BYCODEEND))
+    if (!event.textEditor.document.lineAt(bycodeEndLine).text.includes(EDITABLE_END)) {
+      bycodeEndLine = getDocLines(document).findIndex((s) => s.includes(EDITABLE_END))
     }
 
     const selectionBeginLine: number = Math.min(...event.selections.map((s) => s.start.line))
@@ -133,21 +161,8 @@ const bycodeEndDecorationType = vscode.window.createTextEditorDecorationType({
   borderStyle: 'solid',
 })
 
-const insideBycodeDecorationType = vscode.window.createTextEditorDecorationType({
-  overviewRulerColor: 'blue',
-  overviewRulerLane: vscode.OverviewRulerLane.Right,
-  isWholeLine: true,
-  light: {
-    backgroundColor: '#eff0f1',
-  },
-  dark: {
-    backgroundColor: '#161514',
-  },
-  outline: 'width: 3px',
-})
-
 // TODO? does this belong here
 export function isBycodeTaskFile(document: vscode.TextDocument): boolean {
   const docText: string = document.getText()
-  return docText.includes(BYCODEBEGIN) && docText.includes(BYCODEEND)
+  return docText.includes(EDITABLE_BEGIN) && docText.includes(EDITABLE_END)
 }

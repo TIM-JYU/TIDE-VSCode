@@ -12,7 +12,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
 import UiController from '../ui/UiController'
 import TaskPanel from '../ui/panels/TaskPanel'
-import { bycodeEditorEventListener, isBycodeTaskFile } from '../editor/bycodeEditor'
+import { editableAreaEventListener, isBycodeTaskFile } from '../editor/editableArea'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
   // TODO: Move to its own file in src/event-listeners
@@ -34,9 +34,9 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
         UiController.showTaskPanel()
 
         if (isBycodeTaskFile(editor.document)) {
-          bycodeEditorEventListener.activate(ctx, editor.document)
+          editableAreaEventListener.activate(ctx, editor.document)
         } else {
-          bycodeEditorEventListener.deactivate()
+          editableAreaEventListener.deactivate()
         }
       }
     }
