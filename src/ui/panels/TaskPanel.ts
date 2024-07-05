@@ -9,10 +9,9 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData, MessageType, TimData, WebviewMessage } from '../../common/types'
+import { LoginData, TimData, WebviewMessage } from '../../common/types'
 import path from 'path'
-import Logger from '../../utilities/logger'
-import { log } from 'console'
+import Tide from '../../api/tide'
 
 export default class TaskPanel {
   public static currentPanel: TaskPanel | undefined
@@ -137,6 +136,9 @@ export default class TaskPanel {
             })
           break
         }
+        case 'ResetNoneditableAreas': {
+          Tide.resetNoneditableAreas(TaskPanel.lastActiveTextEditor.document.uri.path.toString())
+        }
         case 'RequestLoginData': {
           this.sendLoginData()
         }
@@ -179,7 +181,6 @@ export default class TaskPanel {
 
       default: {
         try {
-          // activeTextEditor banged! because the case of undefined is handled above
           const doc = TaskPanel.lastActiveTextEditor.document
           const currentFile = doc.fileName
           const currentDir = path.dirname(currentFile)

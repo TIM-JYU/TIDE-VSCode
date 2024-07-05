@@ -138,6 +138,7 @@ export type MessageType =
   | 'OpenWorkspace'
   | 'RequestLoginData'
   | 'ResetExercise'
+  | 'ResetNoneditableAreas'
   | 'SetDownloadPath'
   | 'SetDownloadPathResult'
   | 'ShowCourses'

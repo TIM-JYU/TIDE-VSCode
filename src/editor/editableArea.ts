@@ -21,11 +21,16 @@ export const editableAreaEventListener = {
   },
 }
 
-export const validateNoneditableArea = (document: vscode.TextDocument, originalTaskFileContent: string) => {
+export const validateNoneditableArea = (
+  document: vscode.TextDocument,
+  originalTaskFileContent: string,
+) => {
   // empty lines are ignored
   const noneditableDocumentLines = parseNoneditableLines(document.getText())
   const noneditableOriginalLines = parseNoneditableLines(originalTaskFileContent)
-  if (noneditableDocumentLines.length !== noneditableOriginalLines.length) { return false }
+  if (noneditableDocumentLines.length !== noneditableOriginalLines.length) {
+    return false
+  }
   return noneditableDocumentLines.every((value, idx) => {
     value === noneditableOriginalLines[idx]
   })
@@ -59,7 +64,7 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
   let bycodeBeginLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_BEGIN))
   let bycodeEndLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_END))
   Logger.debug('bycodebegin', bycodeBeginLine, 'bycodeend', bycodeEndLine)
-  return function(event: vscode.TextEditorSelectionChangeEvent) {
+  return function (event: vscode.TextEditorSelectionChangeEvent) {
     Logger.debug('ev', event)
     Logger.debug('nel', parseNoneditableLines(event.textEditor.document.getText()))
 

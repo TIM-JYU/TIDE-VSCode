@@ -8,6 +8,7 @@
 
   import { onMount } from 'svelte'
   import { type LoginData, type TimData, type WebviewMessage } from '../common/types'
+  import path from 'path'
 
   let timData: TimData
   let loginData: LoginData
@@ -70,6 +71,13 @@
     }
   }
 
+  function resetNoneditableAreas() {
+    tsvscode.postMessage({
+      type: 'ResetNoneditableAreas',
+      value: undefined,
+    })
+  }
+
   $: workspace = '// TODO: workspace placeholder'
   $: isLoggedIn = loginData?.isLogged ?? false
 </script>
@@ -125,12 +133,16 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
-    {#if timData.task_files.length < 2}
-      <div class="reset-section">
+    <div class="reset-section">
+      {#if timData.task_files.length < 2}
         <button on:click={resetExercise} disabled={!isLoggedIn}>Reset Exercise</button>
         <!-- <button>Fetch Latest Answer</button> -->
-      </div>
-    {/if}
+      {/if}
+      <button on:click={resetNoneditableAreas}>
+        <!-- TODO: better text for button -->
+        Reset noneditable areas
+      </button>
+    </div>
   </div>
 {/if}
 
