@@ -66,7 +66,7 @@ export interface TaskSet {
  * Represents a single task
  */
 export interface Task {
-  task_doc_id: number
+  doc_id: number
   // TODO: what data belongs here? current and max points? Data coming from
   // Following is printed by CLI tool:
   //

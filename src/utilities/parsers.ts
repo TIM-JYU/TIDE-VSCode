@@ -25,7 +25,8 @@ export async function parseCoursesFromJsonString(data: string): Promise<Array<Co
  */
 export function parseTasksFromJsonString(data: string): Array<Task> {
   // TODO: What info on tasks is required? Currently only the length of the array is used elsewhere in code.
-  return JSON.parse(data).map((_task: Task) => {
-    return { task_doc_id: _task.task_doc_id }
-  })
+  // return JSON.parse(data).map((_task: Task) => {
+  //   return { doc_id: _task.doc_id }
+  // })
+  return JSON.parse(data)
 }

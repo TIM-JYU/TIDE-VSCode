@@ -26,7 +26,7 @@ export function activate(ctx: vscode.ExtensionContext) {
   init.registerCommands(ctx)
   init.registerEventListeners(ctx)
 
-  vscode.commands.executeCommand('tide.updateCoursesFromTim')
+  // vscode.commands.executeCommand('tide.updateCoursesFromTim')
 
   // Creates and registers the side menu on the left
   const sidebarProvider = new SidebarProvider(ctx.extensionUri)

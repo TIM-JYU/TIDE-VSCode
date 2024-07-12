@@ -33,11 +33,11 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
 
         UiController.showTaskPanel()
 
-        // if (isBycodeTaskFile(editor.document)) {
-        //   editableAreaEventListener.activate(ctx, editor.document)
-        // } else {
-        //   editableAreaEventListener.deactivate()
-        // }
+        if (isBycodeTaskFile(editor.document)) {
+          editableAreaEventListener.activate(ctx, editor.document)
+        } else {
+          editableAreaEventListener.deactivate()
+        }
       }
     }
   })

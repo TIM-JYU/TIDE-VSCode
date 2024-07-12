@@ -55,6 +55,7 @@ const parseNoneditableLines = (text: string): Array<string> => {
     }, [])
 }
 
+
 const generateOnSelectionChange = (document: vscode.TextDocument) => {
   const getDocLines = (doc: vscode.TextDocument) => doc.getText().split(/\r?\n/)
   let docTextLines: Array<string> | undefined = getDocLines(document)
@@ -63,12 +64,7 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
   // because of the read-only mode being activated when the cursor is above it
   let bycodeBeginLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_BEGIN))
   let bycodeEndLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_END))
-  Logger.debug('bycodebegin', bycodeBeginLine, 'bycodeend', bycodeEndLine)
   return function (event: vscode.TextEditorSelectionChangeEvent) {
-    Logger.debug('ev', event)
-    Logger.debug('nel', parseNoneditableLines(event.textEditor.document.getText()))
-
-    // TODO: optimize by using docTextLines variable and setting it to undefined at the end of this function
     if (!event.textEditor.document.lineAt(bycodeBeginLine).text.includes(EDITABLE_BEGIN)) {
       bycodeBeginLine = getDocLines(document).findIndex((s) => s.includes(EDITABLE_BEGIN))
     }
