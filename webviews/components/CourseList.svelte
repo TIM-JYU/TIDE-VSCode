@@ -76,7 +76,7 @@ or opening workspaces.
               </tr>
             </thead>
             <tbody>
-              {#each course.task_docs as taskset}
+              {#each course.taskSets as taskset}
                 <tr>
                   <td>{taskset.name}</td>
                   <td>{taskset.tasks.length}</td>
