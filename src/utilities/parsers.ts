@@ -1,5 +1,5 @@
 import Tide from '../api/tide'
-import { Course, Task, TimData } from '../common/types'
+import { Course, CourseDataRaw, Task, TimData } from '../common/types'
 
 /**
  * Parses courses from a json string
@@ -8,13 +8,26 @@ import { Course, Task, TimData } from '../common/types'
  * @returns A promise with an array of courses
  */
 export async function parseCoursesFromJsonString(data: string): Promise<Array<Course>> {
-  const courses: Array<Course> = JSON.parse(data)
-  courses.forEach((c) => {
-    c.status = 'active'
-    c.expanded = true
-    c.task_docs.forEach(async (t) => (t.tasks = await Tide.getTaskListForTaskSetPath(t.path)))
-  })
-  return courses
+  const courses: Array<CourseDataRaw> = JSON.parse(data)
+  const coursesWithTasks = await Promise.all(courses.map(async (c) => {
+    const course: Course = {
+      status: 'active',
+      expanded: false,
+      name: c.name,
+      id: c.id,
+      path: c.path,
+      taskSets: await Promise.all(c.tasks.map(async t => {
+        const tasks = await Tide.getTaskListForTaskSetPath(t.path)
+        return {
+          ...t,
+          tasks
+        }
+      })),
+    }
+    return course
+  }))
+  console.log(coursesWithTasks)
+  return coursesWithTasks
 }
 
 /**

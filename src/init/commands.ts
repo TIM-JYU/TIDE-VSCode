@@ -124,7 +124,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.debug', () => {
-      vscode.window.showInformationMessage('This is a floating message!')
+        Logger.debug(ExtensionStateManager.getCourses())
     }),
   )
 

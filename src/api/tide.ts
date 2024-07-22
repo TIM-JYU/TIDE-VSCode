@@ -51,7 +51,6 @@ export default class Tide {
     await this.runAndHandle(['courses', '--json'], async (data: string) => {
       courses = await parseCoursesFromJsonString(data)
     })
-    console.log(courses)
     return courses
   }
 
@@ -133,7 +132,7 @@ export default class Tide {
    */
   private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
     const data = await this.spawnTideProcess(...args)
-    handler(data)
+    await handler(data)
   }
 
   /**

@@ -79,7 +79,7 @@ or opening workspaces.
               {#each course.task_docs as taskset}
                 <tr>
                   <td>{taskset.name}</td>
-                  <!-- <td>{taskset.tasks.length}</td> -->
+                  <td>{taskset.tasks.length}</td>
                   <!-- <td>6/8</td> -->
                   <td>
                     <button

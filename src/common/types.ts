@@ -1,10 +1,9 @@
 // TODO: snake_case to camelCase conversion (either when parsing in ide code or when sending in cli code) to follow typescript naming conventions
-export type CourseStatus = 'active' | 'hidden'
 
 /**
- * Represents a course
+ * Attributes shared by raw course data and parsed courses 
  */
-export interface Course {
+interface CourseBase {
   /**
    * Name of the course.
    */
@@ -19,11 +18,28 @@ export interface Course {
    * The course's virtual path in TIM.
    */
   path: string
+}
 
+/**
+ * Represents raw data coming from cli
+ */
+export interface CourseDataRaw extends CourseBase {
   /**
    * List of task sets that are defined as part of the course in TIM.
    */
-  task_docs: Array<TaskSet>
+  tasks: Array<TaskSetBase>
+}
+
+export type CourseStatus = 'active' | 'hidden'
+
+/**
+ * Represents a course in the extensions context
+ */
+export interface Course extends CourseBase {
+  /**
+   * List of task sets that are defined as part of the course in TIM.
+   */
+  taskSets: Array<TaskSet>
 
   /**
    * User specific status for the course.
@@ -38,9 +54,9 @@ export interface Course {
 }
 
 /**
- * Represents a task set
+ * Represents a task set data 
  */
-export interface TaskSet {
+export interface TaskSetBase {
   /**
    * Name of the task.
    */
@@ -55,7 +71,12 @@ export interface TaskSet {
    * Task set's virtual path in TIM.
    */
   path: string
+}
 
+/**
+ * Represents a task set with tasks resolved
+ */
+export interface TaskSet extends TaskSetBase {
   /**
    * Tasks of the taskset
    */
