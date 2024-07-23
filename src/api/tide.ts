@@ -11,7 +11,7 @@ import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
 import { Course, LoginData, Task } from '../common/types'
-import { parseCoursesFromJsonString } from '../utilities/parsers'
+import { parseCoursesFromJson } from '../utilities/parsers'
 
 export default class Tide {
   public static async debug() {
@@ -49,7 +49,7 @@ export default class Tide {
   public static async getCourseList(): Promise<Array<Course>> {
     let courses: Array<Course> = []
     await this.runAndHandle(['courses', '--json'], async (data: string) => {
-      courses = await parseCoursesFromJsonString(data)
+      courses = await parseCoursesFromJson(data)
     })
     return courses
   }
