@@ -43,7 +43,7 @@ export default class Tide {
   }
 
   /**
-   * Lists user's IDE-compatible courses from TIM in JSON array.
+   * Fetches user's IDE-compatible courses from TIM.
    * @returns course data
    */
   public static async getCourseList(): Promise<Array<Course>> {
