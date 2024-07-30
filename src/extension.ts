@@ -35,5 +35,5 @@ export function activate(ctx: vscode.ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {
-    console.log(ExtensionStateManager.getCourses())
+  console.log(ExtensionStateManager.getCourses())
 }

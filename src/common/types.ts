@@ -1,7 +1,7 @@
 // TODO: snake_case to camelCase conversion (either when parsing in ide code or when sending in cli code) to follow typescript naming conventions
 
 /**
- * Attributes shared by raw course data and parsed courses 
+ * Attributes shared by raw course data and parsed courses
  */
 interface CourseBase {
   /**
@@ -25,7 +25,7 @@ interface CourseBase {
  */
 export interface CourseDataRaw extends CourseBase {
   /**
-   * List of task sets that are defined as part of the course in TIM.
+   * List of task sets that are defined as part of the course in TIM (without local modifications).
    */
   tasks: Array<TaskSetBase>
 }
@@ -54,7 +54,7 @@ export interface Course extends CourseBase {
 }
 
 /**
- * Represents a task set data 
+ * Represents a task set data
  */
 export interface TaskSetBase {
   /**
@@ -78,6 +78,11 @@ export interface TaskSetBase {
  */
 export interface TaskSet extends TaskSetBase {
   /**
+   * Download path of the taskset
+   */
+  downloadPath: string | undefined
+
+  /**
    * Tasks of the taskset
    */
   tasks: Array<Task>
@@ -88,6 +93,8 @@ export interface TaskSet extends TaskSetBase {
  */
 export interface Task {
   doc_id: number
+  ide_task_id: string
+  path: string
   // TODO: what data belongs here? current and max points? Data coming from
   // Following is printed by CLI tool:
   //

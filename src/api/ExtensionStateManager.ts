@@ -19,11 +19,14 @@ export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
     setKeysForSync(keys: readonly string[]): void
   }
+
   private static KEY_PREFIX = 'tide'
 
   static setContext(ctx: vscode.ExtensionContext) {
     this.globalState = ctx.globalState
   }
+
+  // TODO: why is this in both globalstate and settings
 
   /**
    * Sets the path for downloading tasks to the Global State.
@@ -47,7 +50,6 @@ export default class ExtensionStateManager {
    */
   public static setCourses(courses: Array<Course>) {
     // TODO: Currently overwrites the courses, implement functionality to combine new data with existing data
-    // TODO: Weird bug where a taskset's tasks (an array) aren't saved to global state between vscode sessions, but it is there for the session after the course data has been fetched from TIM
     this.writeToGlobalState('courses', courses)
   }
 
@@ -85,7 +87,15 @@ export default class ExtensionStateManager {
    * @param downloadPath - The path where the task set will be downloaded.
    */
   static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
-    this.writeToGlobalState(taskSetPath, downloadPath)
+    const courses: Array<Course> = this.readFromGlobalState('courses')
+    courses.forEach((course) => {
+      course.taskSets.forEach((taskSet) => {
+        if (taskSet.path === taskSetPath) {
+          taskSet.downloadPath = downloadPath
+        }
+      })
+    })
+    this.writeToGlobalState('courses', courses)
   }
 
   /**
@@ -93,8 +103,12 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @returns The download path stored for the specified task set path.
    */
-  static getTaskSetDownloadPath(taskSetPath: string): string {
-    return this.readFromGlobalState(taskSetPath)
+  static getTaskSetDownloadPath(taskSetPath: string): string | undefined {
+    const courses: Array<Course> = this.readFromGlobalState('courses')
+    const downloadPath = courses
+      .flatMap((course) => course.taskSets)
+      .find((taskSet) => taskSet.path === taskSetPath)?.downloadPath
+    return downloadPath
   }
 
   /**
@@ -115,7 +129,7 @@ export default class ExtensionStateManager {
    * @param {string} key - Key to write to
    * @param {string} value - Value to write
    */
-  private static writeToGlobalState(key: string, value: any) {
+  private static writeToGlobalState(key: StateKey, value: any) {
     Logger.debug(`Writing to globalState: "${this.prefixedKey(key)}": `, value)
     this.globalState.update(this.prefixedKey(key), value)
     this.notifySubscribers(key, value)
@@ -128,7 +142,7 @@ export default class ExtensionStateManager {
    * @param {string} key - Key of the value queries
    * @returns {string} value matching the key or an empty string if key doesn't exist
    */
-  private static readFromGlobalState(key: string): any {
+  private static readFromGlobalState(key: StateKey): any {
     const prefixedKey = this.prefixedKey(key)
     const value: any = this.globalState.get(prefixedKey)
     Logger.debug(`Found the following value from key "${prefixedKey}"`, value)
@@ -146,7 +160,7 @@ export default class ExtensionStateManager {
    * @param {NotifyFunction} onValueChange - Callback function to call when a change happens
    * @returns {vscode.Disposable} A function for unsubscribing
    */
-  public static subscribe(key: string, onValueChange: NotifyFunction): vscode.Disposable {
+  public static subscribe(key: StateKey, onValueChange: NotifyFunction): vscode.Disposable {
     Logger.debug(`Someone subscribed to ${key}`)
     const subscriptionObject: SubscriptionObject = { key, onValueChange }
     this.subscribers.push(subscriptionObject)
@@ -180,7 +194,7 @@ export default class ExtensionStateManager {
    * @param {string} key - The key whose subscribers are notified
    * @param {string} value - The new value of the key
    */
-  private static notifySubscribers(key: string, value: unknown) {
+  private static notifySubscribers(key: StateKey, value: unknown) {
     Logger.debug('Notifying subscribers of the following new value', key, value)
     this.subscribers
       .filter((subscriber) => subscriber.key === key)
@@ -205,4 +219,4 @@ interface NotifyFunction {
 }
 
 // TODO: Refactor from using string to using type StateKey for referring to keys
-type StateKey = 'courses' | 'downloadPath' | 'loginData'
+export type StateKey = 'courses' | 'downloadPath' | 'loginData'

@@ -15,6 +15,7 @@ import Logger from '../utilities/logger'
 import Tide from '../api/tide'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
+import { mergeCoursesWithNewData } from '../utilities/utils'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -65,8 +66,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
-      const courses = await Tide.getCourseList()
-      ExtensionStateManager.setCourses(courses)
+      const existingCourses = ExtensionStateManager.getCourses()
+      const freshCourses = await Tide.getCourseList()
+      const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
+      Logger.debug('old', existingCourses)
+      Logger.debug('new', freshCourses)
+      Logger.debug('merged', mergedCourses)
     }),
   )
 
@@ -117,6 +122,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * Registers the 'tide.listCourses' command, allowing users to list courses from TIDE.
    */
   ctx.subscriptions.push(
+    // TODO: is this needed?
     vscode.commands.registerCommand('tide.listCourses', () => {
       Tide.getCourseList()
     }),
@@ -124,7 +130,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.debug', () => {
-        Logger.debug(ExtensionStateManager.getCourses())
+      Logger.debug(ExtensionStateManager.getCourses())
     }),
   )
 

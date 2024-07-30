@@ -126,12 +126,15 @@ export default class TaskPanel {
                 let taskSetPath = msg.value.path
                 let taskId = msg.value.taskId
                 let fileLocation = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
-                vscode.commands.executeCommand(
-                  'tide.resetExercise',
-                  taskSetPath,
-                  taskId,
-                  fileLocation,
-                )
+                // TODO: proper error handling
+                if (fileLocation) {
+                  vscode.commands.executeCommand(
+                    'tide.resetExercise',
+                    taskSetPath,
+                    taskId,
+                    fileLocation,
+                  )
+                }
               }
             })
           break

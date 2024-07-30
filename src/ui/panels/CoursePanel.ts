@@ -162,8 +162,11 @@ export default class CoursePanel {
           const taskSetName = msg.value.taskSetName
           const taskSetPath = msg.value.taskSetPath
           const downloadPath = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
-          let directory = path.join(downloadPath, taskSetName)
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(directory))
+          // TODO: proper error handling
+          if (downloadPath) {
+            let directory = path.join(downloadPath, taskSetName)
+            vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(directory))
+          }
           break
         }
         case 'RequestLoginData': {

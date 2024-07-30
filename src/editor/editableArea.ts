@@ -55,7 +55,6 @@ const parseNoneditableLines = (text: string): Array<string> => {
     }, [])
 }
 
-
 const generateOnSelectionChange = (document: vscode.TextDocument) => {
   const getDocLines = (doc: vscode.TextDocument) => doc.getText().split(/\r?\n/)
   let docTextLines: Array<string> | undefined = getDocLines(document)

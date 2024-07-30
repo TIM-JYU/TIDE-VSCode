@@ -9,23 +9,27 @@ import { Course, CourseDataRaw, Task } from '../common/types'
  */
 export async function parseCoursesFromJson(data: string): Promise<Array<Course>> {
   const courses: Array<CourseDataRaw> = JSON.parse(data)
-  const coursesWithTasks = await Promise.all(courses.map(async (c) => {
-    const course: Course = {
-      status: 'active',
-      expanded: false,
-      name: c.name,
-      id: c.id,
-      path: c.path,
-      taskSets: await Promise.all(c.tasks.map(async t => {
-        const tasks = await Tide.getTaskListForTaskSetPath(t.path)
-        return {
-          ...t,
-          tasks
-        }
-      })),
-    }
-    return course
-  }))
+  const coursesWithTasks = await Promise.all(
+    courses.map(async (c) => {
+      const course: Course = {
+        status: 'active',
+        expanded: false,
+        name: c.name,
+        id: c.id,
+        path: c.path,
+        taskSets: await Promise.all(
+          c.tasks.map(async (t) => {
+            const tasks = await Tide.getTaskListForTaskSetPath(t.path)
+            return {
+              ...t,
+              tasks,
+            }
+          }),
+        ),
+      }
+      return course
+    }),
+  )
   return coursesWithTasks
 }
 
