@@ -15,7 +15,7 @@ import Logger from '../utilities/logger'
 import Tide from '../api/tide'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
-import { mergeCoursesWithNewData } from '../utilities/utils'
+import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
