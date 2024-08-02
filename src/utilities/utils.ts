@@ -14,11 +14,11 @@ export const mergeCoursesWithNewData = (
     }
   }, [])
 
-  const updatedCourses = newAndUpdatedCourses.concat(
+  const allCourses = newAndUpdatedCourses.concat(
     existingCourses.filter((course) => !newAndUpdatedCourses.map((c) => c.id).includes(course.id)),
   )
 
-  return updatedCourses
+  return allCourses
 }
 
 const mergeCourseWithNewData = (existingCourse: Course, newCourse: Course): Course => {
@@ -34,6 +34,7 @@ const mergeCourseWithNewData = (existingCourse: Course, newCourse: Course): Cour
         return mergeTaskSetWithNewData(existingTaskSet, taskSet)
     }
   })
+
   updatedCourse.taskSets = updatedCourse.taskSets.concat(
     existingCourse.taskSets.filter(
       (taskSet) => !updatedCourse.taskSets.map((ts) => ts.doc_id).includes(taskSet.doc_id),
