@@ -1,5 +1,12 @@
 import { Course, TaskSet } from '../common/types'
 
+// TODO: reconsider terms existingX and newX in paramenters
+
+/**
+ * @param existingCourses - Current courses, e.g. those saved in globalState
+ * @param newCourses - New data to be merged into the existing courses, e.g. those downloaded from TIM
+ * @returns New data merged with existing data
+ */
 export const mergeCoursesWithNewData = (
   existingCourses: Array<Course>,
   newCourses: Array<Course>,
@@ -21,6 +28,11 @@ export const mergeCoursesWithNewData = (
   return allCourses
 }
 
+/**
+ * @param existingCourse - Course with current local data
+ * @param newCourse - Course with fresh data from TIM
+ * @returns New data merged with existing data
+ */
 const mergeCourseWithNewData = (existingCourse: Course, newCourse: Course): Course => {
   const updatedCourse: Course = JSON.parse(JSON.stringify(newCourse))
   updatedCourse.status = existingCourse.status
@@ -43,6 +55,11 @@ const mergeCourseWithNewData = (existingCourse: Course, newCourse: Course): Cour
   return updatedCourse
 }
 
+/**
+ * @param existingTaskSet - Task set with current local data
+ * @param newTaskSet - Task set with fresh data from TIM
+ * @returns New data merged with existing data
+ */
 const mergeTaskSetWithNewData = (existingTaskSet: TaskSet, newTaskSet: TaskSet): TaskSet => {
   const updatedTaskSet: TaskSet = JSON.parse(JSON.stringify(newTaskSet))
   updatedTaskSet.downloadPath = existingTaskSet.downloadPath

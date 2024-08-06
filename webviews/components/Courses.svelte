@@ -17,8 +17,6 @@
 
   let downloadPath: string = ''
   let courses: Array<Course> = []
-  let activeCoursesExpanded = true
-  let hiddenCoursesExpanded = false
   let loginData: LoginData
   let isLoggedIn: boolean
 
@@ -48,16 +46,6 @@
       }
     })
   })
-
-  /**
-   * Toggles the visibility of courses based on their status.
-   * @param {string} status - Tells if the course status is "active" or "hidden".
-   */
-  function toggleVisibility(status: CourseStatus) {
-    status === 'active'
-      ? (activeCoursesExpanded = !activeCoursesExpanded)
-      : (hiddenCoursesExpanded = !hiddenCoursesExpanded)
-  }
 
   /**
    * Updates changes in courses to globalState.
@@ -126,15 +114,12 @@
 
   /**
    * Opens a workspace for the specified task set.
-   * @param {string} taskSetName - The name of the task set to open a workspace for.
+   * @param {string} taskSetPath - The path of the task set to open a workspace for.
    */
-  function openWorkspace(taskSetName: string, taskSetPath: string) {
+  function openWorkspace(taskSetPath: string) {
     tsvscode.postMessage({
       type: 'OpenWorkspace',
-      value: {
-        taskSetName,
-        taskSetPath,
-      },
+      value: taskSetPath,
     })
   }
 
@@ -164,8 +149,7 @@ updates the courses' status, and handles downloading task sets and opening works
   <p>No IDE courses were found. Are you sure you have bookmarked an IDE-course in TIM?</p>
 {:else}
   <CourseList
-    isExpanded={activeCoursesExpanded}
-    toggle={toggleVisibility}
+    defaultExpandedState={true}
     {toggleCourse}
     status={'active'}
     courses={courses.filter((c) => c.status === 'active')}
@@ -176,8 +160,7 @@ updates the courses' status, and handles downloading task sets and opening works
   />
 
   <CourseList
-    isExpanded={hiddenCoursesExpanded}
-    toggle={toggleVisibility}
+    defaultExpandedState={false}
     {toggleCourse}
     status={'hidden'}
     courses={courses.filter((c) => c.status === 'hidden')}

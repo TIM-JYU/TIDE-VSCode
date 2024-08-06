@@ -68,10 +68,15 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
       const existingCourses = ExtensionStateManager.getCourses()
       const freshCourses = await Tide.getCourseList()
-      const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
-      Logger.debug('old', existingCourses)
-      Logger.debug('new', freshCourses)
-      Logger.debug('merged', mergedCourses)
+      switch (existingCourses) {
+          case undefined:
+              ExtensionStateManager.setCourses(freshCourses)
+              break
+          default:
+              const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
+              ExtensionStateManager.setCourses(mergedCourses)
+              break
+      }
     }),
   )
 

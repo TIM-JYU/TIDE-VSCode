@@ -14,10 +14,11 @@
   export let moveCourse // function to move a course between lists
   export let downloadTaskSet // function to download a task set
   export let openWorkspace // function to open a workspace for task set
-  export let isExpanded: boolean
-  export let toggle // function to hide or show "active" or "hidden" category for courses
+  export let defaultExpandedState: boolean
   export let toggleCourse // function to collapse or expand the course information
   export let isLoggedIn: boolean
+
+  let isExpanded = defaultExpandedState
 
   /**
    * Gets the opposite course status.
@@ -25,6 +26,11 @@
   function getOppositeStatus() {
     return status === 'active' ? 'hidden' : 'active'
   }
+
+  function toggleExpandedState() {
+    isExpanded = !isExpanded
+  }
+
 </script>
 
 <!--
@@ -34,9 +40,9 @@ expand or collapse course details, and perform actions like downloading task set
 or opening workspaces.
 -->
 
-<button class="button-header" on:click={toggle(status)}>
+<button class="button-header" on:click={toggleExpandedState}>
   <span class="button-header-span">{status} Courses</span>
-  <span class="arrow {!isExpanded ? 'down-arrow' : 'left-arrow'}">&#8250;</span>
+  <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
 </button>
 
 {#if isExpanded}
@@ -61,7 +67,7 @@ or opening workspaces.
         aria-expanded={course.expanded}
         on:click={() => toggleCourse(course.id)}
       >
-        <span class="arrow {!course.expanded ? 'down-arrow' : 'up-arrow'}">&#9660;</span>
+        <span class="arrow {course.expanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
       </button>
       {#if course.expanded}
         <div class="course-content">
@@ -83,15 +89,17 @@ or opening workspaces.
                   <!-- <td>6/8</td> -->
                   <td>
                     <button
-                      class="download-button"
                       on:click={() => downloadTaskSet(taskset.path)}
-                      disabled={!isLoggedIn}>Download</button
+                      disabled={!isLoggedIn}
+                      title={!isLoggedIn && 'Login to download task set.' || ''}
+                      >Download</button
                     >
                   </td>
                   <td
                     ><button
-                      class="open-workspace"
-                      on:click={() => openWorkspace(taskset.name, taskset.path)}
+                      on:click={() => openWorkspace(taskset.downloadPath)}
+                      disabled={taskset.downloadPath === undefined}
+                      title={taskset.downloadPath === undefined ? 'Task set has not been downloaded.' : ''}
                       >Open in workspace</button
                     ></td
                   >
@@ -169,8 +177,7 @@ or opening workspaces.
     text-decoration: underline;
   }
 
-  .download-button,
-  .open-workspace {
+  button {
     background-color: #007acc;
     color: white;
     border: none;
@@ -180,12 +187,11 @@ or opening workspaces.
     cursor: pointer;
   }
 
-  .download-button:active,
-  .open-workspace:active {
+  button:active {
     background: #004d80;
   }
 
-  .download-button:disabled {
+  button:disabled {
     background: grey;
   }
 
