@@ -76,8 +76,6 @@
    * @param {string} courseId - - The unique identifier of the course.
    */
   function toggleCourse(courseId: number) {
-    // TODO: is it necessary to keep expanded state in permanent storage?
-
     const courseIndex = courses.findIndex((course) => course.id === courseId)
     if (courseIndex !== -1) {
       courses[courseIndex].expanded = !courses[courseIndex].expanded
@@ -151,7 +149,7 @@ updates the courses' status, and handles downloading task sets and opening works
   <CourseList
     defaultExpandedState={true}
     {toggleCourse}
-    status={'active'}
+    statusOfCourses={'active'}
     courses={courses.filter((c) => c.status === 'active')}
     {moveCourse}
     {downloadTaskSet}
@@ -162,7 +160,7 @@ updates the courses' status, and handles downloading task sets and opening works
   <CourseList
     defaultExpandedState={false}
     {toggleCourse}
-    status={'hidden'}
+    statusOfCourses={'hidden'}
     courses={courses.filter((c) => c.status === 'hidden')}
     {moveCourse}
     {downloadTaskSet}

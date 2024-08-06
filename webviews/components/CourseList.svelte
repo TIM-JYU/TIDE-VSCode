@@ -9,7 +9,7 @@
   import MenuItem from './MenuItem.svelte'
   import { type Course, type CourseStatus } from '../common/types'
 
-  export let status: CourseStatus
+  export let statusOfCourses: CourseStatus
   export let courses: Array<Course>
   export let moveCourse // function to move a course between lists
   export let downloadTaskSet // function to download a task set
@@ -24,7 +24,7 @@
    * Gets the opposite course status.
    */
   function getOppositeStatus() {
-    return status === 'active' ? 'hidden' : 'active'
+    return statusOfCourses === 'active' ? 'hidden' : 'active'
   }
 
   function toggleExpandedState() {
@@ -41,7 +41,7 @@ or opening workspaces.
 -->
 
 <button class="button-header" on:click={toggleExpandedState}>
-  <span class="button-header-span">{status} Courses</span>
+  <span class="button-header-span">{statusOfCourses} Courses</span>
   <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
 </button>
 
