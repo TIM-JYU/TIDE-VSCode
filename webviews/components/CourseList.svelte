@@ -5,27 +5,15 @@
    * @license MIT
    * @date 30.4.2024
    */
-  import Menu from './Menu.svelte'
-  import MenuItem from './MenuItem.svelte'
   import { type Course, type CourseStatus } from '../common/types'
+  import CourseListItem from './CourseListItem.svelte'
 
   export let statusOfCourses: CourseStatus
   export let courses: Array<Course>
-  export let moveCourse // function to move a course between lists
-  export let downloadTaskSet // function to download a task set
-  export let openWorkspace // function to open a workspace for task set
   export let defaultExpandedState: boolean
-  export let toggleCourse // function to collapse or expand the course information
   export let isLoggedIn: boolean
 
   let isExpanded = defaultExpandedState
-
-  /**
-   * Gets the opposite course status.
-   */
-  function getOppositeStatus() {
-    return statusOfCourses === 'active' ? 'hidden' : 'active'
-  }
 
   function toggleExpandedState() {
     isExpanded = !isExpanded
@@ -46,70 +34,8 @@ or opening workspaces.
 </button>
 
 {#if isExpanded}
-  {#each courses as course (course.id)}
-    <div class="course-box">
-      <header>
-        <p class="courseTitle">{course.name}</p>
-        <Menu>
-          <span slot="toggle">&#8942;</span>
-          <MenuItem slot="menucontent">
-            <a href="#?" on:click={() => moveCourse(course, getOppositeStatus())}>
-              Move to {getOppositeStatus()} courses
-            </a>
-          </MenuItem>
-        </Menu>
-      </header>
-      <div>
-        <a class="link" href={'https://tim.jyu.fi/view/' + course.path}>Open material page</a>
-      </div>
-      <button
-        class="expand-collapse-button"
-        aria-expanded={course.expanded}
-        on:click={() => toggleCourse(course.id)}
-      >
-        <span class="arrow {course.expanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
-      </button>
-      {#if course.expanded}
-        <div class="course-content">
-          <table>
-            <thead>
-              <tr>
-                <th>Task set</th>
-                <th>Number of exercises</th>
-                <!-- <th>Points</th> -->
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each course.taskSets as taskset}
-                <tr>
-                  <td>{taskset.name}</td>
-                  <td>{taskset.tasks.length}</td>
-                  <!-- <td>6/8</td> -->
-                  <td>
-                    <button
-                      on:click={() => downloadTaskSet(taskset.path)}
-                      disabled={!isLoggedIn}
-                      title={!isLoggedIn && 'Login to download task set.' || ''}
-                      >Download</button
-                    >
-                  </td>
-                  <td
-                    ><button
-                      on:click={() => openWorkspace(taskset.downloadPath)}
-                      disabled={taskset.downloadPath === undefined}
-                      title={taskset.downloadPath === undefined ? 'Task set has not been downloaded.' : ''}
-                      >Open in workspace</button
-                    ></td
-                  >
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
-      {/if}
-    </div>
+  {#each courses as course}
+  <CourseListItem {course} {isLoggedIn} />
   {/each}
 {/if}
 
@@ -148,35 +74,6 @@ or opening workspaces.
     transform: rotate(0deg);
   }
 
-  .course-box {
-    position: relative;
-    background-color: #000000;
-    padding-bottom: 3.5rem;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-    font-size: 1.4em;
-    max-width: 85%;
-    min-width: 24em;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .courseTitle {
-    margin-left: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .link {
-    margin-left: 1.5rem;
-    font-size: 0.9rem;
-    color: #007acc;
-  }
-
-  .link:hover {
-    text-decoration: underline;
-  }
-
   button {
     background-color: #007acc;
     color: white;
@@ -201,31 +98,6 @@ or opening workspaces.
     box-sizing: border-box;
   }
 
-  header {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .expand-collapse-button {
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    background-color: transparent;
-    border: none;
-    width: 36px;
-    height: 36px;
-    position: absolute;
-    bottom: 0rem;
-    left: 50%;
-    transform: translateX(-50%);
-  }
 
   .arrow {
     transition: transform 0.5s ease;
@@ -233,53 +105,5 @@ or opening workspaces.
 
   .down-arrow {
     transform: rotate(0deg);
-  }
-
-  .up-arrow {
-    transform: rotate(-180deg);
-  }
-
-  .link::after {
-    content: '';
-    position: absolute;
-    bottom: 2rem;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: gray;
-  }
-
-  .course-content {
-    margin-top: 2rem;
-    max-width: 100%;
-    overflow-x: auto;
-    box-sizing: content-box;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    box-sizing: content-box;
-  }
-
-  th,
-  td {
-    border: none;
-    text-align: center;
-    padding: 8px;
-  }
-
-  th {
-    background-color: black;
-    font-weight: normal;
-    font-size: smaller;
-  }
-
-  tbody tr:nth-child(odd) {
-    background-color: #222222;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #444444;
   }
 </style>

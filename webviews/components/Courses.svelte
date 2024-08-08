@@ -48,42 +48,6 @@
   })
 
   /**
-   * Updates changes in courses to globalState.
-   * @param courses - courses json array.
-   */
-  function updateCoursesToGlobalState(courses: Array<Course>) {
-    tsvscode.postMessage({
-      type: 'UpdateCoursesToGlobalState',
-      value: courses,
-    })
-  }
-
-  /**
-   * Updates the status of a course to a new status.
-   * @param {object} course - The course object to be updated.
-   * @param {string} status - The new status for the course.
-   */
-  function moveCourse(course: Course, status: CourseStatus) {
-    const index = courses.findIndex((c) => c.id === course.id)
-    if (index !== -1) {
-      courses[index] = { ...course, status: status }
-      updateCoursesToGlobalState(courses)
-    }
-  }
-
-  /**
-   * Toggles the expanded/collapsed state of a course information panel.
-   * @param {string} courseId - - The unique identifier of the course.
-   */
-  function toggleCourse(courseId: number) {
-    const courseIndex = courses.findIndex((course) => course.id === courseId)
-    if (courseIndex !== -1) {
-      courses[courseIndex].expanded = !courses[courseIndex].expanded
-      updateCoursesToGlobalState(courses)
-    }
-  }
-
-  /**
    * Notifies the extension that the user has not chosen a directory for downloading task sets,
    * and posts an error message accordingly.
    */
@@ -91,33 +55,6 @@
     tsvscode.postMessage({
       type: 'OnError',
       value: 'Directory for downloading tasks must be set',
-    })
-  }
-
-  /**
-   * Initiates the download of a task set identified by its path.
-   * @param {string} taskSetPath - The path of the task set to be downloaded.
-   */
-  function downloadTaskSet(taskSetPath: string) {
-    if (!downloadPath) {
-      directoryNotSet()
-      return
-    }
-
-    tsvscode.postMessage({
-      type: 'DownloadTaskSet',
-      value: taskSetPath,
-    })
-  }
-
-  /**
-   * Opens a workspace for the specified task set.
-   * @param {string} taskSetPath - The path of the task set to open a workspace for.
-   */
-  function openWorkspace(taskSetPath: string) {
-    tsvscode.postMessage({
-      type: 'OpenWorkspace',
-      value: taskSetPath,
     })
   }
 
@@ -148,23 +85,15 @@ updates the courses' status, and handles downloading task sets and opening works
 {:else}
   <CourseList
     defaultExpandedState={true}
-    {toggleCourse}
     statusOfCourses={'active'}
     courses={courses.filter((c) => c.status === 'active')}
-    {moveCourse}
-    {downloadTaskSet}
-    {openWorkspace}
     {isLoggedIn}
   />
 
   <CourseList
     defaultExpandedState={false}
-    {toggleCourse}
     statusOfCourses={'hidden'}
     courses={courses.filter((c) => c.status === 'hidden')}
-    {moveCourse}
-    {downloadTaskSet}
-    {openWorkspace}
     {isLoggedIn}
   />
 {/if}
