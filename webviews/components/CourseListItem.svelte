@@ -65,7 +65,9 @@
         </thead>
         <tbody>
           {#each course.taskSets as taskset}
+            <tr>
             <TasksetTableRow {taskset} {isLoggedIn} />
+            </tr>
           {/each}
         </tbody>
       </table>
@@ -160,14 +162,10 @@
     box-sizing: content-box;
   }
 
-  th,
-  td {
+  th {
     border: none;
     text-align: center;
     padding: 8px;
-  }
-
-  th {
     background-color: black;
     font-weight: normal;
     font-size: smaller;
