@@ -12,6 +12,8 @@ import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
 import { Course, LoginData, Task } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
+import ExtensionStateManager from './ExtensionStateManager'
+import path from 'path'
 
 export default class Tide {
   public static async debug() {
@@ -72,13 +74,19 @@ export default class Tide {
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
   public static async downloadTaskSet(taskSetPath: string) {
-    const downloadPath: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
-    if (downloadPath === undefined) {
+    const downloadPathBase: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+    if (downloadPathBase === undefined) {
       // TODO: error handling/notifying the user
       return
     }
+
+    // append course name to the base download path
+    const downloadPath = path.join(path.normalize(downloadPathBase), path.basename(path.dirname(path.normalize(taskSetPath))))
+
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
       Logger.debug(data)
+      // TODO: course path is saved instead of taskset path
+      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
     })
   }
 
