@@ -10,8 +10,7 @@ import * as vscode from 'vscode'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
-import path from 'path'
-import Logger from '../../utilities/logger'
+import Tide from '../../api/tide'
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -150,8 +149,7 @@ export default class CoursePanel {
         }
         case 'DownloadTaskSet': {
           const taskSetPath = msg.value
-          const downloadPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
-          vscode.commands.executeCommand('tide.downloadTaskSet', taskSetPath, downloadPath)
+          Tide.downloadTaskSet(taskSetPath)
           break
         }
         case 'UpdateCoursesToGlobalState': {

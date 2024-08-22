@@ -102,19 +102,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   /**
-   * Registers the 'tide.downloadTaskSet' command, allowing users to download a task set from TIDE.
-   * @param taskSetPath - The path of the task set to download.
-   * @param downloadPath - The path where the task set will be downloaded.
-   */
-  // TODO: why is this available as a command? It's clearly intended to be used by code only.
-  ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.downloadTaskSet', (taskSetPath, downloadPath) => {
-      Tide.downloadTaskSet(taskSetPath, downloadPath)
-      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
-    }),
-  )
-
-  /**
    * Submits task to TIM
    * @param submitPath - The path of the to be submitted task in user's computer.
    */

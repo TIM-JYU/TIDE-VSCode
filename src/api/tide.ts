@@ -71,7 +71,12 @@ export default class Tide {
    * Downloads task set from TIM; creates files for each task
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
-  public static async downloadTaskSet(taskSetPath: string, downloadPath: string) {
+  public static async downloadTaskSet(taskSetPath: string) {
+    const downloadPath: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+    if (downloadPath === undefined) {
+      // TODO: error handling/notifying the user
+      return
+    }
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
       Logger.debug(data)
     })
