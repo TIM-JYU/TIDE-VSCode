@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, LoginData } from '../common/types'
+import { Course, CourseStatus, LoginData } from '../common/types'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -49,7 +49,6 @@ export default class ExtensionStateManager {
    * @param courses - An array containing the course data to be stored.
    */
   public static setCourses(courses: Array<Course>) {
-    // TODO: Currently overwrites the courses, implement functionality to combine new data with existing data
     this.writeToGlobalState('courses', courses)
   }
 
@@ -109,6 +108,13 @@ export default class ExtensionStateManager {
       .flatMap((course) => course.taskSets)
       .find((taskSet) => taskSet.path === taskSetPath)?.downloadPath
     return downloadPath
+  }
+
+  static setCourseStatus(id: number, status: CourseStatus) {
+    const courses: Array<Course> = this.readFromGlobalState('courses')
+    const courseIdx = courses.findIndex((course) => course.id === id)
+    courses[courseIdx].status = status
+    this.writeToGlobalState('courses', courses)
   }
 
   /**

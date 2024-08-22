@@ -14,7 +14,13 @@
    * @param {string} newStatus - The new status for the course.
    */
   function moveCourse(newStatus: CourseStatus) {
-    // TODO
+    tsvscode.postMessage({
+      type: 'SetCourseStatus',
+      value: {
+        id: course.id,
+        status: newStatus,
+      },
+    })
   }
 
   /**
@@ -23,7 +29,6 @@
   function toggleExpanded() {
     isExpanded = !isExpanded
   }
-
 
   let oppositeStatus: CourseStatus
   $: oppositeStatus = course.status === 'active' ? 'hidden' : 'active'
@@ -66,7 +71,7 @@
         <tbody>
           {#each course.taskSets as taskset}
             <tr>
-            <TasksetTableRow {taskset} {isLoggedIn} />
+              <TasksetTableRow {taskset} {isLoggedIn} />
             </tr>
           {/each}
         </tbody>

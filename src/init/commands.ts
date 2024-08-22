@@ -37,7 +37,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   /**
    * Resets exercise.
    */
-   // TODO: why is this available as a command? It's clearly intended to be used by code only.
+  // TODO: why is this available as a command? It's clearly intended to be used by code only.
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.resetExercise', (taskSetPath, taskId, downloadPath) => {
       Tide.overwriteTask(taskSetPath, taskId, downloadPath)
@@ -70,13 +70,13 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const existingCourses = ExtensionStateManager.getCourses()
       const freshCourses = await Tide.getCourseList()
       switch (existingCourses) {
-          case undefined:
-              ExtensionStateManager.setCourses(freshCourses)
-              break
-          default:
-              const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
-              ExtensionStateManager.setCourses(mergedCourses)
-              break
+        case undefined:
+          ExtensionStateManager.setCourses(freshCourses)
+          break
+        default:
+          const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
+          ExtensionStateManager.setCourses(mergedCourses)
+          break
       }
     }),
   )
@@ -106,7 +106,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * @param taskSetPath - The path of the task set to download.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-   // TODO: why is this available as a command? It's clearly intended to be used by code only.
+  // TODO: why is this available as a command? It's clearly intended to be used by code only.
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.downloadTaskSet', (taskSetPath, downloadPath) => {
       Tide.downloadTaskSet(taskSetPath, downloadPath)

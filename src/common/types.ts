@@ -167,6 +167,7 @@ export type MessageType =
   | 'RequestLoginData'
   | 'ResetExercise'
   | 'ResetNoneditableAreas'
+  | 'SetCourseStatus'
   | 'SetDownloadPath'
   | 'SetDownloadPathResult'
   | 'ShowCourses'

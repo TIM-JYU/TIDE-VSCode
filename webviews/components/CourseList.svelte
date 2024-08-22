@@ -18,7 +18,6 @@
   function toggleExpandedState() {
     isExpanded = !isExpanded
   }
-
 </script>
 
 <!--
@@ -35,7 +34,7 @@ or opening workspaces.
 
 {#if isExpanded}
   {#each courses as course}
-  <CourseListItem {course} {isLoggedIn} />
+    <CourseListItem {course} {isLoggedIn} />
   {/each}
 {/if}
 
@@ -97,7 +96,6 @@ or opening workspaces.
   *::after {
     box-sizing: border-box;
   }
-
 
   .arrow {
     transition: transform 0.5s ease;

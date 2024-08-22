@@ -11,6 +11,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import path from 'path'
+import Logger from '../../utilities/logger'
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -164,6 +165,10 @@ export default class CoursePanel {
         }
         case 'RequestLoginData': {
           this.sendLoginData(ExtensionStateManager.getLoginData())
+          break
+        }
+        case 'SetCourseStatus': {
+          ExtensionStateManager.setCourseStatus(msg.value.id, msg.value.status)
         }
       }
     })
