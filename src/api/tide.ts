@@ -144,8 +144,7 @@ export default class Tide {
    * @param handler - a handler function to be called after the executable exits
    */
   private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
-    const data = await this.spawnTideProcess(...args)
-    await handler(data)
+    this.spawnTideProcess(...args).then((data) => handler(data), (err) => console.log(err))
   }
 
   /**
@@ -157,6 +156,7 @@ export default class Tide {
   private static async spawnTideProcess(...args: Array<string>): Promise<string> {
     Logger.debug(`Running cli with args "${args}"`)
     let buffer = ''
+    let errorBuffer = ''
 
     // To run an uncompiled version of the CLI tool:
     // 1. Point the cli tool path in your extension settings to the main.py -file
@@ -172,6 +172,10 @@ export default class Tide {
     childProcess.stdout.on('data', (data) => {
       buffer += data.toString()
     })
+ 
+    childProcess.stderr.on('data', (data) => {
+      errorBuffer += data.toString()
+    })
 
     return new Promise<string>((resolve, reject) => {
       childProcess.on('error', (error) => {
@@ -179,11 +183,11 @@ export default class Tide {
         reject(error)
       })
 
-      childProcess.on('exit', (code, signal) => {
+      childProcess.on('exit', (code) => {
         if (code === 0) {
           resolve(buffer)
         } else {
-          reject(new Error(`Process exited with code ${code} and signal ${signal}`))
+          reject(errorBuffer)
         }
       })
     })
