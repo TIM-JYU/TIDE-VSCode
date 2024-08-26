@@ -11,6 +11,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
+import UiController from '../UiController'
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -118,7 +119,7 @@ export default class CoursePanel {
           if (!msg.value) {
             return
           }
-          vscode.window.showErrorMessage(msg.value)
+          UiController.showError(msg.value)
           break
         }
         case 'SetDownloadPath': {

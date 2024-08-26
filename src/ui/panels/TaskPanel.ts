@@ -12,6 +12,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { LoginData, TimData, WebviewMessage } from '../../common/types'
 import path from 'path'
 import Tide from '../../api/tide'
+import UiController from '../UiController'
 
 export default class TaskPanel {
   public static currentPanel: TaskPanel | undefined
@@ -99,7 +100,7 @@ export default class TaskPanel {
           if (!msg.value) {
             return
           }
-          vscode.window.showErrorMessage(msg.value)
+          UiController.showError(msg.value)
           break
         }
         case 'SubmitTask': {

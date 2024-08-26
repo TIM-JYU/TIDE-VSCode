@@ -12,6 +12,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { LoginData, MessageType, WebviewMessage } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Logger from '../../utilities/logger'
+import UiController from '../UiController'
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   _view?: vscode.WebviewView
@@ -57,7 +58,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           if (!msg.value) {
             return
           }
-          vscode.window.showErrorMessage(msg.value)
+          UiController.showError(msg.value)
           break
         }
         case 'ShowCourses': {

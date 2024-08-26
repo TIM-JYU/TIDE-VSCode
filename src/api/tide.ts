@@ -14,6 +14,7 @@ import { Course, LoginData, Task } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
+import UiController from '../ui/UiController'
 
 export default class Tide {
   public static async debug() {
@@ -144,7 +145,7 @@ export default class Tide {
    * @param handler - a handler function to be called after the executable exits
    */
   private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
-    this.spawnTideProcess(...args).then((data) => handler(data), (err) => console.log(err))
+    this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
   }
 
   /**
@@ -174,7 +175,7 @@ export default class Tide {
     })
  
     childProcess.stderr.on('data', (data) => {
-      errorBuffer += data.toString()
+      errorBuffer = data.toString()
     })
 
     return new Promise<string>((resolve, reject) => {
