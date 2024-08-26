@@ -77,12 +77,14 @@ export default class Tide {
   public static async downloadTaskSet(taskSetPath: string) {
     const downloadPathBase: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     if (downloadPathBase === undefined) {
-      // TODO: error handling/notifying the user
+      UiController.showError('Download path not set!')
       return
     }
 
+    const courseName = path.basename(path.dirname(taskSetPath))
+    const taskSetName = path.basename(taskSetPath)
     // append course name to the base download path
-    const downloadPath = path.join(path.normalize(downloadPathBase), path.basename(path.dirname(path.normalize(taskSetPath))))
+    const downloadPath = path.join(path.normalize(downloadPathBase), courseName, taskSetName)
 
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
       Logger.debug(data)
@@ -145,7 +147,12 @@ export default class Tide {
    * @param handler - a handler function to be called after the executable exits
    */
   private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
-    this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
+    // this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
+    const cliOutput = await this.spawnTideProcess(...args).catch(err => UiController.showError(err))
+    if (typeof cliOutput === 'string') {
+      // !! ts lang server or eslint claims this await has no effect but it actually does !!
+      await handler(cliOutput)
+    }
   }
 
   /**
@@ -173,7 +180,7 @@ export default class Tide {
     childProcess.stdout.on('data', (data) => {
       buffer += data.toString()
     })
- 
+
     childProcess.stderr.on('data', (data) => {
       errorBuffer = data.toString()
     })

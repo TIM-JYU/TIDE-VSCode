@@ -173,5 +173,4 @@ export type MessageType =
   | 'ShowCourses'
   | 'ShowOutput'
   | 'SubmitTask'
-  | 'UpdateCoursesToGlobalState'
   | 'UpdateTimData'

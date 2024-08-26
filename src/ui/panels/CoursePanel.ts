@@ -153,11 +153,6 @@ export default class CoursePanel {
           Tide.downloadTaskSet(taskSetPath)
           break
         }
-        case 'UpdateCoursesToGlobalState': {
-          const courses = msg.value
-          ExtensionStateManager.setCourses(courses)
-          break
-        }
         case 'OpenWorkspace': {
           vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(msg.value))
           break
