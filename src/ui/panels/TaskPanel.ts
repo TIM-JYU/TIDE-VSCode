@@ -20,14 +20,12 @@ export default class TaskPanel {
   private static readonly fileNamePrefix = 'TaskPanel'
   private static readonly viewType = 'TaskPanel'
   private static readonly panelTitle = 'Task Panel'
-  private static preferredColumn = vscode.ViewColumn.Two
 
   private readonly panel: vscode.WebviewPanel
   private readonly extensionUri: vscode.Uri
   private disposables: vscode.Disposable[] = []
 
   private static lastActiveTextEditor: vscode.TextEditor
-  private static loginData: LoginData
 
   public static createOrShow(extensionUri: vscode.Uri) {
     // If we already have a panel, show it.
