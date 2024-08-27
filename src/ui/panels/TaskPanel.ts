@@ -210,6 +210,11 @@ export default class TaskPanel {
     await this.panel.webview.postMessage(timDataMsg)
   }
 
+  private async sendWorkspaceName() {
+    const wsNameDataMsg: WebviewMessage = { type: 'UpdateWorkspaceName', value: vscode.workspace.name }
+    await this.panel.webview.postMessage(wsNameDataMsg)
+  }
+
   private async update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
@@ -217,6 +222,7 @@ export default class TaskPanel {
     // Maybe not a race condition? This behavior doesn't exist in coursepanel with similar code.
     await this.sendLoginData()
     await this.sendTimData()
+    await this.sendWorkspaceName()
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {

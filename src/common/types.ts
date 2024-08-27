@@ -168,3 +168,4 @@ export type MessageType =
   | 'ShowOutput'
   | 'SubmitTask'
   | 'UpdateTimData'
+  | 'UpdateWorkspaceName'

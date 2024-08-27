@@ -8,11 +8,11 @@
 
   import { onMount } from 'svelte'
   import { type LoginData, type TimData, type WebviewMessage } from '../common/types'
-  import path from 'path'
 
   let timData: TimData
   let loginData: LoginData
   let isLoggedIn = false
+  let workspace: string = ''
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -27,6 +27,10 @@
         }
         case 'LoginData': {
           loginData = message.value
+          break
+        }
+        case 'UpdateWorkspaceName': {
+          workspace = message.value
           break
         }
       }
@@ -78,7 +82,6 @@
     })
   }
 
-  $: workspace = '// TODO: workspace placeholder'
   $: isLoggedIn = loginData?.isLogged ?? false
 </script>
 
@@ -97,11 +100,10 @@ This component manages the display of task information and interaction with task
   <span class="loader"></span>
 {:else}
   <div class="task-panel">
-    {#if timData.header !== null}
       <h1>{workspace} - {timData.ide_task_id}</h1>
+    {#if timData.header !== null}
       <h2>{timData.header}</h2>
     {:else}
-      <h1>{workspace} - {timData.ide_task_id}</h1>
       <h2>{timData.task_files[0].file_name}</h2>
     {/if}
     <div class="instructions">
