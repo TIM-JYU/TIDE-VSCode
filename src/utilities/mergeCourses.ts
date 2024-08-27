@@ -36,7 +36,6 @@ export const mergeCoursesWithNewData = (
 const mergeCourseWithNewData = (existingCourse: Course, newCourse: Course): Course => {
   const updatedCourse: Course = JSON.parse(JSON.stringify(newCourse))
   updatedCourse.status = existingCourse.status
-  updatedCourse.expanded = existingCourse.expanded
   updatedCourse.taskSets = updatedCourse.taskSets.map((taskSet: TaskSet): TaskSet => {
     const existingTaskSet = existingCourse.taskSets.find((ts) => ts.doc_id === taskSet.doc_id)
     switch (existingTaskSet) {

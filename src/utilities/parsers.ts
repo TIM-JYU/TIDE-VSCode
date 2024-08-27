@@ -13,7 +13,6 @@ export async function parseCoursesFromJson(data: string): Promise<Array<Course>>
     courses.map(async (c) => {
       const course: Course = {
         status: 'active',
-        expanded: false,
         name: c.name,
         id: c.id,
         path: c.path,
