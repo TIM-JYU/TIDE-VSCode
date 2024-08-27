@@ -31,6 +31,10 @@ export default class Tide {
     await this.runAndHandle(['login', '--json'], (data: string) => {
       const parsedData = JSON.parse(data)
       loginData = { isLogged: parsedData['login_success'] }
+      // TODO: raise exception in cli?
+      if (!loginData.isLogged) {
+        UiController.showError('Login failed.')
+      }
     })
     return loginData
   }
