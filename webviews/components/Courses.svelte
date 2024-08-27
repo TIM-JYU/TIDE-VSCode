@@ -69,13 +69,26 @@ updates the courses' status, and handles downloading task sets and opening works
 
 <h1>My Courses</h1>
 
+<div>
+  <button
+    on:click={() => {
+      tsvscode.postMessage({
+        type: 'RefreshCourseData',
+        value: undefined,
+      })
+    }}>Refresh</button
+  >
+</div>
+
+
+<!-- TODO: does the download location belong here or in settings? -->
 <p>Current directory for downloading files: {downloadPath}</p>
 
 <button
   on:click={() => {
     tsvscode.postMessage({
       type: 'SetDownloadPath',
-      value: '',
+      value: undefined,
     })
   }}>Set directory</button
 >

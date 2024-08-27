@@ -163,6 +163,11 @@ export default class CoursePanel {
         }
         case 'SetCourseStatus': {
           ExtensionStateManager.setCourseStatus(msg.value.id, msg.value.status)
+          break
+        }
+        case 'RefreshCourseData': {
+          vscode.commands.executeCommand('tide.updateCoursesFromTim')
+          break
         }
       }
     })

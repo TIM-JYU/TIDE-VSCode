@@ -158,6 +158,7 @@ export type MessageType =
   | 'OnInfo'
   | 'OpenSettings'
   | 'OpenWorkspace'
+  | 'RefreshCourseData'
   | 'RequestLoginData'
   | 'ResetExercise'
   | 'ResetNoneditableAreas'
