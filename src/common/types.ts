@@ -45,12 +45,6 @@ export interface Course extends CourseBase {
    * User specific status for the course.
    */
   status: CourseStatus
-
-  /**
-   * Whether or not the course is expanded in the course list.
-   */
-  expanded: boolean
-  // TODO: does the thing above belong here / is it necessary to keep track of ui state over sessions
 }
 
 /**
@@ -173,5 +167,4 @@ export type MessageType =
   | 'ShowCourses'
   | 'ShowOutput'
   | 'SubmitTask'
-  | 'UpdateCoursesToGlobalState'
   | 'UpdateTimData'

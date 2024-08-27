@@ -12,6 +12,9 @@ import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
 import { Course, LoginData, Task } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
+import ExtensionStateManager from './ExtensionStateManager'
+import path from 'path'
+import UiController from '../ui/UiController'
 
 export default class Tide {
   public static async debug() {
@@ -28,6 +31,10 @@ export default class Tide {
     await this.runAndHandle(['login', '--json'], (data: string) => {
       const parsedData = JSON.parse(data)
       loginData = { isLogged: parsedData['login_success'] }
+      // TODO: raise exception in cli?
+      if (!loginData.isLogged) {
+        UiController.showError('Login failed.')
+      }
     })
     return loginData
   }
@@ -71,9 +78,22 @@ export default class Tide {
    * Downloads task set from TIM; creates files for each task
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
-  public static async downloadTaskSet(taskSetPath: string, downloadPath: string) {
+  public static async downloadTaskSet(taskSetPath: string) {
+    const downloadPathBase: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+    if (downloadPathBase === undefined) {
+      UiController.showError('Download path not set!')
+      return
+    }
+
+    const courseName = path.basename(path.dirname(taskSetPath))
+    const taskSetName = path.basename(taskSetPath)
+    // append course name to the base download path
+    const downloadPath = path.join(path.normalize(downloadPathBase), courseName, taskSetName)
+
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
       Logger.debug(data)
+      // TODO: course path is saved instead of taskset path
+      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
     })
   }
 
@@ -131,8 +151,12 @@ export default class Tide {
    * @param handler - a handler function to be called after the executable exits
    */
   private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
-    const data = await this.spawnTideProcess(...args)
-    await handler(data)
+    // this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
+    const cliOutput = await this.spawnTideProcess(...args).catch(err => UiController.showError(err))
+    if (typeof cliOutput === 'string') {
+      // !! ts lang server or eslint claims this await has no effect but it actually does !!
+      await handler(cliOutput)
+    }
   }
 
   /**
@@ -144,6 +168,7 @@ export default class Tide {
   private static async spawnTideProcess(...args: Array<string>): Promise<string> {
     Logger.debug(`Running cli with args "${args}"`)
     let buffer = ''
+    let errorBuffer = ''
 
     // To run an uncompiled version of the CLI tool:
     // 1. Point the cli tool path in your extension settings to the main.py -file
@@ -160,17 +185,21 @@ export default class Tide {
       buffer += data.toString()
     })
 
+    childProcess.stderr.on('data', (data) => {
+      errorBuffer = data.toString()
+    })
+
     return new Promise<string>((resolve, reject) => {
       childProcess.on('error', (error) => {
         Logger.error(`Error spawning child process: ${error}`)
         reject(error)
       })
 
-      childProcess.on('exit', (code, signal) => {
+      childProcess.on('exit', (code) => {
         if (code === 0) {
           resolve(buffer)
         } else {
-          reject(new Error(`Process exited with code ${code} and signal ${signal}`))
+          reject(errorBuffer)
         }
       })
     })

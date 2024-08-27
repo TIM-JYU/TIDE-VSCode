@@ -68,16 +68,21 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
       const existingCourses = ExtensionStateManager.getCourses()
-      const freshCourses = await Tide.getCourseList()
-      switch (existingCourses) {
-        case undefined:
+      Tide.getCourseList().then(freshCourses => {
+        if (existingCourses === undefined || existingCourses.length === 0) {
           ExtensionStateManager.setCourses(freshCourses)
-          break
-        default:
+        } else {
           const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
           ExtensionStateManager.setCourses(mergedCourses)
-          break
-      }
+        }
+      })
+      // const freshCourses = await Tide.getCourseList()
+      // if (existingCourses === undefined || existingCourses.length === 0) {
+      //   ExtensionStateManager.setCourses(freshCourses)
+      // } else {
+      //   const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
+      //   ExtensionStateManager.setCourses(mergedCourses)
+      // }
     }),
   )
 
@@ -98,19 +103,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     vscode.commands.registerCommand('tide.logout', async () => {
       let data = await Tide.logout()
       ExtensionStateManager.setLoginData(data)
-    }),
-  )
-
-  /**
-   * Registers the 'tide.downloadTaskSet' command, allowing users to download a task set from TIDE.
-   * @param taskSetPath - The path of the task set to download.
-   * @param downloadPath - The path where the task set will be downloaded.
-   */
-  // TODO: why is this available as a command? It's clearly intended to be used by code only.
-  ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.downloadTaskSet', (taskSetPath, downloadPath) => {
-      Tide.downloadTaskSet(taskSetPath, downloadPath)
-      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
     }),
   )
 

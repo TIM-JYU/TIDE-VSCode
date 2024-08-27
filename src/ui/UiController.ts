@@ -40,4 +40,8 @@ export default class UiController {
     this.closeTaskPanel()
     CoursePanel.createOrShow(this.ctx.extensionUri)
   }
+
+  static showError(error: string) {
+    vscode.window.showErrorMessage(error)
+  }
 }
