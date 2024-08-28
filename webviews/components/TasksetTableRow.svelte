@@ -31,22 +31,14 @@
   <td>{taskset.tasks.length}</td>
   <!-- <td>6/8</td> -->
   <td>
-    <button
-      on:click={downloadTaskSet}
-      disabled={!isLoggedIn}
-      title={(!isLoggedIn && 'Login to download task set.') || ''}>Download</button
-    >
+    {#if taskset.downloadPath === undefined}
+      <button on:click={downloadTaskSet}>Download taskset</button>
+    {:else}
+      <button on:click={openWorkspace}>Open in workspace</button>
+    {/if}
   </td>
-  <td
-    ><button
-      on:click={openWorkspace}
-      disabled={taskset.downloadPath === undefined}
-      title={taskset.downloadPath === undefined ? 'Task set has not been downloaded.' : ''}
-      >Open in workspace</button
-    ></td
-  >
 {:else}
-  <td colspan="3">Unavailable</td>
+  <td colspan="2">Unavailable</td>
 {/if}
 
 <style>
