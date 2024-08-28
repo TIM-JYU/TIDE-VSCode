@@ -8,12 +8,7 @@
 
   import CourseList from './CourseList.svelte'
   import { onMount } from 'svelte'
-  import {
-    type Course,
-    type CourseStatus,
-    type LoginData,
-    type WebviewMessage,
-  } from '../common/types'
+  import { type Course, type LoginData, type WebviewMessage } from '../common/types'
 
   let downloadPath: string = ''
   let courses: Array<Course> = []
@@ -69,46 +64,49 @@ updates the courses' status, and handles downloading task sets and opening works
 
 <h1>My Courses</h1>
 
-<div>
+{#if isLoggedIn}
+  <div>
+    <button
+      on:click={() => {
+        tsvscode.postMessage({
+          type: 'RefreshCourseData',
+          value: undefined,
+        })
+      }}>Refresh</button
+    >
+  </div>
+
+  <!-- TODO: does the download location belong here or in settings? -->
+  <p>Current directory for downloading files: {downloadPath}</p>
+
   <button
     on:click={() => {
       tsvscode.postMessage({
-        type: 'RefreshCourseData',
+        type: 'SetDownloadPath',
         value: undefined,
       })
-    }}>Refresh</button
+    }}>Set directory</button
   >
-</div>
 
+  {#if courses.length === 0}
+    <p>No IDE courses were found. Are you sure you have bookmarked an IDE-course in TIM?</p>
+  {:else}
+    <CourseList
+      defaultExpandedState={true}
+      statusOfCourses={'active'}
+      courses={courses.filter((c) => c.status === 'active')}
+      {isLoggedIn}
+    />
 
-<!-- TODO: does the download location belong here or in settings? -->
-<p>Current directory for downloading files: {downloadPath}</p>
-
-<button
-  on:click={() => {
-    tsvscode.postMessage({
-      type: 'SetDownloadPath',
-      value: undefined,
-    })
-  }}>Set directory</button
->
-
-{#if courses.length === 0}
-  <p>No IDE courses were found. Are you sure you have bookmarked an IDE-course in TIM?</p>
+    <CourseList
+      defaultExpandedState={false}
+      statusOfCourses={'hidden'}
+      courses={courses.filter((c) => c.status === 'hidden')}
+      {isLoggedIn}
+    />
+  {/if}
 {:else}
-  <CourseList
-    defaultExpandedState={true}
-    statusOfCourses={'active'}
-    courses={courses.filter((c) => c.status === 'active')}
-    {isLoggedIn}
-  />
-
-  <CourseList
-    defaultExpandedState={false}
-    statusOfCourses={'hidden'}
-    courses={courses.filter((c) => c.status === 'hidden')}
-    {isLoggedIn}
-  />
+Login to view your courses.
 {/if}
 
 <style>
