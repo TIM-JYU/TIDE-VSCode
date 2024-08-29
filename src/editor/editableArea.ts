@@ -1,9 +1,7 @@
 import * as vscode from 'vscode'
-import Logger from '../utilities/logger'
 
-// TODO: support different keywords
-const EDITABLE_BEGIN = 'BYCODEBEGIN'
-const EDITABLE_END = 'BYCODEEND'
+const EDITABLE_BEGIN = '--- Write your code below this line. ---'
+const EDITABLE_END = '--- Write your code above this line. ---'
 
 let editorTextChangeListener: vscode.Disposable | undefined
 
@@ -58,7 +56,7 @@ const parseNoneditableLines = (text: string): Array<string> => {
 const generateOnSelectionChange = (document: vscode.TextDocument) => {
   const getDocLines = (doc: vscode.TextDocument) => doc.getText().split(/\r?\n/)
   let docTextLines: Array<string> | undefined = getDocLines(document)
-  // TODO: if performance optimization is needed, it could assumed that the line number of the line with BYCODEBEGIN will stay the same
+  // TODO: if performance optimization might be needed, it could assumed that the line number of the line with BYCODEBEGIN will stay the same
   // because editing the preceding contents shouldn't be possible,
   // because of the read-only mode being activated when the cursor is above it
   let bycodeBeginLine: number = docTextLines.findIndex((s) => s.includes(EDITABLE_BEGIN))
@@ -75,16 +73,13 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
     const selectionBeginLine: number = Math.min(...event.selections.map((s) => s.start.line))
     const selectionEndLine: number = Math.max(...event.selections.map((s) => s.end.line))
 
-    Logger.debug('s-start:', selectionBeginLine, 's-end:', selectionEndLine)
-    Logger.debug('b-start:', bycodeBeginLine, 'b-end:', bycodeEndLine)
-
     updateBaseDecorations(event.textEditor, bycodeBeginLine, bycodeEndLine)
 
     if (selectionBeginLine > bycodeBeginLine && selectionEndLine < bycodeEndLine) {
-      vscode.commands.executeCommand('workbench.action.files.setActiveEditorWriteableInSession')
+      // vscode.commands.executeCommand('workbench.action.files.setActiveEditorWriteableInSession')
       event.textEditor.setDecorations(notInsideBycodeNotificationDecorationType, [])
     } else {
-      vscode.commands.executeCommand('workbench.action.files.setActiveEditorReadonlyInSession')
+      // vscode.commands.executeCommand('workbench.action.files.setActiveEditorReadonlyInSession')
       event.textEditor.setDecorations(notInsideBycodeNotificationDecorationType, [
         {
           range: new vscode.Range(
