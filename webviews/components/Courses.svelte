@@ -15,7 +15,7 @@
   let loginData: LoginData
   let isLoggedIn: boolean
 
-  $: if (downloadPath == null) {
+  $: if (downloadPath === null) {
     directoryNotSet()
   }
 
@@ -49,7 +49,7 @@
   function directoryNotSet() {
     tsvscode.postMessage({
       type: 'OnError',
-      value: 'Directory for downloading tasks must be set',
+      value: 'Directory for downloading tasks has not been set.',
     })
   }
 
@@ -76,9 +76,7 @@ updates the courses' status, and handles downloading task sets and opening works
     >
   </div>
 
-  <!-- TODO: does the download location belong here or in settings? -->
-  <p>Current directory for downloading files: {downloadPath}</p>
-
+  {#if downloadPath === null}
   <button
     on:click={() => {
       tsvscode.postMessage({
@@ -87,6 +85,7 @@ updates the courses' status, and handles downloading task sets and opening works
       })
     }}>Set directory</button
   >
+  {/if}
 
   {#if courses.length === 0}
     <p>No IDE courses were found. Are you sure you have bookmarked an IDE-course in TIM?</p>
@@ -106,7 +105,7 @@ updates the courses' status, and handles downloading task sets and opening works
     />
   {/if}
 {:else}
-Login to view your courses.
+  Login to view your courses.
 {/if}
 
 <style>
