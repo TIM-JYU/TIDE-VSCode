@@ -88,7 +88,8 @@ updates the courses' status, and handles downloading task sets and opening works
   {/if}
 
   {#if courses.length === 0}
-    <p>No IDE courses were found. Are you sure you have bookmarked an IDE-course in TIM?</p>
+    <p>No IDE courses were found.</p>
+    <p>Add a course to "My courses" bookmark folder in TIM to begin.</p>
   {:else}
     <CourseList
       defaultExpandedState={true}

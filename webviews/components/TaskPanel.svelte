@@ -93,7 +93,7 @@ This component manages the display of task information and interaction with task
 {#if timData === undefined}
   <p>
     Task Panel only shows information when you have a TIM task document open in the text editor. If
-    you are sure you have a TIM task open, try clicking the text editor to activate the document.
+    you are sure you have a TIM task open, try clicking on the text editor to activate the document.
   </p>
 {:else if !timData}
   <p>Loading...</p>
@@ -110,12 +110,12 @@ This component manages the display of task information and interaction with task
       {#if timData.stem !== null}
         <p>{timData.stem}</p>
       {:else}
-        <p>To see the instructions, please open exercise in TIM.</p>
+        <p>To see the instructions, please open the exercise in TIM.</p>
       {/if}
     </div>
 
     <div>
-      <a href={'https://tim.jyu.fi/view/' + timData.path}>Open exercise in TIM</a>
+      <a href={'https://tim.jyu.fi/view/' + timData.path}>Open the exercise in TIM</a>
     </div>
 
     <hr />
