@@ -18,7 +18,7 @@ export async function parseCoursesFromJson(data: string): Promise<Array<Course>>
         path: c.path,
         taskSets: await Promise.all(
           c.tasks.map(async (t) => {
-            const tasks = await Tide.getTaskListForTaskSetPath(t.path)
+            const tasks = await Tide.getTaskListForTaskSetPath(t.path, true)
             return {
               ...t,
               tasks,

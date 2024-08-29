@@ -66,11 +66,11 @@ export default class Tide {
    * @param taskSetPath path to task set. Path can be found by executing cli courses command
    * @returns task data
    */
-  public static async getTaskListForTaskSetPath(taskSetPath: string): Promise<Array<Task>> {
+  public static async getTaskListForTaskSetPath(taskSetPath: string, ignoreErrors: boolean = false): Promise<Array<Task>> {
     let tasks: Array<Task> = []
     await this.runAndHandle(['task', 'list', taskSetPath, '--json'], async (data: string) => {
       tasks = JSON.parse(data)
-    })
+    }, ignoreErrors)
     return tasks
   }
 
@@ -150,9 +150,13 @@ export default class Tide {
    * @param args - arguments to run the executable with
    * @param handler - a handler function to be called after the executable exits
    */
-  private static async runAndHandle(args: Array<string>, handler: HandlerFunction) {
+  private static async runAndHandle(args: Array<string>, handler: HandlerFunction, ignoreErrors: boolean = false) {
     // this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
-    const cliOutput = await this.spawnTideProcess(...args).catch(err => UiController.showError(err))
+    const cliOutput = await this.spawnTideProcess(...args).catch(err => {
+      if (!ignoreErrors) {
+        UiController.showError(err)
+      }
+    })
     if (typeof cliOutput === 'string') {
       // !! ts lang server or eslint claims this await has no effect but it actually does !!
       await handler(cliOutput)
