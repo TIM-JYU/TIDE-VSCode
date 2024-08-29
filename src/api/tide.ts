@@ -124,10 +124,11 @@ export default class Tide {
   }
 
   /**
-   * Resets the noneditable parts of a task to their original state.
+   * Resets the noneditable parts of a task file to their original state.
    * @param filePath - path of the file to reset
    */
   public static async resetNoneditableAreas(filePath: string) {
+    vscode.commands.executeCommand('workbench.action.files.save')
     this.runAndHandle(['task', 'reset', filePath], (data: string) => {
       Logger.debug(data)
     })
