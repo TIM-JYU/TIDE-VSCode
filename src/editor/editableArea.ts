@@ -138,8 +138,7 @@ const outsideBycodeDecorationType = vscode.window.createTextEditorDecorationType
 
 const notInsideBycodeNotificationDecorationType = vscode.window.createTextEditorDecorationType({
   isWholeLine: true,
-  // TODO: this is here just for example, replace with actual implementation if necessary
-  gutterIconPath: '/home/hannes/work/temp/exclam.svg',
+  textDecoration: 'underline dotted yellow' 
 })
 
 const bycodeBeginDecorationType = vscode.window.createTextEditorDecorationType({
@@ -156,7 +155,6 @@ const bycodeEndDecorationType = vscode.window.createTextEditorDecorationType({
   borderStyle: 'solid',
 })
 
-// TODO? does this belong here
 export function isBycodeTaskFile(document: vscode.TextDocument): boolean {
   const docText: string = document.getText()
   return docText.includes(EDITABLE_BEGIN) && docText.includes(EDITABLE_END)
