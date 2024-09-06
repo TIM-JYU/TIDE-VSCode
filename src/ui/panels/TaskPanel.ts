@@ -52,8 +52,8 @@ export default class TaskPanel {
     TaskPanel.currentPanel = new TaskPanel(panel, extensionUri)
   }
 
+  // TODO: does this function have a purpose?
   private updateLoginData(loginData: LoginData) {
-    TaskPanel.loginData = loginData
     this.sendLoginData()
   }
 
@@ -144,6 +144,10 @@ export default class TaskPanel {
         case 'RequestLoginData': {
           this.sendLoginData()
         }
+        case 'UpdateTaskPoints': {
+          // TODO: clean up and reorganize and type
+          Tide.getTaskPoints(msg.value.taskSetPath, msg.value.ideTaskId, this.sendTaskPoints)
+        }
       }
     })
   }
@@ -213,6 +217,11 @@ export default class TaskPanel {
   private async sendWorkspaceName() {
     const wsNameDataMsg: WebviewMessage = { type: 'UpdateWorkspaceName', value: vscode.workspace.name }
     await this.panel.webview.postMessage(wsNameDataMsg)
+  }
+
+  private sendTaskPoints(points: number) {
+    const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points}
+    this.panel.webview.postMessage(taskPointsMsg)
   }
 
   private async update() {

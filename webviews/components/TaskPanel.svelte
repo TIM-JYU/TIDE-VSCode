@@ -13,6 +13,7 @@
   let loginData: LoginData
   let isLoggedIn = false
   let workspace: string = ''
+  let taskPoints: number
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -31,6 +32,10 @@
         }
         case 'UpdateWorkspaceName': {
           workspace = message.value
+          break
+        }
+        case 'TaskPoints': {
+          taskPoints = message.value
           break
         }
       }
@@ -82,6 +87,16 @@
     })
   }
 
+  function updateTaskPoints() {
+    tsvscode.postMessage({
+      type: 'UpdateTaskPoints',
+      value: {
+        taskSetPath: timData.path,
+        ideTaskId: timData.ide_task_id
+      }
+      })
+  }
+
   $: isLoggedIn = loginData?.isLogged ?? false
 </script>
 
@@ -121,7 +136,10 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
+    <!--
       <p>Points: Information is not available. Please check task points from TIM.</p>
+    -->
+      <p>Points: {taskPoints} (<span on:click={updateTaskPoints}>update</span>)</p>
       <button class="submit-exercise" on:click={submitTask} disabled={!isLoggedIn}
         >Submit Exercise</button
       >

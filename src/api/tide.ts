@@ -92,7 +92,6 @@ export default class Tide {
 
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
       Logger.debug(data)
-      // TODO: course path is saved instead of taskset path
       ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
     })
   }
@@ -142,6 +141,14 @@ export default class Tide {
   public static async submitTask(taskPath: string) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
+    })
+  }
+
+  public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
+    this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
+      Logger.debug(data)
+      // TODO: temporary solution: replace with a smarter way to store and send the data 
+      callback(data)
     })
   }
 

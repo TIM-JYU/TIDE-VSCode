@@ -168,5 +168,7 @@ export type MessageType =
   | 'ShowCourses'
   | 'ShowOutput'
   | 'SubmitTask'
+  | 'TaskPoints'
+  | 'UpdateTaskPoints'
   | 'UpdateTimData'
   | 'UpdateWorkspaceName'
