@@ -86,7 +86,8 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
             new vscode.Position(selectionBeginLine, 0),
             new vscode.Position(selectionEndLine, 0),
           ),
-          hoverMessage: 'Tätä riviä ei ole tarkoitus muokata.',
+          // TODO: wording
+          hoverMessage: 'This line is not included when submitting an answer. Please, only edit the code in the designated area',
         },
       ])
     }
