@@ -10,7 +10,7 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task } from '../common/types'
+import { Course, LoginData, Task, TaskPoints } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -66,11 +66,18 @@ export default class Tide {
    * @param taskSetPath path to task set. Path can be found by executing cli courses command
    * @returns task data
    */
-  public static async getTaskListForTaskSetPath(taskSetPath: string, ignoreErrors: boolean = false): Promise<Array<Task>> {
+  public static async getTaskListForTaskSetPath(
+    taskSetPath: string,
+    ignoreErrors: boolean = false,
+  ): Promise<Array<Task>> {
     let tasks: Array<Task> = []
-    await this.runAndHandle(['task', 'list', taskSetPath, '--json'], async (data: string) => {
-      tasks = JSON.parse(data)
-    }, ignoreErrors)
+    await this.runAndHandle(
+      ['task', 'list', taskSetPath, '--json'],
+      async (data: string) => {
+        tasks = JSON.parse(data)
+      },
+      ignoreErrors,
+    )
     return tasks
   }
 
@@ -79,7 +86,9 @@ export default class Tide {
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
   public static async downloadTaskSet(taskSetPath: string) {
-    const downloadPathBase: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+    const downloadPathBase: string | undefined = vscode.workspace
+      .getConfiguration()
+      .get('TIM-IDE.fileDownloadPath')
     if (downloadPathBase === undefined) {
       UiController.showError('Download path not set!')
       return
@@ -147,8 +156,10 @@ export default class Tide {
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
     this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
       Logger.debug(data)
-      // TODO: temporary solution: replace with a smarter way to store and send the data 
-      callback(data)
+      // TODO: temporary solution: replace with a smarter way to store and send the data
+      const points: TaskPoints = JSON.parse(data)
+      Logger.debug(points)
+      callback(points)
     })
   }
 
@@ -158,9 +169,13 @@ export default class Tide {
    * @param args - arguments to run the executable with
    * @param handler - a handler function to be called after the executable exits
    */
-  private static async runAndHandle(args: Array<string>, handler: HandlerFunction, ignoreErrors: boolean = false) {
+  private static async runAndHandle(
+    args: Array<string>,
+    handler: HandlerFunction,
+    ignoreErrors: boolean = false,
+  ) {
     // this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
-    const cliOutput = await this.spawnTideProcess(...args).catch(err => {
+    const cliOutput = await this.spawnTideProcess(...args).catch((err) => {
       if (!ignoreErrors) {
         UiController.showError(err)
       }

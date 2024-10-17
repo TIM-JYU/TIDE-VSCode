@@ -77,14 +77,14 @@ updates the courses' status, and handles downloading task sets and opening works
   </div>
 
   {#if downloadPath === null}
-  <button
-    on:click={() => {
-      tsvscode.postMessage({
-        type: 'SetDownloadPath',
-        value: undefined,
-      })
-    }}>Set directory</button
-  >
+    <button
+      on:click={() => {
+        tsvscode.postMessage({
+          type: 'SetDownloadPath',
+          value: undefined,
+        })
+      }}>Set directory</button
+    >
   {/if}
 
   {#if courses.length === 0}

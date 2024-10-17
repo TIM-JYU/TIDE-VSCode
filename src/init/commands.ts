@@ -68,7 +68,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
       const existingCourses = ExtensionStateManager.getCourses()
-      Tide.getCourseList().then(freshCourses => {
+      Tide.getCourseList().then((freshCourses) => {
         if (existingCourses === undefined || existingCourses.length === 0) {
           ExtensionStateManager.setCourses(freshCourses)
         } else {

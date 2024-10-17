@@ -138,7 +138,7 @@ const outsideBycodeDecorationType = vscode.window.createTextEditorDecorationType
 
 const notInsideBycodeNotificationDecorationType = vscode.window.createTextEditorDecorationType({
   isWholeLine: true,
-  textDecoration: 'underline dotted yellow' 
+  textDecoration: 'underline dotted yellow',
 })
 
 const bycodeBeginDecorationType = vscode.window.createTextEditorDecorationType({

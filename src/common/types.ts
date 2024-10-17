@@ -137,6 +137,10 @@ export interface LoginData {
   isLogged: boolean
 }
 
+export interface TaskPoints {
+  current_points: number
+}
+
 /**
  * Messages sent between panels and webviews
  */

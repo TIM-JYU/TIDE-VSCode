@@ -7,13 +7,18 @@
    */
 
   import { onMount } from 'svelte'
-  import { type LoginData, type TimData, type WebviewMessage } from '../common/types'
+  import {
+    type LoginData,
+    type TaskPoints,
+    type TimData,
+    type WebviewMessage,
+  } from '../common/types'
 
   let timData: TimData
   let loginData: LoginData
   let isLoggedIn = false
   let workspace: string = ''
-  let taskPoints: number
+  let taskPoints: TaskPoints
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -92,9 +97,9 @@
       type: 'UpdateTaskPoints',
       value: {
         taskSetPath: timData.path,
-        ideTaskId: timData.ide_task_id
-      }
-      })
+        ideTaskId: timData.ide_task_id,
+      },
+    })
   }
 
   $: isLoggedIn = loginData?.isLogged ?? false
@@ -115,7 +120,7 @@ This component manages the display of task information and interaction with task
   <span class="loader"></span>
 {:else}
   <div class="task-panel">
-      <h1>{workspace} - {timData.ide_task_id}</h1>
+    <h1>{workspace} - {timData.ide_task_id}</h1>
     {#if timData.header !== null}
       <h2>{timData.header}</h2>
     {:else}
@@ -136,10 +141,11 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
-    <!--
-      <p>Points: Information is not available. Please check task points from TIM.</p>
-    -->
-      <p>Points: {taskPoints} (<span on:click={updateTaskPoints}>update</span>)</p>
+      {#if taskPoints !== undefined}
+        <p>Points: {taskPoints.current_points}</p>
+      {/if}
+      <button on:click={updateTaskPoints}>Check task points</button>
+      <hr />
       <button class="submit-exercise" on:click={submitTask} disabled={!isLoggedIn}
         >Submit Exercise</button
       >

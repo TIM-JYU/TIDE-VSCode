@@ -9,7 +9,7 @@
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { LoginData, TimData, WebviewMessage } from '../../common/types'
+import { LoginData, TaskPoints, TimData, WebviewMessage } from '../../common/types'
 import path from 'path'
 import Tide from '../../api/tide'
 import UiController from '../UiController'
@@ -146,7 +146,11 @@ export default class TaskPanel {
         }
         case 'UpdateTaskPoints': {
           // TODO: clean up and reorganize and type
-          Tide.getTaskPoints(msg.value.taskSetPath, msg.value.ideTaskId, this.sendTaskPoints)
+          Tide.getTaskPoints(
+            msg.value.taskSetPath,
+            msg.value.ideTaskId,
+            this.sendTaskPoints.bind(this),
+          )
         }
       }
     })
@@ -215,12 +219,15 @@ export default class TaskPanel {
   }
 
   private async sendWorkspaceName() {
-    const wsNameDataMsg: WebviewMessage = { type: 'UpdateWorkspaceName', value: vscode.workspace.name }
+    const wsNameDataMsg: WebviewMessage = {
+      type: 'UpdateWorkspaceName',
+      value: vscode.workspace.name,
+    }
     await this.panel.webview.postMessage(wsNameDataMsg)
   }
 
-  private sendTaskPoints(points: number) {
-    const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points}
+  private sendTaskPoints(points: TaskPoints) {
+    const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points }
     this.panel.webview.postMessage(taskPointsMsg)
   }
 
