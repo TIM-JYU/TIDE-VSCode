@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TaskSet } from '../common/types'
+  import type { TaskSet } from '../../common/types'
 
   export let taskset: TaskSet
   export let isLoggedIn: boolean

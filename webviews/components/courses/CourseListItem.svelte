@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Course, CourseStatus } from '../common/types'
+  import type { Course, CourseStatus } from '../../common/types'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'

@@ -8,7 +8,7 @@
 
   import CourseList from './CourseList.svelte'
   import { onMount } from 'svelte'
-  import { type Course, type LoginData, type WebviewMessage } from '../common/types'
+  import { type Course, type LoginData, type WebviewMessage } from '../../common/types'
 
   let downloadPath: string = ''
   let courses: Array<Course> = []

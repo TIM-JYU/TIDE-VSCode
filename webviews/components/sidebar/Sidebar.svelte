@@ -7,7 +7,7 @@
    */
 
   import { onMount } from 'svelte'
-  import { type LoginData } from '../common/types'
+  import { type LoginData } from '../../common/types'
   let isLoggedIn = false
   let loginData: LoginData
 

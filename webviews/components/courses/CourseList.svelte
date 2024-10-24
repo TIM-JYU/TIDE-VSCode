@@ -5,7 +5,7 @@
    * @license MIT
    * @date 30.4.2024
    */
-  import { type Course, type CourseStatus } from '../common/types'
+  import { type Course, type CourseStatus } from '../../common/types'
   import CourseListItem from './CourseListItem.svelte'
 
   export let statusOfCourses: CourseStatus

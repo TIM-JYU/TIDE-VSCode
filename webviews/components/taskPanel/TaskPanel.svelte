@@ -92,7 +92,6 @@
     })
   }
 
-
   function updateTaskPoints() {
     tsvscode.postMessage({
       type: 'UpdateTaskPoints',

@@ -1,3 +1,7 @@
+<script lang="ts">
+  // without these (empty) tags, svelte language server shows errors else where
+</script>
+
 <!--
 @component
 This component is a li part of hover menu.

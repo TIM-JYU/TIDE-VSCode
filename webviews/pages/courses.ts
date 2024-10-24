@@ -1,4 +1,4 @@
-import App from '../components/Courses.svelte'
+import App from '../components/courses/Courses.svelte'
 
 const app = new App({
   target: document.body,

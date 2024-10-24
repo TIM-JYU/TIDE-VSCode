@@ -1,3 +1,6 @@
+<script lang="ts">
+  // without these (empty) tags, svelte language server shows errors else where
+</script>
 <!-- 
 @component
 This component creates a on hover menu with a toggle button and menu content.
