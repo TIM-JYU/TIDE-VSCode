@@ -12,13 +12,14 @@
     type TaskPoints,
     type TimData,
     type WebviewMessage,
-  } from '../common/types'
+  } from '../../common/types'
+  import PointsDisplay from './PointsDisplay.svelte'
 
   let timData: TimData
   let loginData: LoginData
   let isLoggedIn = false
   let workspace: string = ''
-  let taskPoints: TaskPoints
+  let taskPoints: TaskPoints = { current_points: undefined }
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -141,9 +142,7 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
-      {#if taskPoints !== undefined}
-        <p>Points: {taskPoints.current_points} / {timData.max_points}</p>
-      {/if}
+      <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
       <button on:click={updateTaskPoints}>Check task points</button>
       <hr />
       <!-- Why are submit and show output buttons in "points-section"? -->

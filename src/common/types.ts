@@ -113,11 +113,11 @@ export interface Task {
  */
 export interface TimData {
   doc_id: number
-  header: string | null
+  header: string | undefined
   ide_task_id: string
   max_points: number | null
   path: string
-  stem: string | null
+  stem: string | undefined
   task_files: TaskFile[]
   type: string
 }
@@ -139,7 +139,7 @@ export interface LoginData {
 }
 
 export interface TaskPoints {
-  current_points: number
+  current_points: number | undefined
 }
 
 /**
