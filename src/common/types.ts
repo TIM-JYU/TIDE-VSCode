@@ -89,7 +89,7 @@ export interface Task {
   doc_id: number
   ide_task_id: string
   path: string
-  // TODO: what data belongs here? current and max points? Data coming from
+  // TODO: what data belongs here? Data coming from
   // Following is printed by CLI tool:
   //
   // doc_id:
@@ -112,22 +112,23 @@ export interface Task {
  * Data included in .timdata
  */
 export interface TimData {
-  path: string
-  type: string
   doc_id: number
-  ide_task_id: string
-  task_files: TaskFile[]
-  stem: string | null
   header: string | null
+  ide_task_id: string
+  max_points: number | null
+  path: string
+  stem: string | null
+  task_files: TaskFile[]
+  type: string
 }
 
 export interface TaskFile {
-  task_id_ext: string
   content: string
   file_name: string
   source: string
-  user_input: string
+  task_id_ext: string
   user_args: string
+  user_input: string
 }
 
 /**

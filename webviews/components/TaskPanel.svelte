@@ -142,10 +142,11 @@ This component manages the display of task information and interaction with task
 
     <div class="points-section">
       {#if taskPoints !== undefined}
-        <p>Points: {taskPoints.current_points}</p>
+        <p>Points: {taskPoints.current_points} / {timData.max_points}</p>
       {/if}
       <button on:click={updateTaskPoints}>Check task points</button>
       <hr />
+      <!-- Why are submit and show output buttons in "points-section"? -->
       <button class="submit-exercise" on:click={submitTask} disabled={!isLoggedIn}
         >Submit Exercise</button
       >
