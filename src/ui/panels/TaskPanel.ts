@@ -102,10 +102,8 @@ export default class TaskPanel {
           break
         }
         case 'SubmitTask': {
-          vscode.commands.executeCommand(
-            'tide.submitTask',
-            path.dirname(TaskPanel.lastActiveTextEditor.document.fileName),
-          )
+          vscode.commands.executeCommand('workbench.action.files.save')
+          await Tide.submitTask(path.dirname(TaskPanel.lastActiveTextEditor.document.fileName), this.onSubmitTask.bind(this))
           break
         }
         case 'ShowOutput': {
@@ -143,9 +141,6 @@ export default class TaskPanel {
         }
         case 'RequestLoginData': {
           this.sendLoginData()
-        }
-        case 'RequestTaskPoints': {
-          const { taskSetPath, IdeTaskId } = msg.value
         }
         case 'UpdateTaskPoints': {
           // TODO: clean up and reorganize and type
@@ -228,9 +223,15 @@ export default class TaskPanel {
     await this.panel.webview.postMessage(wsNameDataMsg)
   }
 
-  private sendTaskPoints(points: TaskPoints) {
+  private sendTaskPoints(points: TaskPoints | undefined) {
     const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points }
     this.panel.webview.postMessage(taskPointsMsg)
+  }
+
+  private onSubmitTask() {
+    // TODO: logic for informing about success/failure while submitting task
+    const msg: WebviewMessage = { type: 'SubmitResult', value: true}
+    this.panel.webview.postMessage(msg)
   }
 
   private async update() {

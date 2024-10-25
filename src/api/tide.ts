@@ -147,9 +147,11 @@ export default class Tide {
    *
    * @param {string} taskPath - path of the task
    */
-  public static async submitTask(taskPath: string) {
+  public static async submitTask(taskPath: string, callback: () => any) {
+    // TODO: return boolean of success?
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
+      callback()
     })
   }
 

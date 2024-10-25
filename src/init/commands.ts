@@ -111,9 +111,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * @param submitPath - The path of the to be submitted task in user's computer.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.submitTask', (submitPath) => {
+    vscode.commands.registerCommand('tide.submitTask', async (submitPath, callback) => {
       vscode.commands.executeCommand('workbench.action.files.save')
-      Tide.submitTask(submitPath)
+      await Tide.submitTask(submitPath)
+      callback()
     }),
   )
 

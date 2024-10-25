@@ -44,6 +44,10 @@
           taskPoints = message.value
           break
         }
+        case 'SubmitResult': {
+          onTaskSubmitted(message.value)
+          break
+        }
       }
     })
   })
@@ -57,6 +61,10 @@
       value: undefined,
     }
     tsvscode.postMessage(msg)
+  }
+
+  function onTaskSubmitted() {
+    updateTaskPoints()
   }
 
   /**
