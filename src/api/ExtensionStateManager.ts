@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData } from '../common/types'
+import { Course, CourseStatus, LoginData, TaskPoints } from '../common/types'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -115,6 +115,26 @@ export default class ExtensionStateManager {
     const courseIdx = courses.findIndex((course) => course.id === id)
     courses[courseIdx].status = status
     this.writeToGlobalState('courses', courses)
+  }
+
+  static setTaskPoints(taskSetPath: string, ideTaskId: string, taskPoints: TaskPoints) {
+    let taskPointsData = this.readFromGlobalState('taskPoints')
+    if (taskPointsData === undefined) {
+      taskPointsData = {}
+    }
+    if (taskPointsData[taskSetPath] === undefined) {
+      taskPointsData[taskSetPath] = {}
+    }
+    taskPointsData[taskSetPath][ideTaskId] = taskPoints
+    this.writeToGlobalState('taskPoints', taskPointsData)
+  }
+
+  static getTaskPoints(taskSetPath: string, ideTaskId: string): TaskPoints | undefined {
+    const taskPoints = this.readFromGlobalState('taskPoints')
+    if (taskPoints === undefined) {
+      return undefined
+    }
+    return taskPoints[taskSetPath][ideTaskId]
   }
 
   /**
@@ -224,5 +244,4 @@ interface NotifyFunction {
   (newValue: any): void
 }
 
-// TODO: Refactor from using string to using type StateKey for referring to keys
-export type StateKey = 'courses' | 'downloadPath' | 'loginData'
+export type StateKey = 'courses' | 'downloadPath' | 'loginData' | 'taskPoints'

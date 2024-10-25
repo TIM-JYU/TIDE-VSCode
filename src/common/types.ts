@@ -89,23 +89,6 @@ export interface Task {
   doc_id: number
   ide_task_id: string
   path: string
-  // TODO: what data belongs here? Data coming from
-  // Following is printed by CLI tool:
-  //
-  // doc_id:
-  // 639244
-  // header:
-  // null
-  // ide_task_id:
-  // 't8'
-  // path:
-  // 'kurssit/tie/ohj2/2024k/demot/DemoC1'
-  // stem:
-  // null
-  // task_files:
-  // (1) [{…}]
-  // type:
-  // 'c++/comtest'
 }
 
 /**
@@ -165,6 +148,7 @@ export type MessageType =
   | 'OpenWorkspace'
   | 'RefreshCourseData'
   | 'RequestLoginData'
+  | 'RequestTaskPoints'
   | 'ResetExercise'
   | 'ResetNoneditableAreas'
   | 'SetCourseStatus'

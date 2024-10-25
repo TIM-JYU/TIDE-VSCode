@@ -156,9 +156,9 @@ export default class Tide {
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
     this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
       Logger.debug(data)
-      // TODO: temporary solution: replace with a smarter way to store and send the data
       const points: TaskPoints = JSON.parse(data)
-      Logger.debug(points)
+      // TODO: should this be called elsewhere instead?
+      ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
       callback(points)
     })
   }

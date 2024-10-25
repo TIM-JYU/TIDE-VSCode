@@ -144,6 +144,9 @@ export default class TaskPanel {
         case 'RequestLoginData': {
           this.sendLoginData()
         }
+        case 'RequestTaskPoints': {
+          const { taskSetPath, IdeTaskId } = msg.value
+        }
         case 'UpdateTaskPoints': {
           // TODO: clean up and reorganize and type
           Tide.getTaskPoints(
@@ -212,8 +215,7 @@ export default class TaskPanel {
     await this.panel.webview.postMessage(loginDataMsg)
   }
 
-  private async sendTimData() {
-    const timData: TimData | undefined = await this.getTimData()
+  private async sendTimData(timData: TimData | undefined) {
     const timDataMsg: WebviewMessage = { type: 'UpdateTimData', value: timData }
     await this.panel.webview.postMessage(timDataMsg)
   }
@@ -234,11 +236,16 @@ export default class TaskPanel {
   private async update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
-    // TODO: Race condition. Webview doesn't receive messages while it's updating. Effect in work if sendTimData is called right before sendLoginData. Current implementation is prone to it too, but logindata message is so small, it's not happening in practice
-    // Maybe not a race condition? This behavior doesn't exist in coursepanel with similar code.
+    // The order of calling the functions below seems to matter for magical reasons.
+    const timData: TimData | undefined = await this.getTimData()
     await this.sendLoginData()
-    await this.sendTimData()
     await this.sendWorkspaceName()
+    if (timData !== undefined) {
+      this.sendTimData(timData)
+
+      const taskPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+      this.sendTaskPoints(taskPoints)
+    }
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {
