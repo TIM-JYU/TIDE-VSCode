@@ -107,18 +107,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   /**
-   * Submits task to TIM
-   * @param submitPath - The path of the to be submitted task in user's computer.
-   */
-  ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.submitTask', async (submitPath, callback) => {
-      vscode.commands.executeCommand('workbench.action.files.save')
-      await Tide.submitTask(submitPath)
-      callback()
-    }),
-  )
-
-  /**
    * Registers the 'tide.listCourses' command, allowing users to list courses from TIDE.
    */
   ctx.subscriptions.push(
