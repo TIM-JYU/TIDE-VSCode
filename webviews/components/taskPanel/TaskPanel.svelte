@@ -150,8 +150,13 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
+      {#if timData.max_points == undefined}
+      <p>This task does not reward points.</p>
+      {:else}
       <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
       <button on:click={updateTaskPoints}>Update points from TIM</button>
+      {/if}
+
       <hr />
       <!-- Why are submit and show output buttons in "points-section"? -->
       <button class="submit-exercise" on:click={submitTask} disabled={!isLoggedIn}
