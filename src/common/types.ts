@@ -125,6 +125,10 @@ export interface TaskPoints {
   current_points: number | undefined
 }
 
+export interface TaskCreationFeedback {
+  success: boolean
+}
+
 /**
  * Messages sent between panels and webviews
  */

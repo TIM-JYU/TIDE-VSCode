@@ -10,7 +10,7 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task, TaskPoints } from '../common/types'
+import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -31,7 +31,6 @@ export default class Tide {
     await this.runAndHandle(['login', '--json'], (data: string) => {
       const parsedData = JSON.parse(data)
       loginData = { isLogged: parsedData['login_success'] }
-      // TODO: raise exception in cli?
       if (!loginData.isLogged) {
         UiController.showError('Login failed.')
       }
@@ -99,9 +98,14 @@ export default class Tide {
     // append course name to the base download path
     const downloadPath = path.join(path.normalize(downloadPathBase), courseName, taskSetName)
 
-    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
-      Logger.debug(data)
-      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
+    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath, '--json'], (data: string) => {
+      const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
+      if (taskCreationFeedback.success) {
+        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
+      } else {
+        // TODO: more specific errors from cli
+        UiController.showError('Error downloading tasks.')
+      }
     })
   }
 
