@@ -21,7 +21,8 @@ https://tim.jyu.fi/view/kurssit/tie/proj/2024/tide/dokumentit/kayttoohjeet/tim-v
 
 NOTE: When making changes to the code, it is necessary to run either
 `Developer: Reload Webviews` or `Developer: Reload Window` in the Visual Studio
-Code command palette (ctrl + shift + p) before the changes have any effect.
+Code (the development instance) command palette (ctrl + shift + p) before the
+changes have any effect.
 
 NOTE: The Visual Studio Code extension requires
 [TIDE-CLI](https://github.com/TIM-JYU/TIDE-CLI) to be installed in order to
