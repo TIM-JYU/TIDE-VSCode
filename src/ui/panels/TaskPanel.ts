@@ -52,7 +52,6 @@ export default class TaskPanel {
     TaskPanel.currentPanel = new TaskPanel(panel, extensionUri)
   }
 
-  // TODO: does this function have a purpose?
   private updateLoginData(loginData: LoginData) {
     this.sendLoginData()
   }

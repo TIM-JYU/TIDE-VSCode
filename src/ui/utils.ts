@@ -46,7 +46,7 @@ export function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptio
  * @param webview - webview used for generating the html string
  * @param extensionUri - extensionUri used for generating the html string
  * @param fileNamePrefix - file name  prefix of the compiled components in "/out/compiled/" directory
- * @returns [TODO:description]
+ * @returns Default html for a webview
  */
 export function getDefaultHtmlForWebview(
   webview: vscode.Webview,

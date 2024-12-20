@@ -26,7 +26,7 @@ export default class ExtensionStateManager {
     this.globalState = ctx.globalState
   }
 
-  // TODO: why is this in both globalstate and settings
+  // TODO: why is download path written in globalstate when it is defined in settings (from where it can be read from, too)
 
   /**
    * Sets the path for downloading tasks to the Global State.
@@ -196,7 +196,7 @@ export default class ExtensionStateManager {
       },
     }
 
-    // TODO: is sending the info when subscribing ok?
+    // TODO: is it necessary to send the value of a key when subscribing to it?
     onValueChange(this.readFromGlobalState(key))
 
     return vscode.Disposable.from(disposableObject)

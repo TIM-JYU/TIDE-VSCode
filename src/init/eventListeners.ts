@@ -15,7 +15,6 @@ import TaskPanel from '../ui/panels/TaskPanel'
 import { editableAreaEventListener, isBycodeTaskFile } from '../editor/editableArea'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
-  // TODO: Move to its own file in src/event-listeners
   let lastActiveEditor: vscode.TextEditor | undefined
 
   /**
@@ -52,7 +51,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
       const newPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
 
       // Update ExtensionStateManager with the new path
-      // TODO: Why is the download path stored in ExtensionStateManager?
+      // TODO: Why is the download path stored in ExtensionStateManager when it is available in the settings?
       if (typeof newPath === 'string') {
         ExtensionStateManager.setDownloadPath(newPath)
       } else {

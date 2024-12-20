@@ -99,13 +99,14 @@ export default class Tide {
     const downloadPath = path.join(path.normalize(downloadPathBase), courseName, taskSetName)
 
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath, '--json'], (data: string) => {
-      const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
-      if (taskCreationFeedback.success) {
-        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
-      } else {
-        // TODO: more specific errors from cli
-        UiController.showError('Error downloading tasks.')
-      }
+      // TODO: --json flag is not yet implemented in cli tool 
+      // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
+      // if (taskCreationFeedback.success) {
+      //   ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
+      // } else {
+      //   // TODO: more specific errors from cli
+      //   UiController.showError('Error downloading tasks.')
+      // }
     })
   }
 
@@ -152,7 +153,6 @@ export default class Tide {
    * @param {string} taskPath - path of the task
    */
   public static async submitTask(taskPath: string, callback: () => any) {
-    // TODO: return boolean of success?
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
       callback()

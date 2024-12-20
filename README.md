@@ -19,6 +19,10 @@ https://tim.jyu.fi/view/kurssit/tie/proj/2024/tide/dokumentit/kayttoohjeet/tim-v
 4. Open the project in Visual Studio Code
 5. Launch the `Run Extension` configuration from the `Run and Debug` tab
 
+NOTE: When making changes to the code, it is necessary to run either
+`Developer: Reload Webviews` or `Developer: Reload Window` in the Visual Studio
+Code command palette (ctrl + shift + p) before the changes have any effect.
+
 NOTE: The Visual Studio Code extension requires
 [TIDE-CLI](https://github.com/TIM-JYU/TIDE-CLI) to be installed in order to
 function properly.
@@ -62,6 +66,7 @@ bundles webviews/pages/TaskPanel.ts → out/compiled/TaskPanel.js...
 
 1 import App from '../components/taskPanel/TaskPanel.svelte'
 ```
+
 
 ### Helpful links
 

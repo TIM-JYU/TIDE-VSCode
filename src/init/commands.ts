@@ -110,7 +110,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * Registers the 'tide.listCourses' command, allowing users to list courses from TIDE.
    */
   ctx.subscriptions.push(
-    // TODO: is this needed?
+    // TODO: This is unnecessary
     vscode.commands.registerCommand('tide.listCourses', () => {
       Tide.getCourseList()
     }),
