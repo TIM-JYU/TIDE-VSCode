@@ -33,7 +33,7 @@ export default class ExtensionStateManager {
    * @param path - The path where the tasks will be downloaded.
    */
   static setDownloadPath(path: string) {
-    this.writeToGlobalState('downloadPath', path)
+    this.writeToGlobalState(StateKey.DownloadPath, path)
   }
 
   /**
@@ -41,7 +41,7 @@ export default class ExtensionStateManager {
    * @returns The download path stored in the Global State.
    */
   static getDownloadPath(): string {
-    return this.readFromGlobalState('downloadPath')
+    return this.readFromGlobalState(StateKey.DownloadPath)
   }
 
   /**
@@ -49,7 +49,7 @@ export default class ExtensionStateManager {
    * @param courses - An array containing the course data to be stored.
    */
   public static setCourses(courses: Array<Course>) {
-    this.writeToGlobalState('courses', courses)
+    this.writeToGlobalState(StateKey.Courses, courses)
   }
 
   /**
@@ -57,7 +57,7 @@ export default class ExtensionStateManager {
    * @returns Courses from the global state.
    */
   public static getCourses(): Array<Course> {
-    return this.readFromGlobalState('courses')
+    return this.readFromGlobalState(StateKey.Courses)
   }
 
   /**
@@ -67,7 +67,7 @@ export default class ExtensionStateManager {
    * @param {LoginData} loginData - the data to be saved
    */
   public static setLoginData(loginData: LoginData) {
-    this.writeToGlobalState('loginData', loginData)
+    this.writeToGlobalState(StateKey.LoginData, loginData)
   }
 
   /**
@@ -77,7 +77,7 @@ export default class ExtensionStateManager {
    * @returns {LoginData} LoginData saved to the global state
    */
   public static getLoginData(): LoginData {
-    return this.readFromGlobalState('loginData')
+    return this.readFromGlobalState(StateKey.LoginData)
   }
 
   /**
@@ -86,7 +86,7 @@ export default class ExtensionStateManager {
    * @param downloadPath - The path where the task set will be downloaded.
    */
   static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
-    const courses: Array<Course> = this.readFromGlobalState('courses')
+    const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
@@ -94,7 +94,7 @@ export default class ExtensionStateManager {
         }
       })
     })
-    this.writeToGlobalState('courses', courses)
+    this.writeToGlobalState(StateKey.Courses, courses)
   }
 
   /**
@@ -103,7 +103,7 @@ export default class ExtensionStateManager {
    * @returns The download path stored for the specified task set path.
    */
   static getTaskSetDownloadPath(taskSetPath: string): string | undefined {
-    const courses: Array<Course> = this.readFromGlobalState('courses')
+    const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     const downloadPath = courses
       .flatMap((course) => course.taskSets)
       .find((taskSet) => taskSet.path === taskSetPath)?.downloadPath
@@ -111,14 +111,15 @@ export default class ExtensionStateManager {
   }
 
   static setCourseStatus(id: number, status: CourseStatus) {
-    const courses: Array<Course> = this.readFromGlobalState('courses')
+    const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     const courseIdx = courses.findIndex((course) => course.id === id)
     courses[courseIdx].status = status
-    this.writeToGlobalState('courses', courses)
+    this.writeToGlobalState(StateKey.Courses, courses)
   }
 
   static setTaskPoints(taskSetPath: string, ideTaskId: string, taskPoints: TaskPoints) {
-    let taskPointsData = this.readFromGlobalState('taskPoints')
+    // TODO: This could be a hashmap
+    let taskPointsData = this.readFromGlobalState(StateKey.TaskPoints)
     if (taskPointsData === undefined) {
       taskPointsData = {}
     }
@@ -126,15 +127,28 @@ export default class ExtensionStateManager {
       taskPointsData[taskSetPath] = {}
     }
     taskPointsData[taskSetPath][ideTaskId] = taskPoints
-    this.writeToGlobalState('taskPoints', taskPointsData)
+    this.writeToGlobalState(StateKey.TaskPoints, taskPointsData)
   }
 
   static getTaskPoints(taskSetPath: string, ideTaskId: string): TaskPoints | undefined {
-    const taskPoints = this.readFromGlobalState('taskPoints')
+    // const taskPoints = this.readFromGlobalState('taskPoints')
+    const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
     if (taskPoints === undefined) {
       return undefined
     }
     return taskPoints[taskSetPath][ideTaskId]
+  }
+
+  static reset() {
+    // let key: keyof typeof StateKey
+    // for (key in StateKey) {
+    //   Logger.debug(`Reseting globalState: "${this.prefixedKey(key)}" `)
+    //   this.globalState.update(this.prefixedKey(key), undefined)
+    // }
+    this.writeToGlobalState(StateKey.Courses, undefined)
+    this.writeToGlobalState(StateKey.LoginData, undefined)
+    this.writeToGlobalState(StateKey.TaskPoints, undefined)
+    this.writeToGlobalState(StateKey.DownloadPath, undefined)
   }
 
   /**
@@ -244,4 +258,11 @@ interface NotifyFunction {
   (newValue: any): void
 }
 
-export type StateKey = 'courses' | 'downloadPath' | 'loginData' | 'taskPoints'
+
+// type StateKey = 'courses' | 'downloadPath' | 'loginData' | 'taskPoints'
+enum StateKey {
+  Courses = 'courses',
+  DownloadPath = 'downloadPath',
+  LoginData = 'loginData',
+  TaskPoints = 'taskPoints'
+}

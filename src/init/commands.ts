@@ -127,4 +127,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       ExtensionStateManager.setCourses([])
     }),
   )
+
+  ctx.subscriptions.push(
+    vscode.commands.registerCommand('tide.clearLocalExtensionData', () => {
+      ExtensionStateManager.reset()
+    }),
+  )
 }

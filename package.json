@@ -97,7 +97,12 @@
 				"command": "tide.submitTask",
 				"title": "Submit exercise to TIM",
 				"category": "TIM-IDE"
-			}
+			},
+            {
+				"command": "tide.clearLocalExtensionData",
+				"title": "Clear local extension data",
+				"category": "TIM-IDE"
+            }
 		],
 		"viewsContainers": {
 			"activitybar": [
