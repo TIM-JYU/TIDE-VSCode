@@ -137,7 +137,8 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p .",
-		"watch-svelte": "rollup -c -w --bundleConfigAsCjs",
+		"svelte-watch": "rollup -c -w --bundleConfigAsCjs",
+		"svelte-compile": "rollup -c --bundleConfigAsCjs",
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "vscode-test"
