@@ -33,13 +33,23 @@ framework can be found [here](https://svelte.dev/docs/svelte).
 The codebase uses Svelte 4, and not the latest version 5, i.e. runes syntax
 introduced in the latter one can not be used.
 
+#### Creating a new webview
+
+To create a new Svelte component run (while in the project root directory)
+`scripts/create-webview.sh` with the desired name as an argument, e.g.
+`scripts/create-webview.sh MyGloriousWebview`. This will create the Svelte-file
+in `webviews/components` directory and the necessary boilerplate in
+`webviews/pages` directory. The name provided as argument will also be used as
+the file prefix in `out/compiled`.
+
 #### Compiling Svelte components
 
 Svelte components need to be recompiled in order for any changes made to them
 to take place. This can be done by running `npm run svelte-watch` inside the
 project directory. This launches a watcher that will, as long as it runs,
 automatically compile any components affected by changes made to the source
-files.
+files. Compiled Svelte-components are saved to `./out/compiled` from where they
+can be used inside panels.
 
 In its current state, the `svelte-watch` and `svelte-compile` run configurations cause warnings when
 ran, but they do not affect the compiling process. The warnings in question are
