@@ -98,7 +98,7 @@ export default class Tide {
     // append course name to the base download path
     const downloadPath = path.join(path.normalize(downloadPathBase), courseName, taskSetName)
 
-    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath, '--json'], (data: string) => {
+    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
         ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)

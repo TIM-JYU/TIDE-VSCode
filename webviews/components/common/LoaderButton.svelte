@@ -1,4 +1,5 @@
 <script lang="ts">
+  // TODO: this component needs styling
   import Spinner from "./Spinner.svelte"
 
   export let onClick: () => void
@@ -21,3 +22,4 @@ text.
   {text}
   {/if}
 </button>
+
