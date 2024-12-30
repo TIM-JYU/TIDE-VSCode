@@ -6,7 +6,7 @@
   .spinner {
     width: 1rem;
     height: 1rem;
-    border: 0.25rem solid #ffffff;
+    border: 0.25rem solid #000000;
     border-top-color: transparent;
     border-radius: 50%;
     display: inline-block;

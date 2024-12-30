@@ -7,6 +7,7 @@
    */
 
   import CourseList from './CourseList.svelte'
+  import LoaderButton from '../common/LoaderButton.svelte'
   import { onMount } from 'svelte'
   import { type Course, type LoginData, type WebviewMessage } from '../../common/types'
 
@@ -14,9 +15,18 @@
   let courses: Array<Course> = []
   let loginData: LoginData
   let isLoggedIn: boolean
+  let coursesRefreshing: boolean = false
 
   $: if (downloadPath === null) {
     directoryNotSet()
+  }
+
+  function refreshCourses() {
+    coursesRefreshing = true
+    tsvscode.postMessage({
+      type: 'RefreshCourseData',
+      value: undefined,
+    })
   }
 
   /**
@@ -32,6 +42,7 @@
         }
         case 'CourseData': {
           courses = message.value
+          coursesRefreshing = false
           break
         }
         case 'LoginData': {
@@ -66,14 +77,12 @@ updates the courses' status, and handles downloading task sets and opening works
 
 {#if isLoggedIn}
   <div>
-    <button
-      on:click={() => {
-        tsvscode.postMessage({
-          type: 'RefreshCourseData',
-          value: undefined,
-        })
-      }}>Refresh</button
-    >
+    <LoaderButton
+      text="Refresh"
+      textWhileLoading="Refreshing"
+      loading={coursesRefreshing}
+      onClick={refreshCourses}
+    />
   </div>
 
   {#if downloadPath === null}
