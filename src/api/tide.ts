@@ -29,7 +29,9 @@ export default class Tide {
   public static async login(): Promise<LoginData> {
     let loginData = { isLogged: false }
     await this.runAndHandle(['login', '--json'], (data: string) => {
-      const parsedData = JSON.parse(data)
+      const jsonStart = data.indexOf('{')
+      const jsonString = data.slice(jsonStart)
+      const parsedData = JSON.parse(jsonString)
       loginData = { isLogged: parsedData['login_success'] }
       if (!loginData.isLogged) {
         UiController.showError('Login failed.')
