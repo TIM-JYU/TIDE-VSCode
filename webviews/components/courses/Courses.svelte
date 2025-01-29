@@ -9,7 +9,7 @@
   import CourseList from './CourseList.svelte'
   import LoaderButton from '../common/LoaderButton.svelte'
   import { onMount } from 'svelte'
-  import { type Course, type LoginData, type WebviewMessage } from '../../common/types'
+  import { type Course, type LoginData, type WebviewMessage } from '../../../src/common/types'
 
   let downloadPath: string = ''
   let courses: Array<Course> = []

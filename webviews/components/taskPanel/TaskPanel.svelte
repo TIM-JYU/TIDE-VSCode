@@ -12,7 +12,7 @@
     type TaskPoints,
     type TimData,
     type WebviewMessage,
-  } from '../../common/types'
+  } from '../../../src/common/types'
   import PointsDisplay from './PointsDisplay.svelte'
 
   let timData: TimData
