@@ -22,7 +22,9 @@ export default fs.readdirSync(path.join(__dirname, 'webviews', 'pages')).map((in
 		plugins: [
 			svelte({
 				// enable run-time checks when not in production
-				dev: !production,
+				compilerOptions: {
+					dev: !production,// Siirrä tämä tänne
+				},
 				// we'll extract any component CSS out into
 				// a separate file - better for performance
 				//css: (css) => {
