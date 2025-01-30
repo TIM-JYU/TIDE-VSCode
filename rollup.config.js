@@ -44,7 +44,7 @@ export default fs.readdirSync(path.join(__dirname, "webviews", "pages")).map((in
 			commonjs(),
 			typescript({
 				tsconfig: "webviews/tsconfig.json",
-				sourceMap: !production,
+				sourceMap: true,
 				inlineSources: !production,
 			}),
 
