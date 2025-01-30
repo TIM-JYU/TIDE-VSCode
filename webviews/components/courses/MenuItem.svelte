@@ -1,4 +1,9 @@
 <script lang="ts">
+  interface Props {
+    children?: import('svelte').Snippet;
+  }
+
+  let { children }: Props = $props();
   // without these (empty) tags, svelte language server shows errors else where
 </script>
 
@@ -9,7 +14,7 @@ From Svelte.dev On Hover Menu: https://svelte.dev/repl/2f5ab01c05f84790bcb94a0f7
 -->
 
 <li>
-  <slot />
+  {@render children?.()}
 </li>
 
 <style>

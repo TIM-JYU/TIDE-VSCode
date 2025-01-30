@@ -1,6 +1,7 @@
 import App from '../components/sidebar/Sidebar.svelte'
+import { mount } from "svelte";
 
-const app = new App({
+const app = mount(App, {
   target: document.body,
 })
 
