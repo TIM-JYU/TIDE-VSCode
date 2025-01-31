@@ -36,20 +36,27 @@ expand or collapse course details, and perform actions like downloading task set
 or opening workspaces.
 -->
 
-<button class="button-header" onclick={toggleExpandedState}>
-  <span class="button-header-span">{statusOfCourses} Courses</span>
-  <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
-</button>
+<div class="course-list">
+  <button class="button-header" onclick={toggleExpandedState}>
+    <span class="button-header-span">{statusOfCourses} Courses</span>
+    <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
+  </button>
 
-{#if isExpanded}
-  {#each courses as course}
-    <CourseListItem {course} {isLoggedIn} />
-  {/each}
-{/if}
+  {#if isExpanded}
+    {#each courses as course}
+      <CourseListItem {course} {isLoggedIn} />
+    {/each}
+  {/if}
+</div>
+
 
 <style>
   :global(body) {
     margin-bottom: 2.5rem;
+  }
+
+  .course-list {
+    width: 100%;
   }
 
   .button-header {
