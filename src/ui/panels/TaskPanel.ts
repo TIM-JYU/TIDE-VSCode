@@ -8,7 +8,7 @@
  */
 import * as vscode from 'vscode'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
-import ExtensionStateManager from '../../api/ExtensionStateManager'
+import ExtensionStateManager, {StateKey} from '../../api/ExtensionStateManager'
 import { LoginData, TaskPoints, TimData, WebviewMessage } from '../../common/types'
 import path from 'path'
 import Tide from '../../api/tide'
@@ -62,7 +62,7 @@ export default class TaskPanel {
 
     // subscribe to changes in login data
     this.disposables.push(
-      ExtensionStateManager.subscribe('loginData', this.updateLoginData.bind(this)),
+      ExtensionStateManager.subscribe(StateKey.LoginData, this.updateLoginData.bind(this)),
     )
 
     // Set the webview's initial html content.

@@ -8,7 +8,7 @@ exports
  * @date 16.3.2024
  */
 import * as vscode from 'vscode'
-import ExtensionStateManager from '../../api/ExtensionStateManager'
+import ExtensionStateManager, {StateKey} from '../../api/ExtensionStateManager'
 import { LoginData, MessageType, WebviewMessage } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Logger from '../../utilities/logger'
@@ -19,7 +19,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   _doc?: vscode.TextDocument
 
   constructor(private readonly _extensionUri: vscode.Uri) {
-    ExtensionStateManager.subscribe('loginData', this.sendLoginValue.bind(this))
+    ExtensionStateManager.subscribe(StateKey.LoginData , this.sendLoginValue.bind(this))
   }
 
   /**

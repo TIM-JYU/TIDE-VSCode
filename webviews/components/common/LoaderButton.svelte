@@ -2,10 +2,19 @@
   // TODO: this component needs styling
   import Spinner from "./Spinner.svelte"
 
-  export let onClick: () => void
-  export let loading: boolean
-  export let text: string
-  export let textWhileLoading
+  interface Props {
+    onClick: () => void;
+    loading: boolean;
+    text: string;
+    textWhileLoading: any;
+  }
+
+  let {
+    onClick,
+    loading,
+    text,
+    textWhileLoading
+  }: Props = $props();
 </script>
 
 <!--
@@ -14,7 +23,7 @@ A button that can be toggled to show a spinner and optionally an alternative
 text.
 -->
 
-<button on:click={onClick}>
+<button onclick={onClick}>
   {#if loading}
   {textWhileLoading ?? text}
   <Spinner/>
