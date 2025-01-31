@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   /**
    * @author Hannes Koivusipilä
    * @author Stella Palenius
@@ -11,14 +9,17 @@
   import CourseList from './CourseList.svelte'
   import LoaderButton from '../common/LoaderButton.svelte'
   import { onMount } from 'svelte'
-  import { type Course, type LoginData, type WebviewMessage } from '../../../src/common/types'
+  import { type Course, type LoginData, type WebviewMessage } from '../../common/types'
 
-  let downloadPath: string = $state('')
-  let courses: Array<Course> = $state([])
-  let loginData: LoginData = $state()
-  let isLoggedIn: boolean = $derived(loginData?.isLogged ?? false)
-  let coursesRefreshing: boolean = $state(false)
+  let downloadPath: string = ''
+  let courses: Array<Course> = []
+  let loginData: LoginData
+  let isLoggedIn: boolean
+  let coursesRefreshing: boolean = false
 
+  $: if (downloadPath === null) {
+    directoryNotSet()
+  }
 
   function refreshCourses() {
     coursesRefreshing = true
@@ -63,12 +64,7 @@
     })
   }
 
-  run(() => {
-    if (downloadPath === null) {
-      directoryNotSet()
-    }
-  });
-  
+  $: isLoggedIn = loginData?.isLogged ?? false
 </script>
 
 <!--
@@ -91,7 +87,7 @@ updates the courses' status, and handles downloading task sets and opening works
 
   {#if downloadPath === null}
     <button
-      onclick={() => {
+      on:click={() => {
         tsvscode.postMessage({
           type: 'SetDownloadPath',
           value: undefined,

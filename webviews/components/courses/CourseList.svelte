@@ -5,24 +5,15 @@
    * @license MIT
    * @date 30.4.2024
    */
-  import { type Course, type CourseStatus } from '../../../src/common/types'
+  import { type Course, type CourseStatus } from '../../common/types'
   import CourseListItem from './CourseListItem.svelte'
 
-  interface Props {
-    statusOfCourses: CourseStatus;
-    courses: Array<Course>;
-    defaultExpandedState: boolean;
-    isLoggedIn: boolean;
-  }
+  export let statusOfCourses: CourseStatus
+  export let courses: Array<Course>
+  export let defaultExpandedState: boolean
+  export let isLoggedIn: boolean
 
-  let {
-    statusOfCourses,
-    courses,
-    defaultExpandedState,
-    isLoggedIn
-  }: Props = $props();
-
-  let isExpanded = $state(defaultExpandedState)
+  let isExpanded = defaultExpandedState
 
   function toggleExpandedState() {
     isExpanded = !isExpanded
@@ -36,7 +27,7 @@ expand or collapse course details, and perform actions like downloading task set
 or opening workspaces.
 -->
 
-<button class="button-header" onclick={toggleExpandedState}>
+<button class="button-header" on:click={toggleExpandedState}>
   <span class="button-header-span">{statusOfCourses} Courses</span>
   <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
 </button>

@@ -4,14 +4,10 @@
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'
 
-  interface Props {
-    course: Course;
-    isLoggedIn: boolean;
-  }
+  export let course: Course
+  export let isLoggedIn: boolean
 
-  let { course, isLoggedIn }: Props = $props();
-
-  let isExpanded: boolean = $state(false)
+  let isExpanded: boolean = false
 
   /**
    * Updates the status of a course to a new status.
@@ -34,24 +30,20 @@
     isExpanded = !isExpanded
   }
 
-  let oppositeStatus: CourseStatus = $derived(course.status === 'active' ? 'hidden' : 'active')
-  
+  let oppositeStatus: CourseStatus
+  $: oppositeStatus = course.status === 'active' ? 'hidden' : 'active'
 </script>
 
 <div class="course-box">
   <header>
     <p class="courseTitle">{course.name}</p>
     <Menu>
-      {#snippet toggle()}
-            <span >&#8942;</span>
-          {/snippet}
-      {#snippet menucontent()}
-            <MenuItem >
-          <a href="#?" onclick={() => moveCourse(oppositeStatus)}>
-            Move to {oppositeStatus} courses
-          </a>
-        </MenuItem>
-          {/snippet}
+      <span slot="toggle">&#8942;</span>
+      <MenuItem slot="menucontent">
+        <a href="#?" on:click={() => moveCourse(oppositeStatus)}>
+          Move to {oppositeStatus} courses
+        </a>
+      </MenuItem>
     </Menu>
   </header>
   <div>
@@ -60,7 +52,7 @@
   <button
     class="expand-collapse-button"
     aria-expanded={course.expanded}
-    onclick={() => toggleExpanded()}
+    on:click={() => toggleExpanded()}
   >
     <span class="arrow {course.expanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
   </button>
