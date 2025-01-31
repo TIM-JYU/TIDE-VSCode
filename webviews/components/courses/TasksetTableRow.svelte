@@ -1,12 +1,8 @@
 <script lang="ts">
   import type { TaskSet } from '../../common/types'
 
-  interface Props {
-    taskset: TaskSet;
-    isLoggedIn: boolean;
-  }
-
-  let { taskset, isLoggedIn }: Props = $props();
+  export let taskset: TaskSet
+  export let isLoggedIn: boolean
 
   /**
    * Initiates the download of a task set identified by its path.
@@ -36,9 +32,9 @@
   <!-- <td>6/8</td> -->
   <td>
     {#if taskset.downloadPath === undefined}
-      <button onclick={downloadTaskSet}>Download taskset</button>
+      <button on:click={downloadTaskSet}>Download taskset</button>
     {:else}
-      <button onclick={openWorkspace}>Open in workspace</button>
+      <button on:click={openWorkspace}>Open in workspace</button>
     {/if}
   </td>
 {:else}
