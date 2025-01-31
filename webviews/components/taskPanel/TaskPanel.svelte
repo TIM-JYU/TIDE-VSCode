@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   /**
    * @author Hannes Koivusipilä
    * @author Stella Palenius
@@ -15,11 +17,11 @@
   } from '../../../src/common/types'
   import PointsDisplay from './PointsDisplay.svelte'
 
-  let timData: TimData
-  let loginData: LoginData
-  let isLoggedIn = false
-  let workspace: string = ''
-  let taskPoints: TaskPoints = { current_points: undefined }
+  let timData: TimData = $state()
+  let loginData: LoginData = $state()
+  let isLoggedIn = $state(false)
+  let workspace: string = $state('')
+  let taskPoints: TaskPoints = $state({ current_points: undefined })
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -111,7 +113,9 @@
     })
   }
 
-  $: isLoggedIn = loginData?.isLogged ?? false
+  run(() => {
+    isLoggedIn = loginData?.isLogged ?? false
+  });
 </script>
 
 <!--
@@ -154,15 +158,15 @@ This component manages the display of task information and interaction with task
       <p>This task does not reward points.</p>
       {:else}
       <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
-      <button on:click={updateTaskPoints}>Update points from TIM</button>
+      <button onclick={updateTaskPoints}>Update points from TIM</button>
       {/if}
 
       <hr />
       <!-- Why are submit and show output buttons in "points-section"? -->
-      <button class="submit-exercise" on:click={submitTask} disabled={!isLoggedIn}
+      <button class="submit-exercise" onclick={submitTask} disabled={!isLoggedIn}
         >Submit Exercise</button
       >
-      <button on:click={showOutput}>Show Output</button>
+      <button onclick={showOutput}>Show Output</button>
       <!-- <p>Passed Tests</p>
             <div class="progress-bar">
                 <div class="progress" style="width: 75%"></div>
@@ -174,10 +178,10 @@ This component manages the display of task information and interaction with task
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
     <div class="reset-section">
       {#if timData.task_files.length < 2}
-        <button on:click={resetExercise} disabled={!isLoggedIn}>Reset Exercise</button>
+        <button onclick={resetExercise} disabled={!isLoggedIn}>Reset Exercise</button>
         <!-- <button>Fetch Latest Answer</button> -->
       {/if}
-      <button on:click={resetNoneditableAreas}>
+      <button onclick={resetNoneditableAreas}>
         <!-- TODO: better text for button -->
         Reset noneditable areas
       </button>

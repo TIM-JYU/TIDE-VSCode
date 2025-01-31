@@ -7,7 +7,7 @@
  * @date 22.3.2024
  */
 import * as vscode from 'vscode'
-import ExtensionStateManager from '../../api/ExtensionStateManager'
+import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
@@ -88,8 +88,8 @@ export default class CoursePanel {
 
     // subscribe to changes in login data
     this.disposables.push(
-      ExtensionStateManager.subscribe('loginData', this.sendLoginData.bind(this)),
-      ExtensionStateManager.subscribe('courses', this.sendCourseData.bind(this)),
+      ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this)),
+      ExtensionStateManager.subscribe(StateKey.Courses, this.sendCourseData.bind(this)),
     )
 
     // Set the webview's initial html content
