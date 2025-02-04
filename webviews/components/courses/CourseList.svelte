@@ -35,7 +35,6 @@ This component renders a list of courses with options to toggle their visibility
 expand or collapse course details, and perform actions like downloading task sets
 or opening workspaces.
 -->
-
 <div class="course-list">
   <button class="button-header" onclick={toggleExpandedState}>
     <span class="button-header-span">{statusOfCourses} Courses</span>
