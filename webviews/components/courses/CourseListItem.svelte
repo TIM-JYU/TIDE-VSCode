@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Course, CourseStatus } from '../../common/types'
+  import type { Course, CourseStatus } from '../../../src/common/types'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'
@@ -59,10 +59,10 @@
   </div>
   <button
     class="expand-collapse-button"
-    aria-expanded={course.expanded}
+    aria-expanded={isExpanded}
     onclick={() => toggleExpanded()}
   >
-    <span class="arrow {course.expanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
+    <span class="arrow {isExpanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
   </button>
   {#if isExpanded}
     <div class="course-content">
