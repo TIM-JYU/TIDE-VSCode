@@ -192,11 +192,11 @@ export default class TaskPanel {
           const currentFile = doc.fileName
           const currentDir = path.dirname(currentFile)
           const taskId = path.basename(currentDir)
-          const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata');
+          const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata')
           const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
           const timDataCourse= JSON.parse(timDataContent.toString())
-          const coursePath = Object.keys(timDataCourse.course_parts)[0];
-          const timData : TimData= timDataCourse.course_parts[coursePath].tasks[taskId];
+          const coursePath = Object.keys(timDataCourse.course_parts)[0]
+          const timData : TimData= timDataCourse.course_parts[coursePath].tasks[taskId]
           
           return timData
         } catch {
