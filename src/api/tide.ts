@@ -98,7 +98,7 @@ export default class Tide {
     const courseName = path.basename(path.dirname(taskSetPath))
     const taskSetName = path.basename(taskSetPath)
     // append course name to the base download path
-    const downloadPath = path.join(path.normalize(downloadPathBase), courseName, taskSetName)
+    const downloadPath = path.join(path.normalize(downloadPathBase), courseName)
 
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
         ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
