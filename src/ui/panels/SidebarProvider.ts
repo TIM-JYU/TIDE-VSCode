@@ -70,11 +70,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break
         }
         case 'Login': {
-          vscode.commands.executeCommand('tide.login')
+          await vscode.commands.executeCommand('tide.login')
+          vscode.commands.executeCommand('tide.refreshTree')        
           break
         }
         case 'Logout': {
-          vscode.commands.executeCommand('tide.logout')
+          await vscode.commands.executeCommand('tide.logout')
+          vscode.commands.executeCommand('tide.wipeTreeAndEditors')
           break
         }
         case 'RequestLoginData': {

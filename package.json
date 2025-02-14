@@ -27,6 +27,20 @@
 				{
 					"command": "tide.showTaskPanel",
 					"group": "navigation"
+				}				
+			],
+			"view/title": [
+				{
+					"command": "tide.refreshTree",
+					"when": "view == tide-tasks-treeview",
+					"group": "navigation@0"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "tide.treeview_menu_open_tasks",
+					"when": "view == tide-tasks-treeview",
+					"group": "tide@0"
 				}
 			]
 		},
@@ -102,7 +116,25 @@
 				"command": "tide.clearLocalExtensionData",
 				"title": "Clear local extension data",
 				"category": "TIM-IDE"
+			},
+			{
+				"command": "tide.item_clicked",
+				"title": "Open item"
+			},
+			{
+				"command": "tide.refreshTree",
+				"title": "Refresh treeview",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "tide.treeview_menu_open_tasks",
+				"title": "Open all tasks in this directory"
+			},
+			{
+				"command": "tide.wipeTreeAndEditors",
+				"title": "Empty course task treeview and close files"
 			}
+
 		],
 		"viewsContainers": {
 			"activitybar": [
@@ -121,9 +153,19 @@
 					"name": "Menu",
 					"icon": "./media/timlogovscode.png",
 					"contextualTitle": "TIM-IDE"
+				},
+				{
+					"id": "tide-tasks-treeview",
+					"name": "Courses"
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view" : "tide-tasks-treeview",
+				"contents": "Login to view courses and tasks!"
+			}
+		],
 		"configuration": {
 			"title": "TIM-IDE",
 			"properties": {
