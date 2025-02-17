@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as vscode from 'vscode'
+import * as fs from 'fs'
+import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 
 
@@ -12,7 +12,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     private course_data: CourseTaskTreeItem [] = []
 
     // with the vscode.EventEmitter we can refresh our  tree view
-    private m_onDidChangeTreeData: vscode.EventEmitter<CourseTaskTreeItem | undefined> = new vscode.EventEmitter<CourseTaskTreeItem | undefined>();
+    private m_onDidChangeTreeData: vscode.EventEmitter<CourseTaskTreeItem | undefined> = new vscode.EventEmitter<CourseTaskTreeItem | undefined>()
     // // and vscode will access the event by using a readonly onDidChangeTreeData (this member has to be named like here, otherwise vscode doesnt update our treeview.
     readonly onDidChangeTreeData ? : vscode.Event<CourseTaskTreeItem | undefined> = this.m_onDidChangeTreeData.event
 
@@ -37,9 +37,9 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         openDocuments.forEach(document => {
             vscode.window.showTextDocument(document.uri, {preview: true, preserveFocus: false})
                 .then(() => {
-                    return vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-                });
-                    });
+                    return vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+                })
+                    })
     }
 
     // Opens all tasks found in the children of the given item
@@ -105,7 +105,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 fs.readdirSync(rootDir).forEach(element => {
                     // console.log("Reading main course dir")
                     // console.log(element)
-                    let current = path.join(rootDir,element);
+                    let current = path.join(rootDir,element)
                     if (fs.statSync(current).isFile()) {
                         // console.log("Found file instead of course dir!")
                     } else {
@@ -135,7 +135,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 fs.readdirSync(courseDirPath).forEach(element => {
                     // console.log("Reading course items")
                     // console.log(element)
-                    let current = path.join(courseDirPath,element);
+                    let current = path.join(courseDirPath,element)
                     // If the current element is a file, add it to the parents children and stop the recursion
                     if (fs.statSync(current).isFile()) {
                         // console.log("Found file!")
@@ -167,11 +167,11 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // Returns true if succeeds, false on error
     private pathExists(p: string): boolean {
         try {
-            fs.accessSync(p);
+            fs.accessSync(p)
         } catch (err) {
-            return false;
+            return false
         }
-        return true;
+        return true
         }
 
     // Handles clicks on treeview items
@@ -207,21 +207,21 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // we need to implement getTreeItem to receive items from our tree view
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
         let title = item.label? item.label.toString() : ""
-        let result = new vscode.TreeItem(title, item.collapsibleState);
+        let result = new vscode.TreeItem(title, item.collapsibleState)
         result.command = {
             command : 'tide.item_clicked',
             title : title,
             arguments: [item]
         }
-        return result;
+        return result
     }
 
     // and getChildren
     public getChildren(element : CourseTaskTreeItem | undefined): vscode.ProviderResult<CourseTaskTreeItem[]> {
         if (element === undefined) {
-            return this.course_data;
+            return this.course_data
         } else {
-            return element.children;
+            return element.children
         }
     }
 }
@@ -230,30 +230,30 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 class CourseTaskTreeItem extends vscode.TreeItem {
 
     readonly path: string
-    readonly type: string | undefined;
+    readonly type: string | undefined
 
     // children represent branches, which are also items 
-    public children: CourseTaskTreeItem[] = [];
+    public children: CourseTaskTreeItem[] = []
     
     // the label represent the text which is displayed in the tree
     // and is passed to the base class
     // path = path to file or dir
     // type = type of item (file or dir)
     constructor(label: string, path: string, type: "file" | "dir") {
-        super(label);
+        super(label)
         this.path = path
-        this.type = type;
+        this.type = type
         if (this.type === "file") {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.None;
+            this.collapsibleState = vscode.TreeItemCollapsibleState.None
         } else {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
+            this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded
         }
     }
 
     // a public method to add childs, and with additional branches
     // we want to make the item collabsible
     public add_child (child : CourseTaskTreeItem) {
-        // this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
-        this.children.push(child);
+        // this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
+        this.children.push(child)
     }
 }
