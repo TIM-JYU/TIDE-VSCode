@@ -15,6 +15,7 @@
     isLogged: false
   })
 
+  // This might not be doing anything
   /**
    * Listens to messages from the extension.
    */
