@@ -163,7 +163,7 @@
 		"viewsWelcome": [
 			{
 				"view" : "tide-tasks-treeview",
-				"contents": "Login to view courses and tasks!"
+				"contents": "Active courses will show here!"
 			}
 		],
 		"configuration": {

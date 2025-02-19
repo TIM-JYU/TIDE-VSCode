@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
+import UiController from '../UiController'
 
 
 // Class for handling TreeView data
@@ -28,18 +29,17 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
 
     // Empty treeview and close files after a user logs out
-    private wipeTreeAndEditors() {
+    private async wipeTreeAndEditors() {
         this.course_data = []
         this.m_onDidChangeTreeData.fire(undefined)
-        // Somehow there is no close editor method,
-        // this is the only way I found to close open files in the editor
-        const openDocuments = vscode.workspace.textDocuments
-        openDocuments.forEach(document => {
-            vscode.window.showTextDocument(document.uri, {preview: true, preserveFocus: false})
-                .then(() => {
-                    return vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+
+        // Closes open editors
+        const tabGroups = vscode.window.tabGroups.all
+        tabGroups.forEach(async group => {
+            await vscode.window.tabGroups.close(group)
                 })
-                    })
+
+        UiController.closeTaskPanel()
     }
 
     // Opens all tasks found in the children of the given item
@@ -53,23 +53,23 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         } else {
             try {
                 // Open the document
-            vscode.workspace.openTextDocument(item.path).then( document => {
+                vscode.workspace.openTextDocument(item.path).then( document => {
 
-                // Using this we can open multiple files on the same window
-                const showOptions: vscode.TextDocumentShowOptions = {
-                    preserveFocus: false,
-                    preview: false
-                }
-                // Open the document in the editor
-                vscode.window.showTextDocument(document, showOptions).then( editor => {
-                    // first 2 rows are informational, task code starts at row 3(index 2)
-                    let pos = new vscode.Position(2,0)
-                    // set cursos
-                    editor.selection = new vscode.Selection(pos,pos)
-                    // set focus to opened editor
-                    editor.revealRange(new vscode.Range(pos,pos))
+                    // Using this we can open multiple files on the same window
+                    const showOptions: vscode.TextDocumentShowOptions = {
+                        preserveFocus: false,
+                        preview: false
+                    }
+                    // Open the document in the editor
+                    vscode.window.showTextDocument(document, showOptions).then( editor => {
+                        // first 2 rows are informational, task code starts at row 3(index 2)
+                        let pos = new vscode.Position(2,0)
+                        // set cursos
+                        editor.selection = new vscode.Selection(pos,pos)
+                        // set focus to opened editor
+                        editor.revealRange(new vscode.Range(pos,pos))
+                    })
                 })
-            })
             } catch {
                 vscode.window.showErrorMessage("Error opening documents. Refreshing treeview")
                 this.refreshTree()

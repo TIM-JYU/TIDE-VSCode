@@ -24,6 +24,7 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
    * If they click another text document open, the task panel opens.
    */
   const textEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+
     if (editor && editor !== lastActiveEditor) {
       if (editor.document && editor.document.uri.scheme === 'file') {
         lastActiveEditor = editor
