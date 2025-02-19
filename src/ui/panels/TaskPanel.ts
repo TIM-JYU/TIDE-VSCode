@@ -251,9 +251,15 @@ export default class TaskPanel {
       await this.sendWorkspaceName()
       if (timData !== undefined) {
         this.sendTimData(timData)
-  
-        const taskPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-        this.sendTaskPoints(taskPoints)
+
+        // If the task can score points, show points
+        if (timData.max_points) {
+          const taskPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+          this.sendTaskPoints(taskPoints)
+        } else {
+          // Otherwise send undefined so the scores aren't shown
+          this.sendTaskPoints(undefined)
+        }
       }
     } catch (error) {
       console.log(error)
