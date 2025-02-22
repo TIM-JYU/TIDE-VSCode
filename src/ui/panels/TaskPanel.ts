@@ -181,6 +181,7 @@ export default class TaskPanel {
    *
    */
   private async getTimData(): Promise<TimData | undefined> {
+
     switch (TaskPanel.lastActiveTextEditor) {
       case undefined: {
         return undefined
@@ -207,17 +208,20 @@ export default class TaskPanel {
   }
 
   private async sendLoginData() {
+
     const loginData = ExtensionStateManager.getLoginData()
     const loginDataMsg: WebviewMessage = { type: 'LoginData', value: loginData }
     await this.panel.webview.postMessage(loginDataMsg)
   }
 
   private async sendTimData(timData: TimData | undefined) {
+
     const timDataMsg: WebviewMessage = { type: 'UpdateTimData', value: timData }
     await this.panel.webview.postMessage(timDataMsg)
   }
 
   private async sendWorkspaceName() {
+
     const wsNameDataMsg: WebviewMessage = {
       type: 'UpdateWorkspaceName',
       value: vscode.workspace.name,
@@ -226,6 +230,7 @@ export default class TaskPanel {
   }
 
   private sendTaskPoints(points: TaskPoints | undefined) {
+    
     const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points }
     this.panel.webview.postMessage(taskPointsMsg)
   }
@@ -237,18 +242,29 @@ export default class TaskPanel {
   }
 
   private async update() {
-    const webview = this.panel.webview
-    this.panel.webview.html = this.getHtmlForWebview(webview)
-    // The order of calling the functions below seems to matter for magical reasons.
-    const timData: TimData | undefined = await this.getTimData()
-    await this.sendLoginData()
-    await this.sendWorkspaceName()
-    if (timData !== undefined) {
-      this.sendTimData(timData)
+    try {
+      const webview = this.panel.webview
+      this.panel.webview.html = this.getHtmlForWebview(webview)
+      // The order of calling the functions below seems to matter for magical reasons.
+      const timData: TimData | undefined = await this.getTimData()
+      await this.sendLoginData()
+      await this.sendWorkspaceName()
+      if (timData !== undefined) {
+        this.sendTimData(timData)
 
-      const taskPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-      this.sendTaskPoints(taskPoints)
+        // If the task can score points, show points
+        if (timData.max_points) {
+          const taskPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+          this.sendTaskPoints(taskPoints)
+        } else {
+          // Otherwise send undefined so the scores aren't shown
+          this.sendTaskPoints(undefined)
+        }
+      }
+    } catch (error) {
+      console.log(error)
     }
+    
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {
