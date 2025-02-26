@@ -26,6 +26,13 @@
       type: 'OpenWorkspace',
       value: taskset.downloadPath,
     })
+    window.addEventListener('message', (event) => {
+      const message = event.data;
+
+      if (message.type === 'WorkspaceError') {
+        taskset.downloadPath = undefined;
+      }
+    });
   }
 </script>
 

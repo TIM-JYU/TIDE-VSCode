@@ -7,6 +7,7 @@
  * @date 22.3.2024
  */
 import * as vscode from 'vscode'
+import * as fs from 'fs'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
@@ -154,7 +155,16 @@ export default class CoursePanel {
           break
         }
         case 'OpenWorkspace': {
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(msg.value))
+          const workspacePath = msg.value;
+          //check that the local folder exists
+          if (!fs.existsSync(workspacePath)) {
+            vscode.window.showErrorMessage(`Path does not exist: ${workspacePath} \n Download taskset` );
+              this.panel.webview.postMessage({
+              type: 'WorkspaceError',
+            });
+            return;
+          }
+          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(workspacePath))
           break
         }
         case 'RequestLoginData': {
