@@ -155,16 +155,16 @@ export default class CoursePanel {
           break
         }
         case 'OpenWorkspace': {
-          const workspacePath = msg.value;
+          const tasksetPath = msg.value;
           //check that the local folder exists
-          if (!fs.existsSync(workspacePath)) {
-            vscode.window.showErrorMessage(`Path does not exist: ${workspacePath} \n Download taskset` );
+          if (!fs.existsSync(tasksetPath)) {
+            vscode.window.showErrorMessage(`Path does not exist: ${tasksetPath} \n Please download the taskset` );
               this.panel.webview.postMessage({
               type: 'WorkspaceError',
             });
             return;
           }
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(workspacePath))
+          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(tasksetPath))
           break
         }
         case 'RequestLoginData': {
