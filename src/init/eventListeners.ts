@@ -11,8 +11,7 @@ import * as vscode from 'vscode'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
 import UiController from '../ui/UiController'
-import TaskPanel from '../ui/panels/TaskPanel'
-import { NewTaskPanelProvider } from '../ui/panels/NewTaskPanel'
+import { TaskPanelProvider } from '../ui/panels/TaskPanelProvider'
 import { editableAreaEventListener, isBycodeTaskFile } from '../editor/editableArea'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
@@ -26,13 +25,13 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
    */
   const textEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
 
-  NewTaskPanelProvider.updateCurrentActiveEditor(editor)
+  TaskPanelProvider.updateCurrentActiveEditor(editor)
 
     if (editor && editor !== lastActiveEditor) {
       if (editor.document && editor.document.uri.scheme === 'file') {
         lastActiveEditor = editor
 
-        TaskPanel.updateLastActiveEditor(lastActiveEditor)
+        //TaskPanelProvider.updateLastActiveEditor(lastActiveEditor)
 
         UiController.showTaskPanel()
 

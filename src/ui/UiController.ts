@@ -7,7 +7,7 @@
  * @date 2.5.2024
  */
 import * as vscode from 'vscode'
-import TaskPanel from './panels/TaskPanel'
+import { TaskPanelProvider } from './panels/TaskPanelProvider'
 import CoursePanel from './panels/CoursePanel'
 
 export default class UiController {
@@ -23,14 +23,14 @@ export default class UiController {
    * @param submitPath - the path that is needed if answer is submitted.
    */
   static showTaskPanel() {
-    TaskPanel.createOrShow(this.ctx.extensionUri)
+    //TaskPanelProvider.createOrShow(this.ctx.extensionUri)
   }
 
   /**
    * Closes the task panel.
    */
   static closeTaskPanel() {
-    TaskPanel.dispose()
+    //TaskPanelProvider.dispose()
   }
 
   /**

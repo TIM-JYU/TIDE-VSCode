@@ -10,7 +10,7 @@ import UiController from '../UiController'
 /**
  * Class for providing the Taskpanel menu into the extensions sidemenu
  */
-export class NewTaskPanelProvider implements vscode.WebviewViewProvider {
+export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
     _view?: vscode.WebviewView
 
@@ -53,8 +53,8 @@ export class NewTaskPanelProvider implements vscode.WebviewViewProvider {
                 case 'SubmitTask': {
                     vscode.commands.executeCommand('workbench.action.files.save')
                     // Required arguments: (taskPath: string, callback: () => any)
-                    if (NewTaskPanelProvider.activeTextEditor) {
-                        const data = await Tide.submitTask(path.dirname(NewTaskPanelProvider.activeTextEditor.document.fileName), this.onSubmitTask.bind(this))
+                    if (TaskPanelProvider.activeTextEditor) {
+                        const data = await Tide.submitTask(path.dirname(TaskPanelProvider.activeTextEditor.document.fileName), this.onSubmitTask.bind(this))
                         break
                     } else {
                         break
@@ -92,8 +92,8 @@ export class NewTaskPanelProvider implements vscode.WebviewViewProvider {
                     break
                 }
                 case 'ResetNoneditableAreas': {
-                    if (NewTaskPanelProvider.activeTextEditor) {
-                        Tide.resetNoneditableAreas(NewTaskPanelProvider.activeTextEditor.document.uri.path.toString())
+                    if (TaskPanelProvider.activeTextEditor) {
+                        Tide.resetNoneditableAreas(TaskPanelProvider.activeTextEditor.document.uri.path.toString())
                     }
                     
                 }
