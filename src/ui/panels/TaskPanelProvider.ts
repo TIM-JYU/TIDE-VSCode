@@ -114,7 +114,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
-        return getDefaultHtmlForWebview(webview, this._extensionUri, 'taskPanel')
+        return getDefaultHtmlForWebview(webview, this._extensionUri, 'TaskPanel')
     }
 
     public static updateCurrentActiveEditor(editor: vscode.TextEditor | undefined) {
