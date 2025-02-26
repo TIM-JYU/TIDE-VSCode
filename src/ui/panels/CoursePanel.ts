@@ -123,6 +123,7 @@ export default class CoursePanel {
           break
         }
         case 'SetDownloadPath': {
+          
           let newPath: vscode.Uri[] | undefined = await vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
@@ -131,7 +132,7 @@ export default class CoursePanel {
           })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
-            const previousPath = ExtensionStateManager.getDownloadPath()
+           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '');
             if (previousPath) {
               newPath = [vscode.Uri.file(previousPath)]
             }
@@ -203,7 +204,7 @@ export default class CoursePanel {
   private update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
-    const path = ExtensionStateManager.getDownloadPath()
+    const path = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     this.sendInitialPath()
     this.panel.webview.postMessage({
       type: 'SetDownloadPathResult',

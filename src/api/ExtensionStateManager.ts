@@ -26,24 +26,6 @@ export default class ExtensionStateManager {
     this.globalState = ctx.globalState
   }
 
-  // TODO: why is download path written in globalstate when it is defined in settings (from where it can be read from, too)
-
-  /**
-   * Sets the path for downloading tasks to the Global State.
-   * @param path - The path where the tasks will be downloaded.
-   */
-  static setDownloadPath(path: string) {
-    this.writeToGlobalState(StateKey.DownloadPath, path)
-  }
-
-  /**
-   * Retrieves the download path from the Global State.
-   * @returns The download path stored in the Global State.
-   */
-  static getDownloadPath(): string {
-    return this.readFromGlobalState(StateKey.DownloadPath)
-  }
-
   /**
    * Sets the courses data in the global state.
    * @param courses - An array containing the course data to be stored.
@@ -148,7 +130,6 @@ export default class ExtensionStateManager {
     this.writeToGlobalState(StateKey.Courses, undefined)
     this.writeToGlobalState(StateKey.LoginData, undefined)
     this.writeToGlobalState(StateKey.TaskPoints, undefined)
-    this.writeToGlobalState(StateKey.DownloadPath, undefined)
   }
 
   /**
@@ -259,10 +240,9 @@ interface NotifyFunction {
 }
 
 
-// type StateKey = 'courses' | 'downloadPath' | 'loginData' | 'taskPoints'
+// type StateKey = 'courses' | 'loginData' | 'taskPoints'
 export enum StateKey {
   Courses = 'courses',
-  DownloadPath = 'downloadPath',
   LoginData = 'loginData',
   TaskPoints = 'taskPoints'
 }
