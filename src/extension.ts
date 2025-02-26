@@ -17,6 +17,7 @@ import { SidebarProvider } from './ui/panels/SidebarProvider'
 import ExtensionStateManager from './api/ExtensionStateManager'
 import UiController from './ui/UiController'
 import { CourseTaskProvider } from './ui/panels/TaskExplorerProvider'
+import { NewTaskPanelProvider } from './ui/panels/NewTaskPanel'
 
 // This method is called when your extension is activated
 export function activate(ctx: vscode.ExtensionContext) {
@@ -39,6 +40,9 @@ export function activate(ctx: vscode.ExtensionContext) {
   if (ExtensionStateManager.getLoginData().isLogged) {
     vscode.commands.executeCommand('tide.refreshTree')
   }
+
+  const taskPanelProvider = new NewTaskPanelProvider(ctx.extensionUri)
+  ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider))
 }
 
 // This method is called when your extension is deactivated
