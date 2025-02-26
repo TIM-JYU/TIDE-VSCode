@@ -12,6 +12,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
 import UiController from '../ui/UiController'
 import TaskPanel from '../ui/panels/TaskPanel'
+import { NewTaskPanelProvider } from '../ui/panels/NewTaskPanel'
 import { editableAreaEventListener, isBycodeTaskFile } from '../editor/editableArea'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
@@ -24,6 +25,8 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
    * If they click another text document open, the task panel opens.
    */
   const textEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+
+  NewTaskPanelProvider.updateCurrentActiveEditor(editor)
 
     if (editor && editor !== lastActiveEditor) {
       if (editor.document && editor.document.uri.scheme === 'file') {

@@ -154,6 +154,11 @@
 					"contextualTitle": "TIM-IDE"
 				},
 				{
+					"type": "webview",
+					"id": "tide-taskpanel",
+					"name": "Taskpanel"
+				},
+				{
 					"id": "tide-tasks-treeview",
 					"name": "Courses"
 				}

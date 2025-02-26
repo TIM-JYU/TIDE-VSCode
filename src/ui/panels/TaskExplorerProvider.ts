@@ -208,11 +208,15 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
         let title = item.label? item.label.toString() : ""
         let result = new vscode.TreeItem(title, item.collapsibleState)
+        // This finally showed the icon
+        // TODO: Logic for choosing the right icon
+        let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
         result.command = {
             command : 'tide.item_clicked',
             title : title,
-            arguments: [item]
+            arguments: [item],
         }
+        result.iconPath = iconPath
         return result
     }
 
@@ -239,9 +243,9 @@ class CourseTaskTreeItem extends vscode.TreeItem {
     // and is passed to the base class
     // path = path to file or dir
     // type = type of item (file or dir)
-    constructor(label: string, path: string, type: "file" | "dir") {
+    constructor(label: string, itemPath: string, type: "file" | "dir") {
         super(label)
-        this.path = path
+        this.path = itemPath
         this.type = type
         if (this.type === "file") {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None
