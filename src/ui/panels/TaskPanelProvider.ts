@@ -17,7 +17,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     private static activeTextEditor: vscode.TextEditor | undefined
 
     constructor(private readonly _extensionUri: vscode.Uri) {
-        ExtensionStateManager.subscribe(StateKey.LoginData , this.sendLoginValue.bind(this))
+        ExtensionStateManager.subscribe(StateKey.LoginData , this.sendLoginData.bind(this))
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -29,11 +29,11 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             enableScripts: true,
       
             localResourceRoots: [this._extensionUri],
-          }
+        }
 
-          webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
+        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
-          webviewView.webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
+        webviewView.webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
             // When a Webviewmessage is recieved, execute the appropriate command
             switch (msg.type) {
                 case 'OnInfo': {
@@ -109,7 +109,8 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
                     )
                 }
             }
-          })
+        })
+        this.sendLoginData();
 
     }
 
@@ -119,24 +120,24 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
     public static updateCurrentActiveEditor(editor: vscode.TextEditor | undefined) {
         this.activeTextEditor = editor
-      }
+    }
 
     /**
-   * Sends data to Sidebar if user's login is successful or not.
-   * @param json_array JSON array from login data.
-   */
+    * Sends data to Sidebar if user's login is successful or not.
+    * @param json_array JSON array from login data.
+    */
     public sendLoginValue(loginData: LoginData) {
         this._view?.webview.postMessage({
           type: 'LoginData',
           value: loginData,
         })
-      }
+    }
 
     // Testing required
     private async onSubmitTask() {
-    // TODO: logic for informing about success/failure while submitting task
-    const msg: WebviewMessage = { type: 'SubmitResult', value: true}
-    await this._view?.webview.postMessage(msg)
+        // TODO: logic for informing about success/failure while submitting task
+        const msg: WebviewMessage = { type: 'SubmitResult', value: true}
+        await this._view?.webview.postMessage(msg)
     }
 
     // Testing required
@@ -148,12 +149,12 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
     // Testing required
     private sendTaskPoints(points: TaskPoints | undefined) {    
-    const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points }
-    this._view?.webview.postMessage(taskPointsMsg)
+        const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points }
+        this._view?.webview.postMessage(taskPointsMsg)
     }
 
     public revive(panel: vscode.WebviewView) {
         this._view = panel
-      }
+    }
 
 }
