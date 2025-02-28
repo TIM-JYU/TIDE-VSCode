@@ -1,117 +1,94 @@
 import * as vscode from 'vscode'
-import ExtensionStateManager, {StateKey} from '../../api/ExtensionStateManager'
-import { LoginData, TaskPoints, WebviewMessage } from '../../common/types'
+import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
+import { LoginData, TaskPoints, WebviewMessage, TimData } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Tide from '../../api/tide'
 import path from 'path'
 import Logger from '../../utilities/logger'
 import UiController from '../UiController'
 
-/**
- * Class for providing the Taskpanel menu into the extensions sidemenu
- */
 export class TaskPanelProvider implements vscode.WebviewViewProvider {
-
     _view?: vscode.WebviewView
 
     private static activeTextEditor: vscode.TextEditor | undefined
 
     constructor(private readonly _extensionUri: vscode.Uri) {
-        ExtensionStateManager.subscribe(StateKey.LoginData , this.sendLoginData.bind(this))
+        ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this))
+
+        vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+            TaskPanelProvider.updateCurrentActiveEditor(editor);
+            if (editor) {
+                const timData = await this.getTimData();
+                this.sendTimData(timData);
+            }
+        });
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView) {
         this._view = webviewView
 
-        // Might include unnecessary stuff
         webviewView.webview.options = {
-            // Allow scripts in the webview
             enableScripts: true,
-      
             localResourceRoots: [this._extensionUri],
         }
 
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
         webviewView.webview.onDidReceiveMessage(async (msg: WebviewMessage) => {
-            // When a Webviewmessage is recieved, execute the appropriate command
             switch (msg.type) {
-                case 'OnInfo': {
-                    if (!msg.value) {
-                        return
+                case 'OnInfo':
+                    if (msg.value) {
+                        vscode.window.showInformationMessage(msg.value)
                     }
-                    vscode.window.showInformationMessage(msg.value)
                     break
-                }
-                case 'OnError': {
-                    if (!msg.value) {
-                        return
+                case 'OnError':
+                    if (msg.value) {
+                        UiController.showError(msg.value)
                     }
-                    UiController.showError(msg.value)
                     break
-                }
-                case 'SubmitTask': {
+                case 'SubmitTask':
                     vscode.commands.executeCommand('workbench.action.files.save')
-                    // Required arguments: (taskPath: string, callback: () => any)
                     if (TaskPanelProvider.activeTextEditor) {
-                        const data = await Tide.submitTask(path.dirname(TaskPanelProvider.activeTextEditor.document.fileName), this.onSubmitTask.bind(this))
-                        break
-                    } else {
-                        break
+                        await Tide.submitTask(
+                            path.dirname(TaskPanelProvider.activeTextEditor.document.fileName), 
+                            this.onSubmitTask.bind(this)
+                        )
                     }
-                }
-                case 'ShowOutput': {
+                    break
+                case 'ShowOutput':
                     vscode.commands.executeCommand('workbench.action.output.toggleOutput')
                     vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup')
                     break
-                }
-                case 'ResetExercise': {
-                    vscode.window
-                    .showInformationMessage(
+                case 'ResetExercise':
+                    vscode.window.showInformationMessage(
                         'Are you sure you want to reset exercise? All unsubmitted changes will be lost.',
-                        'Continue',
-                        'Cancel',
-                    )
-                    .then((answer) => {
-                        // Testing required
+                        'Continue', 'Cancel'
+                    ).then((answer) => {
                         if (answer === 'Continue') {
-                        let taskSetPath = msg.value.path
-                        let taskId = msg.value.taskId
-                        let fileLocation = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
-                        // TODO: proper error handling
-                        if (fileLocation) {
-                            vscode.commands.executeCommand(
-                            'tide.resetExercise',
-                            taskSetPath,
-                            taskId,
-                            fileLocation,
-                            )
-                        }
+                            let taskSetPath = msg.value.path
+                            let taskId = msg.value.taskId
+                            let fileLocation = ExtensionStateManager.getTaskSetDownloadPath(taskSetPath)
+                            if (fileLocation) {
+                                vscode.commands.executeCommand(
+                                    'tide.resetExercise', taskSetPath, taskId, fileLocation
+                                )
+                            }
                         }
                     })
                     break
-                }
-                case 'ResetNoneditableAreas': {
-                    if (TaskPanelProvider.activeTextEditor) {
-                        Tide.resetNoneditableAreas(TaskPanelProvider.activeTextEditor.document.uri.path.toString())
-                    }
-                    
-                }
-                case 'RequestLoginData': {
+                case 'RequestLoginData':
                     this.sendLoginData()
-                }
-                case 'UpdateTaskPoints': {
-                    // TODO: clean up and reorganize and type
+                    break
+                case 'UpdateTaskPoints':
                     Tide.getTaskPoints(
-                    msg.value.taskSetPath,
-                    msg.value.ideTaskId,
-                    this.sendTaskPoints.bind(this),
+                        msg.value.taskSetPath,
+                        msg.value.ideTaskId,
+                        this.sendTaskPoints.bind(this)
                     )
-                }
+                    break
             }
         })
         this.sendLoginData();
-
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
@@ -119,42 +96,57 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     }
 
     public static updateCurrentActiveEditor(editor: vscode.TextEditor | undefined) {
-        this.activeTextEditor = editor
+        this.activeTextEditor = editor;
     }
 
-    /**
-    * Sends data to Sidebar if user's login is successful or not.
-    * @param json_array JSON array from login data.
-    */
     public sendLoginValue(loginData: LoginData) {
         this._view?.webview.postMessage({
-          type: 'LoginData',
-          value: loginData,
+            type: 'LoginData',
+            value: loginData,
         })
     }
 
-    // Testing required
     private async onSubmitTask() {
-        // TODO: logic for informing about success/failure while submitting task
-        const msg: WebviewMessage = { type: 'SubmitResult', value: true}
+        const msg: WebviewMessage = { type: 'SubmitResult', value: true }
         await this._view?.webview.postMessage(msg)
     }
 
-    // Testing required
     private async sendLoginData() {    
         const loginData = ExtensionStateManager.getLoginData()
         const loginDataMsg: WebviewMessage = { type: 'LoginData', value: loginData }
         await this._view?.webview.postMessage(loginDataMsg)
     }
 
-    // Testing required
     private sendTaskPoints(points: TaskPoints | undefined) {    
         const taskPointsMsg: WebviewMessage = { type: 'TaskPoints', value: points }
         this._view?.webview.postMessage(taskPointsMsg)
     }
 
+    private async getTimData(): Promise<TimData | undefined> {
+        if (!TaskPanelProvider.activeTextEditor) {
+            return undefined;
+        }
+        try {
+            const doc = TaskPanelProvider.activeTextEditor.document
+            const currentFile = doc.fileName
+            const currentDir = path.dirname(currentFile)
+            const taskId = path.basename(currentDir)
+            const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata')
+            const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
+            const timDataCourse = JSON.parse(timDataContent.toString())
+            const coursePath = Object.keys(timDataCourse.course_parts)[0]
+            return timDataCourse.course_parts[coursePath].tasks[taskId]
+        } catch {
+            return undefined
+        }
+    }
+
+    private async sendTimData(timData: TimData | undefined) {
+        const timDataMsg: WebviewMessage = { type: 'UpdateTimData', value: timData }
+        await this._view?.webview.postMessage(timDataMsg)
+    }
+
     public revive(panel: vscode.WebviewView) {
         this._view = panel
     }
-
 }
