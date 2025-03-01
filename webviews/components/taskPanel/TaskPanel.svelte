@@ -146,7 +146,6 @@ This component manages the display of task information and interaction with task
   <span class="loader"></span>
 {:else}
   <div class="task-panel">
-    <h1>{workspace} - {timData.ide_task_id}</h1>
     {#if timData.header !== null}
       <h2>{timData.header}</h2>
     {:else}
@@ -156,7 +155,7 @@ This component manages the display of task information and interaction with task
       {#if timData.stem !== null}
         <p>{timData.stem}</p>
       {:else}
-        <p>To see the instructions, please open the exercise in TIM.</p>
+        <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
     </div>
 
