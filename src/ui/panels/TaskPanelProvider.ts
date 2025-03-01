@@ -21,7 +21,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             if (editor) {
                 const timData = await this.getTimData()
                 this.sendTimData(timData)
-                console.log(timData)
                 if (timData?.path && timData?.ide_task_id) {
                     Tide.getTaskPoints(timData.path, timData.ide_task_id, this.sendTaskPoints.bind(this))
                 }
