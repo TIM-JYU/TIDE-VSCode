@@ -17,10 +17,14 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this))
 
         vscode.window.onDidChangeActiveTextEditor(async (editor) => {
-            TaskPanelProvider.activeTextEditor = editor;
+            TaskPanelProvider.activeTextEditor = editor
             if (editor) {
-                const timData = await this.getTimData();
-                this.sendTimData(timData);
+                const timData = await this.getTimData()
+                this.sendTimData(timData)
+                console.log(timData)
+                if (timData?.path && timData?.ide_task_id) {
+                    Tide.getTaskPoints(timData.path, timData.ide_task_id, this.sendTaskPoints.bind(this))
+                }
             }
         });
     }
