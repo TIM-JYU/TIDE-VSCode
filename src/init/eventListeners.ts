@@ -16,19 +16,16 @@ export function registerEventListeners(ctx: vscode.ExtensionContext) {
   /**
    * Listens to changes in configuration.
    */
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    if (event.affectsConfiguration('TIM-IDE.fileDownloadPath')) {
+  vscode.workspace.onDidChangeConfiguration((event) => 
+  {
+    if (event.affectsConfiguration('TIM-IDE.fileDownloadPath')) 
+    {
       // Get the new value of fileDownloadPath
-      const newPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
-
-      // Update ExtensionStateManager with the new path
-      // TODO: Why is the download path stored in ExtensionStateManager when it is available in the settings?
-      if (typeof newPath === 'string') {
-        ExtensionStateManager.setDownloadPath(newPath)
-      } else {
-        // Handle invalid or undefined newPath
-        Logger.warning('Undefined download path')
+      const newPath = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath');
+      if (typeof newPath !== 'string') 
+      {
+        Logger.warning('Undefined download path');
       }
     }
-  })
+  });
 }
