@@ -4,8 +4,8 @@
 
 <style>
   .spinner {
-    width: 1rem;
-    height: 1rem;
+    width: 1em;
+    height: 1em;
     border: 0.25rem solid #000000;
     border-top-color: transparent;
     border-radius: 50%;
