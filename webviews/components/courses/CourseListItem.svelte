@@ -41,7 +41,7 @@
 
 <div class="course-box">
   <header>
-    <p class="courseTitle">{course.name}</p>
+    <p class="course-title">{course.name}</p>
     <Menu>
       {#snippet toggle()}
             <span >&#8942;</span>
@@ -67,22 +67,29 @@
   </button>
   {#if isExpanded}
     <div class="course-content">
-      <table>
-        <thead>
-          <tr>
-            <th>Task set</th>
-            <th>Number of exercises</th>
-            <!-- <th>Points</th> -->
-          </tr>
-        </thead>
-        <tbody>
-          {#each course.taskSets as taskset}
+      <div class="course-summary">
+        <p>Course summary</p>
+        <table>
+          <thead>
             <tr>
-              <TasksetTableRow {taskset} {isLoggedIn} />
+              <th>Task set</th>
+              <th>Number of exercises</th>
+              <!-- <th>Deadline</th> -->
+              <!-- <th>Done</th> -->
             </tr>
-          {/each}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {#each course.taskSets as taskset}
+              <tr>
+                <TasksetTableRow {taskset} {isLoggedIn} />
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+      <div class="task-details">
+        <p>Task set details</p>
+      </div>
     </div>
   {/if}
 </div>
@@ -102,7 +109,7 @@
     box-sizing: border-box;
   }
 
-  .courseTitle {
+  .course-title {
     margin-left: 1.5rem;
     margin-top: 1.5rem;
   }
@@ -168,6 +175,16 @@
     box-sizing: content-box;
   }
 
+  .course-content p{
+    margin-left: 1.5rem;
+    margin-top: 1.5rem;
+    font-size: smaller;
+  }
+
+  .course-summary {
+    border-top: 1px solid rgb(116, 116, 116);
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -190,4 +207,8 @@
   tbody tr:nth-child(even) {
     background-color: #444444;
   }
+
+  .task-details {
+  }
+
 </style>
