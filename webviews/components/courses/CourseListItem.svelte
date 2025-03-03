@@ -72,8 +72,6 @@
             <th>Task set</th>
             <th>Number of exercises</th>
             <!-- <th>Points</th> -->
-            <th></th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
