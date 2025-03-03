@@ -62,4 +62,18 @@
   #name-cell {
     text-align: left;
   }
+
+  button {
+    background-color:rgb(0, 111, 185);
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+  }
+
+  button:hover {
+    background-color:rgb(0, 83, 138);
+  }
 </style>
