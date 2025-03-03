@@ -175,6 +175,11 @@
 				"TIM-IDE.cliPath": {
 					"type": "string",
 					"description": "Path to CLI tool"
+				},
+				"TIM-IDE.customUrl": {
+					"type": "string",
+					"default": "",
+					"description": "Custom URL for the tide CLI. Leave empty for the default https://tim.jyu.fi"
 				}
 			}
 		}
