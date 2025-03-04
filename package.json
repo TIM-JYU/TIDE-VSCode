@@ -27,7 +27,7 @@
 				{
 					"command": "tide.showTaskPanel",
 					"group": "navigation"
-				}				
+				}
 			],
 			"view/title": [
 				{
@@ -134,7 +134,6 @@
 				"command": "tide.wipeTreeAndEditors",
 				"title": "Empty course task treeview and close files"
 			}
-
 		],
 		"viewsContainers": {
 			"activitybar": [
@@ -167,7 +166,7 @@
 		},
 		"viewsWelcome": [
 			{
-				"view" : "tide-tasks-treeview",
+				"view": "tide-tasks-treeview",
 				"contents": "Active courses will show here!"
 			}
 		],
@@ -216,6 +215,7 @@
 		"rollup-plugin-svelte": "^7.2.2",
 		"svelte": "^5.19.9",
 		"svelte-preprocess": "^6.0.3",
-		"typescript": "^5.7.3"
+		"typescript": "^5.7.3",
+		"tslib": "^2.5.0"
 	}
 }

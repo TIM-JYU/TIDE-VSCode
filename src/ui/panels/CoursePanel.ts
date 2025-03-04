@@ -7,6 +7,7 @@
  * @date 22.3.2024
  */
 import * as vscode from 'vscode'
+import * as fs from 'fs'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
@@ -123,6 +124,7 @@ export default class CoursePanel {
           break
         }
         case 'SetDownloadPath': {
+          
           let newPath: vscode.Uri[] | undefined = await vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
@@ -131,7 +133,7 @@ export default class CoursePanel {
           })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
-            const previousPath = ExtensionStateManager.getDownloadPath()
+           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '');
             if (previousPath) {
               newPath = [vscode.Uri.file(previousPath)]
             }
@@ -154,7 +156,16 @@ export default class CoursePanel {
           break
         }
         case 'OpenWorkspace': {
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(msg.value))
+          const tasksetPath = msg.value;
+          //check that the local folder exists
+          if (!fs.existsSync(tasksetPath)) {
+            vscode.window.showErrorMessage(`Path does not exist: ${tasksetPath} \n Please download the taskset` );
+              this.panel.webview.postMessage({
+              type: 'WorkspaceError',
+            });
+            return;
+          }
+          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(tasksetPath))
           break
         }
         case 'RequestLoginData': {
@@ -203,7 +214,7 @@ export default class CoursePanel {
   private update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
-    const path = ExtensionStateManager.getDownloadPath()
+    const path = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     this.sendInitialPath()
     this.panel.webview.postMessage({
       type: 'SetDownloadPathResult',

@@ -4,9 +4,9 @@
 
 <style>
   .spinner {
-    width: 1rem;
-    height: 1rem;
-    border: 0.25rem solid #000000;
+    width: 0.8em;
+    height: 0.8em;
+    border: 0.25em solid currentColor;
     border-top-color: transparent;
     border-radius: 50%;
     display: inline-block;
