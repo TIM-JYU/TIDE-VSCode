@@ -206,11 +206,11 @@ export default class Tide {
     let errorBuffer = ''
 
     // Use a copy of process.env to pass custom url to the child process 
-    const env_modified = {...process.env};
+    const env_modified = {...process.env}
     
-    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string;
+    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string
     if (customUrl && customUrl.trim() !== "") {
-      env_modified.URL = customUrl;
+      env_modified.URL = customUrl
     }
     else {
       env_modified.URL = "https://tim.jyu.fi/"
