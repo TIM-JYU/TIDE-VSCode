@@ -60,23 +60,11 @@
         case 'SubmitResult': {
           // Todo: This tries to show points, but it's not yet implemented
           onTaskSubmitted()
-          console.log(message.value)
           break
         }
       }
     })
   })
-
-  /**
-   * Sends message to TaskPanel about submitting exercise
-   */
-  function submitTask() {
-    const msg: WebviewMessage = {
-      type: 'SubmitTask',
-      value: undefined,
-    }
-    tsvscode.postMessage(msg)
-  }
 
   function onTaskSubmitted() {
     updateTaskPoints()
@@ -175,8 +163,6 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <!-- Why are submit and show output buttons in "points-section"? -->
-    <button class="submit-exercise" onclick={submitTask} disabled={!isLoggedIn}
-    >Submit Exercise</button>
     <button onclick={showOutput}>Show Output</button>
     <!-- <p>Passed Tests</p>
       <div class="progress-bar">

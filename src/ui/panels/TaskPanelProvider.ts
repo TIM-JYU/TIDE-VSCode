@@ -53,9 +53,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             case 'OnError':
                 msg.value && UiController.showError(msg.value)
                 break
-            case 'SubmitTask':
-                await this.handleSubmitTask()
-                break
             case 'ShowOutput':
                 vscode.commands.executeCommand('workbench.action.output.toggleOutput')
                 vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup')
@@ -109,21 +106,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
      */
     private async sendTimData(timData: TimData | undefined) {
         await this._view?.webview.postMessage({ type: 'UpdateTimData', value: timData })
-    }
-
-    /**
-     * Handles task submission.
-     */
-    private async handleSubmitTask() {
-        vscode.commands.executeCommand('workbench.action.files.save')
-        if (TaskPanelProvider.activeTextEditor) {
-            await Tide.submitTask(
-                path.dirname(TaskPanelProvider.activeTextEditor.document.fileName), 
-                async () => {
-                    await this._view?.webview.postMessage({ type: 'SubmitResult', value: true })
-                }
-            )
-        }
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {

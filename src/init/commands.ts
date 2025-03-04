@@ -55,7 +55,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return;
       }
       const taskPath = editor.document.uri.fsPath;
-      
       // TODO: callback should maybe be a show output function
       const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
       Tide.submitTask(taskPath, callback)

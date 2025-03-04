@@ -15,6 +15,8 @@ import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
+import { get } from 'http'
+
 
 export default class Tide {
   public static async debug() {
@@ -156,7 +158,9 @@ export default class Tide {
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
-      Logger.debug(data)
+      const pathSplit = taskPath.split(path.sep)
+      Logger.debug(pathSplit)
+      this.getTaskPoints(taskPath, pathSplit[-2], undefined)
       callback()
     })
   }
