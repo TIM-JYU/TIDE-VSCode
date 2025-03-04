@@ -16,28 +16,10 @@ export default class UiController {
   static init(ctx: vscode.ExtensionContext) {
     this.ctx = ctx
   }
-
-  /**
-   * Creates or shows task panel.
-   * @param timDataJson - .timdata file from the task.
-   * @param submitPath - the path that is needed if answer is submitted.
-   */
-  static showTaskPanel() {
-    //TaskPanelProvider.createOrShow(this.ctx.extensionUri)
-  }
-
-  /**
-   * Closes the task panel.
-   */
-  static closeTaskPanel() {
-    //TaskPanelProvider.dispose()
-  }
-
   /**
    * Creates or shows the course panel, and closes the task panel.
    */
   static showCoursePanel() {
-    this.closeTaskPanel()
     CoursePanel.createOrShow(this.ctx.extensionUri)
   }
 

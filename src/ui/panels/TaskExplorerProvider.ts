@@ -38,8 +38,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         tabGroups.forEach(async group => {
             await vscode.window.tabGroups.close(group)
                 })
-
-        UiController.closeTaskPanel()
     }
 
     // Opens all tasks found in the children of the given item
