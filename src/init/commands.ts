@@ -141,4 +141,14 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       ExtensionStateManager.reset()
     }),
   )
+
+  /**
+   * Opens TIDE Logs into Output panel.
+   */
+  ctx.subscriptions.push(
+    vscode.commands.registerCommand('tide.showOutput', () => {
+      vscode.commands.executeCommand('workbench.panel.output.focus')
+      vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup')
+    }),
+  )
 }

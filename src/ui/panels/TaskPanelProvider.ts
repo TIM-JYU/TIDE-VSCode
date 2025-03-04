@@ -53,10 +53,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             case 'OnError':
                 msg.value && UiController.showError(msg.value)
                 break
-            case 'ShowOutput':
-                vscode.commands.executeCommand('workbench.action.output.toggleOutput')
-                vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup')
-                break
             case 'RequestLoginData':
                 this.sendLoginData()
                 break

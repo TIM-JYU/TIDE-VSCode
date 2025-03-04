@@ -127,6 +127,11 @@
 			{
 				"command": "tide.wipeTreeAndEditors",
 				"title": "Empty course task treeview and close files"
+			},
+			{
+				"command": "tide.showOutput",
+				"title": "Opens TIDE Logs into Output panel.",
+				"category": "TIM-IDE"
 			}
 		],
 		"viewsContainers": {

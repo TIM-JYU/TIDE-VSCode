@@ -71,17 +71,6 @@
   }
 
   /**
-   * Shows the output console
-   */
-  function showOutput() {
-    const msg: WebviewMessage = {
-      type: 'ShowOutput',
-      value: undefined,
-    }
-    tsvscode.postMessage(msg)
-  }
-
-  /**
    * Resets the task file to it's initial stage from TIM.
    * @param taskId ide task id of the task
    */
@@ -161,15 +150,7 @@ This component manages the display of task information and interaction with task
     </div>
 
     <hr />
-
-    <!-- Why are submit and show output buttons in "points-section"? -->
-    <button onclick={showOutput}>Show Output</button>
-    <!-- <p>Passed Tests</p>
-      <div class="progress-bar">
-      <div class="progress" style="width: 75%"></div>
-    </div> -->
-    
-
+  
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
     <div class="reset-section">
       {#if timData.task_files.length < 2}
