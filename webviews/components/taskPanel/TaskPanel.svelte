@@ -157,10 +157,7 @@ This component manages the display of task information and interaction with task
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-    </div>
-
-    <div>
-      <a href={'https://tim.jyu.fi/view/' + timData.path}>Open the exercise in TIM</a>
+        <a href={'https://tim.jyu.fi/view/' + timData.path}>Open the exercise in TIM</a>
     </div>
 
     <hr />
@@ -170,22 +167,22 @@ This component manages the display of task information and interaction with task
       <p>This task does not reward points.</p>
       {:else}
       <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
+      
       <button onclick={updateTaskPoints}>Update points from TIM</button>
       {/if}
-
-      <hr />
-      <!-- Why are submit and show output buttons in "points-section"? -->
-      <button class="submit-exercise" onclick={submitTask} disabled={!isLoggedIn}
-        >Submit Exercise</button
-      >
-      <button onclick={showOutput}>Show Output</button>
-      <!-- <p>Passed Tests</p>
-            <div class="progress-bar">
-                <div class="progress" style="width: 75%"></div>
-            </div> -->
     </div>
 
     <hr />
+
+    <!-- Why are submit and show output buttons in "points-section"? -->
+    <button class="submit-exercise" onclick={submitTask} disabled={!isLoggedIn}
+    >Submit Exercise</button>
+    <button onclick={showOutput}>Show Output</button>
+    <!-- <p>Passed Tests</p>
+      <div class="progress-bar">
+      <div class="progress" style="width: 75%"></div>
+    </div> -->
+    
 
     <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
     <div class="reset-section">
@@ -207,49 +204,27 @@ This component manages the display of task information and interaction with task
   }
 
   .task-panel h2 {
-    margin: 1em 0 1em 0;
+    margin: 0 0 1em 0;
   }
 
   .task-panel p {
     margin: 0.5em 0 0.5em 0;
   }
 
-  .points-section {
-
-  }
-
-  .reset-section {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .reset-section button {
-    margin-bottom: 10px;
-    background-color: #d2042d;
-  }
-
-  .reset-section button:hover {
-    background-color: #93021f;
-  }
-
-  .points-section button,
-  .reset-section button {
-    margin-right: 10px;
-    border: none;
-    width: 130px;
-    border-radius: 5px;
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  button {
+    background-color: #007ACC;
     color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+    max-width: 20em;
+    margin: 5px 0 5px 0;
   }
 
-  .points-section button {
-    background-color: #007acc;
-  }
-
-  .points-section button:hover {
-    background-color: #00558e;
+  button:hover {
+    background-color: #005F9E;
   }
 
   .task-panel hr {
@@ -258,10 +233,6 @@ This component manages the display of task information and interaction with task
     border: none;
     border-top: 1px inset #ccc;
     width: 100%;
-  }
-
-  .submit-exercise {
-    margin-bottom: 10px;
   }
 
   .loader {
@@ -273,10 +244,6 @@ This component manages the display of task information and interaction with task
     display: inline-block;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
-  }
-
-  button:disabled {
-    background: grey;
   }
 
   @keyframes rotation {
