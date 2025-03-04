@@ -41,6 +41,7 @@ export function activate(ctx: vscode.ExtensionContext) {
     vscode.commands.executeCommand('tide.refreshTree')
   }
 
+  // Creates and registers the taskpanel menu on the left
   const taskPanelProvider = new TaskPanelProvider(ctx.extensionUri)
   ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider))
 }

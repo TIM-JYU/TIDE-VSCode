@@ -45,11 +45,20 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   /**
-   * Opens task panel.
+   * Submits current task file to TIM.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.showTaskPanel', () => {
-      UiController.showTaskPanel()
+    vscode.commands.registerCommand('tide.submitTask', () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showErrorMessage('No active file to submit.');
+        return;
+      }
+      const taskPath = editor.document.uri.fsPath;
+      
+      // TODO: callback should maybe be a show output function
+      const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
+      Tide.submitTask(taskPath, callback)
     }),
   )
 
