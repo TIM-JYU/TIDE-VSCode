@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import UiController from '../UiController'
+import { TimData } from '../../common/types'
 
 
 // Class for handling TreeView data
@@ -139,7 +140,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                         // console.log("Found file!")
                         // console.log(element)
                         if (current.endsWith('.timdata')) {
-                            // skip
+                            // Save the tim data for the extension to use later
+                            // console.log("Found timData!")
+                            // console.log(current)
+
+                            this.readAndSaveTimData(current)
+
                         } else {
                             let newNode = new CourseTaskTreeItem(element, current, "file")
                             parent.add_child(newNode)
@@ -158,6 +164,43 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                     }
                 })
             }
+        }
+    }
+
+    /**
+     * Read a .timdata file and save tasks objects found
+     * @param filePath path to the .timdata file about to be read
+     */
+    private async readAndSaveTimData(filePath: string) {
+        try {
+            // Read the timdata object from the file
+            const timDataRaw = fs.readFileSync(filePath)
+            const timData = JSON.parse(timDataRaw.toString())
+            
+            //console.log(timData)
+
+            // course_parts includes all task sets (demos)
+            let courseParts = Object.keys(timData.course_parts)
+            courseParts.forEach(demo => {
+                let taskData = timData.course_parts[demo].tasks
+                let keys = Object.keys(taskData)
+                keys.forEach(element => {
+                    // Save each task as separate objects into TimData
+                    const newTimData : TimData = timData.course_parts[demo].tasks[element]
+                    ExtensionStateManager.setTimData(newTimData)
+                })
+            })
+
+            /* // Create an Array of the tasks in .timdata
+            const taskData = timData.course_parts[coursePath].tasks
+            let keys = Object.keys(taskData)
+            // And save each task object to TimData
+            keys.forEach(element => {
+                const newTimData : TimData = timData.course_parts[coursePath].tasks[element]
+                ExtensionStateManager.setTimData(newTimData)
+            })  */           
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -206,9 +249,55 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
         let title = item.label? item.label.toString() : ""
         let result = new vscode.TreeItem(title, item.collapsibleState)
+        let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
         // This finally showed the icon
         // TODO: Logic for choosing the right icon
-        let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
+        console.log("getting treeview item")
+        if (item.type == 'file') {
+            // Find the names of the tasks ide_task_id and the task set from the files path
+            let itemPath = item.path
+            // console.log(path)
+            let pathSplit = itemPath.split('\\')
+            // ide_task_id
+            let id = pathSplit.at(-2)
+            // task set name
+            let demo = pathSplit.at(-3)
+            // console.log(id)
+            // console.log(demo)
+
+            // Find the points data of this task file from ExtensionStateManager
+            if (id && demo) {
+                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+                if (timData) {
+                    // Task Max points
+                    let maxPoints = timData.max_points
+                    if (maxPoints == null) {
+                        maxPoints = 0
+                    }
+                    if (maxPoints == 0) {
+                        iconPath = ""
+                    } else {
+                        // Current task points
+                        const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+                        if (maxPoints && currentPoints && currentPoints.current_points) {
+                            // Maximum points received from the task
+                            if (currentPoints?.current_points == maxPoints) {
+                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                                // Some points received from the task
+                            } else if (currentPoints?.current_points > 0) {
+                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                                // Zero points received from the task
+                            } else {
+                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
+                            }
+                        }
+                    }
+                }
+            } else {
+                vscode.window.showErrorMessage("Error parsing task path!")
+            }
+        }
+        // let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
         result.command = {
             command : 'tide.item_clicked',
             title : title,
@@ -259,3 +348,4 @@ class CourseTaskTreeItem extends vscode.TreeItem {
         this.children.push(child)
     }
 }
+
