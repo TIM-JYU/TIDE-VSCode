@@ -158,9 +158,7 @@ export default class Tide {
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
-      const pathSplit = taskPath.split(path.sep)
-      Logger.debug(pathSplit)
-      this.getTaskPoints(taskPath, pathSplit[-2], undefined)
+      Logger.debug(data)
       callback()
     })
   }
