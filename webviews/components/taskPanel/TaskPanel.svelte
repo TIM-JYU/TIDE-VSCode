@@ -203,43 +203,22 @@ This component manages the display of task information and interaction with task
 
 <style>
   .task-panel {
-    padding: 20px;
     border: none;
-    width: 90%;
-    max-width: 600px;
-    margin: 20px auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .task-panel h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
+    margin: 1em 0 1em 0;
   }
 
   .task-panel p {
-    margin-bottom: 10px;
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .progress {
-    height: 100%;
-    background-color: #28a745;
-    transition: width 0.3s ease-in-out;
+    margin: 0.5em 0 0.5em 0;
   }
 
   .points-section {
-    margin-top: 20px;
+
   }
 
   .reset-section {
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
   }
