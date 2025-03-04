@@ -72,8 +72,6 @@
             <th>Task set</th>
             <th>Number of exercises</th>
             <!-- <th>Points</th> -->
-            <th></th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -91,7 +89,7 @@
 <style>
   .course-box {
     position: relative;
-    background-color: #000000;
+    background-color:rgb(19, 19, 19);
     padding-bottom: 3.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -179,7 +177,7 @@
     border: none;
     text-align: center;
     padding: 8px;
-    background-color: black;
+    background-color: rgb(19, 19, 19);;
     font-weight: normal;
     font-size: smaller;
   }
