@@ -5,6 +5,7 @@ import { getDefaultHtmlForWebview } from '../utils'
 import Tide from '../../api/tide'
 import path from 'path'
 import UiController from '../UiController'
+import Logger from '../../utilities/logger'
 
 /**
  * Provides the TaskPanel menu in the extension's sidebar.
@@ -86,12 +87,17 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         try {
             const doc = TaskPanelProvider.activeTextEditor.document
             const currentDir = path.dirname(doc.fileName)
-            const taskId = path.basename(currentDir)
-            const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata')
-            const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
-            const timDataCourse = JSON.parse(timDataContent.toString())
-            const coursePath = Object.keys(timDataCourse.course_parts)[0]
-            return timDataCourse.course_parts[coursePath].tasks[taskId]
+            // Find the names of the tasks ide_task_id and the task set from the files path
+            let itemPath = currentDir
+            // console.log(path)
+            let pathSplit = itemPath.split(path.sep)
+            // ide_task_id
+            let id = pathSplit.at(-1)
+            // task set name
+            let demo = pathSplit.at(-2)
+            if (demo && id) {
+                return(ExtensionStateManager.getTaskTimData(demo, id))
+            }
         } catch {
             return undefined
         }
