@@ -7,9 +7,10 @@
   interface Props {
     course: Course;
     isLoggedIn: boolean;
+    customUrl: String;
   }
 
-  let { course, isLoggedIn }: Props = $props();
+  let { course, isLoggedIn, customUrl }: Props = $props();
 
   let isExpanded: boolean = $state(false)
 
@@ -55,7 +56,7 @@
     </Menu>
   </header>
   <div>
-    <a class="link" href={'https://tim.jyu.fi/view/' + course.path}>Open material page</a>
+    <a class="link" href={ {customUrl} + course.path}>Open material page</a>
   </div>
   <button
     class="expand-collapse-button"

@@ -142,6 +142,7 @@ export interface WebviewMessage {
  */
 export type MessageType =
   | 'CourseData'
+  | 'CustomUrl'
   | 'DownloadTaskSet'
   | 'Login'
   | 'LoginData'

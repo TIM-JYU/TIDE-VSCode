@@ -14,6 +14,7 @@
   import { type Course, type LoginData, type WebviewMessage } from '../../../src/common/types'
 
   let downloadPath: string = $state('')
+  let customUrl: string = $state('')
   let courses: Array<Course> = $state([])
   let loginData: LoginData = $state({
     isLogged: false
@@ -48,6 +49,10 @@
         }
         case 'LoginData': {
           loginData = message.value
+          break
+        }
+        case 'CustomUrl': {
+          customUrl = message.value
           break
         }
       }
@@ -110,6 +115,7 @@ updates the courses' status, and handles downloading task sets and opening works
       defaultExpandedState={true}
       statusOfCourses={'active'}
       courses={courses.filter((c) => c.status === 'active')}
+      customUrl={customUrl}
       {isLoggedIn}
     />
 
@@ -117,6 +123,7 @@ updates the courses' status, and handles downloading task sets and opening works
       defaultExpandedState={false}
       statusOfCourses={'hidden'}
       courses={courses.filter((c) => c.status === 'hidden')}
+      customUrl={customUrl}
       {isLoggedIn}
     />
   {/if}
