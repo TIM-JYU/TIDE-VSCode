@@ -70,29 +70,6 @@
     updateTaskPoints()
   }
 
-  /**
-   * Resets the task file to it's initial stage from TIM.
-   * @param taskId ide task id of the task
-   */
-  function resetExercise() {
-    if (timData) {
-      tsvscode.postMessage({
-        type: 'ResetExercise',
-        value: {
-          path: timData.path,
-          taskId: timData.ide_task_id,
-        },
-      })
-    }
-  }
-
-  function resetNoneditableAreas() {
-    tsvscode.postMessage({
-      type: 'ResetNoneditableAreas',
-      value: undefined,
-    })
-  }
-
   function updateTaskPoints() {
     tsvscode.postMessage({
       type: 'UpdateTaskPoints',
@@ -124,9 +101,9 @@ This component manages the display of task information and interaction with task
 {:else}
   <div class="task-panel">
     {#if timData.header !== null}
-      <h2>{timData.header}</h2>
+      <h3>{timData.header}</h3>
     {:else}
-      <h2>{timData.task_files[0].file_name}</h2>
+      <h3>{timData.task_files[0].file_name}</h3>
     {/if}
     <div class="instructions">
       {#if timData.stem !== null}
@@ -134,7 +111,7 @@ This component manages the display of task information and interaction with task
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-        <a href={'https://tim.jyu.fi/view/' + timData.path}>Open the exercise in TIM</a>
+        <a href={'https://tim.jyu.fi/view/' + timData.path}>Open exercise in TIM</a>
     </div>
 
     <hr />
@@ -145,7 +122,7 @@ This component manages the display of task information and interaction with task
       {:else}
       <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
       
-      <button onclick={updateTaskPoints}>Update points from TIM</button>
+      <button onclick={updateTaskPoints}>Update points</button>
       {/if}
     </div>
   </div>
@@ -156,23 +133,31 @@ This component manages the display of task information and interaction with task
     border: none;
   }
 
-  .task-panel h2 {
+  .task-panel h3 {
     margin: 0;
+    font-weight: bold;
   }
 
   .task-panel p {
     margin: 0.5em 0 0.5em 0;
+    font-size: small;
+  }
+
+  .task-panel a {
+    margin: 0.5em 0 0.5em 0;
+    font-size: small;
   }
 
   button {
     background-color: #007ACC;
+    font-size: small;
     color: white;
     border: none;
     padding: 5px;
     cursor: pointer;
     transition: background 0.3s;
     border-radius: 3px;
-    max-width: 20em;
+    width: 100%;
     margin: 5px 0 5px 0;
   }
 
