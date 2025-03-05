@@ -27,6 +27,10 @@
 				{
 					"command": "tide.submitTask",
 					"group": "navigation"
+				},
+				{
+					"command": "tide.resetExercise",
+					"group": "navigation"
 				}
 			],
 			"view/title": [
@@ -103,8 +107,9 @@
 			},
 			{
 				"command": "tide.submitTask",
-				"title": "Submit exercise to TIM",
-				"category": "TIM-IDE"
+				"title": "Submit",
+				"category": "TIM-IDE",
+				"description": "Submit exercise of active editor to TIM"
 			},
 			{
 				"command": "tide.clearLocalExtensionData",
@@ -132,6 +137,12 @@
 				"command": "tide.showOutput",
 				"title": "Opens TIDE Logs into Output panel.",
 				"category": "TIM-IDE"
+			},
+			{
+				"command": "tide.resetExercise",
+				"title": "Reset",
+				"category": "TIM-IDE",
+				"description": "Resets exercise of active editor to initial state"
 			}
 		],
 		"viewsContainers": {

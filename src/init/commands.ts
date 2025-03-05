@@ -16,6 +16,7 @@ import Tide from '../api/tide'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
+import path from 'path'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -35,12 +36,25 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   /**
-   * Resets exercise.
+   * Resets exercise. 
+   * TODO: choose overwrite or reset function to be used and fix tide cli command.
    */
-  // TODO: why is this available as a command? It's clearly intended to be used by code only.
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.resetExercise', (taskSetPath, taskId, downloadPath) => {
-      Tide.overwriteTask(taskSetPath, taskId, downloadPath)
+    vscode.commands.registerCommand('tide.resetExercise', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showErrorMessage('No active editor found.')
+        return
+      }
+      const doc = editor.document;
+      const currentDir = path.dirname(doc.fileName)
+      const taskId = path.basename(currentDir)
+      const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata')
+      const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
+      const timDataCourse = JSON.parse(timDataContent.toString())
+      const coursePath = Object.keys(timDataCourse.course_parts)[0]
+      const tasksetDir = path.dirname(path.dirname(currentDir))
+      Tide.overwriteTask(coursePath, taskId, tasksetDir)
     }),
   )
 

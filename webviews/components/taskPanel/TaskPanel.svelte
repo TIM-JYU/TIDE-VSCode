@@ -148,20 +148,6 @@ This component manages the display of task information and interaction with task
       <button onclick={updateTaskPoints}>Update points from TIM</button>
       {/if}
     </div>
-
-    <hr />
-  
-    <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
-    <div class="reset-section">
-      {#if timData.task_files.length < 2}
-        <button onclick={resetExercise} disabled={!isLoggedIn}>Reset Exercise</button>
-        <!-- <button>Fetch Latest Answer</button> -->
-      {/if}
-      <button onclick={resetNoneditableAreas}>
-        <!-- TODO: better text for button -->
-        Reset noneditable areas
-      </button>
-    </div>
   </div>
 {/if}
 
