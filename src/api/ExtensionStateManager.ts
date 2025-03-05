@@ -14,6 +14,7 @@
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
 import { Course, CourseStatus, LoginData, TaskPoints, TimData } from '../common/types'
+import path from 'path'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -171,8 +172,9 @@ export default class ExtensionStateManager {
       // Find a timdata object with the given taskId
       if (element.ide_task_id === taskId) {
         // Make sure the task set is correct
-        let pathParts = element.path.split('/')
-        console.log(pathParts)
+        let pathParts = element.path.split(path.posix.sep)
+        // console.log("parts: ")
+        // console.log(pathParts)
         let demo = pathParts.at(-1)
         if (demoName == demo) {
           timData = element
