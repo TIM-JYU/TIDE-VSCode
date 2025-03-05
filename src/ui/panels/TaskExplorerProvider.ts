@@ -259,7 +259,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = item.path
             // console.log(path)
-            let pathSplit = itemPath.split('\\')
+            let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-2)
             // task set name
@@ -298,6 +298,39 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             } else {
                 vscode.window.showErrorMessage("Error parsing task path!")
             }
+        } else {
+            // Write directory icon logic here
+            iconPath = ""
+
+            // Calculate maxPoints sum for tasks in this directory
+            let maxPointsForDir = this.calculateMaxPoints(item, 0)
+            console.log(maxPointsForDir)
+
+            // Calculate currentPoints sum for tasks in this directory
+            let currentPointsForDir = this.calculateCurrentPoints(item, 0)
+            console.log(currentPointsForDir)
+
+            if (maxPointsForDir > 0) {
+                if (maxPointsForDir == currentPointsForDir) {
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                } else if (currentPointsForDir > 0) {
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                } else {
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
+                }
+            } else {
+                iconPath = ""
+            }
+
+            let children = item.children
+            children.forEach(child => {
+                console.log(child)
+            })
+            // Find all .timdata task objects for each task inside the children of this
+            // Calculate the maximum points for the sum of those tasks
+            // Calculate the current points for the sum of those tasks
+            // Pick the correct icon
+
         }
         // let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
         result.command = {
@@ -309,7 +342,80 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         return result
     }
 
-    // and getChildren
+    /**
+     * Calculates a sum of maxPoints for tasks within the items children
+     * @param item the treeview item for which the sum is calculated
+     * @param sum current sum
+     * @returns calculated max points
+     */
+    public calculateMaxPoints(item: CourseTaskTreeItem, sum: number): number {
+        let children = item.children
+        let pointsSum = sum
+        let readyCheck = false
+        if (children.length > 0) {
+            children.forEach(child => {
+                if (child.type === 'dir') {
+                    pointsSum += this.calculateMaxPoints(child, sum)
+                } else {
+                    // type === 'file' -> ready to find max points
+                    readyCheck = true
+                }
+            })
+            if (readyCheck) {
+                let pathSplit = item.path.split(path.sep)
+                let demo = pathSplit.at(-2)
+                let taskId = pathSplit.at(-1)
+                if (demo && taskId) {
+                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                    if (timData && timData.max_points) {
+                        pointsSum += timData?.max_points
+                        return pointsSum
+                    }
+                }
+            }
+        }
+        return pointsSum
+    }
+
+    /**
+     * Calculates the current points sum of the tasks within the items children
+     * @param item the treeview item for which the sum is calculated
+     * @param sum current sum
+     * @returns calculated current points sum
+     */
+    public calculateCurrentPoints(item: CourseTaskTreeItem, sum: number): number {
+        let children = item.children
+        let pointsSum = sum
+        let readyCheck = false
+        if (children.length > 0) {
+            children.forEach(child => {
+                if (child.type === 'dir') {
+                    pointsSum += this.calculateCurrentPoints(child, sum)
+                } else {
+                    // type === 'file' -> ready to find max points
+                    readyCheck = true
+                }
+            })
+            if (readyCheck) {
+                let pathSplit = item.path.split(path.sep)
+                let demo = pathSplit.at(-2)
+                let taskId = pathSplit.at(-1)
+                if (demo && taskId) {
+                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                    if (timData) {
+                        let pointsData = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+                        if (pointsData && pointsData.current_points) {
+                            pointsSum += pointsData.current_points
+                            return pointsSum
+                        }                        
+                    }
+                }
+            }
+        }
+        return pointsSum
+    }
+
+    // Returns treeview items children
     public getChildren(element : CourseTaskTreeItem | undefined): vscode.ProviderResult<CourseTaskTreeItem[]> {
         if (element === undefined) {
             return this.course_data
