@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   /**
    * @author Hannes Koivusipilä
    * @author Stella Palenius
@@ -9,9 +7,9 @@
    */
 
   import { onMount } from 'svelte'
-  import { type LoginData } from '../../../src/common/types'
-  let isLoggedIn = $state(false)
-  let loginData: LoginData = $state()
+  import { type LoginData } from '../../common/types'
+  let isLoggedIn = false
+  let loginData: LoginData
 
   /**
    * Listens to messages from the extension.
@@ -47,9 +45,7 @@
     })
   }
 
-  run(() => {
-    isLoggedIn = loginData ? loginData.isLogged : false
-  });
+  $: isLoggedIn = loginData ? loginData.isLogged : false
 </script>
 
 <!--
@@ -61,11 +57,11 @@ It listens for messages from the extension to handle login and logout functional
 <nav>
   <ul class="nav-list">
     {#if !isLoggedIn}
-      <li><button onclick={handleLogin}>Login</button></li>
+      <li><button on:click={handleLogin}>Login</button></li>
     {:else}
       <li>
         <button
-          onclick={() => {
+          on:click={() => {
             tsvscode.postMessage({
               type: 'ShowCourses',
               value: '',
@@ -74,12 +70,12 @@ It listens for messages from the extension to handle login and logout functional
         >
       </li>
       <li>
-        <button onclick={handleLogout}>Logout</button>
+        <button on:click={handleLogout}>Logout</button>
       </li>
     {/if}
     <li>
       <button
-        onclick={() => {
+        on:click={() => {
           tsvscode.postMessage({
             type: 'OpenSettings',
             value: '',
