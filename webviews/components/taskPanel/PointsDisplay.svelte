@@ -1,8 +1,12 @@
 <script lang="ts">
   import type { TaskPoints } from '../../common/types'
 
-  export let taskPoints: TaskPoints
-  export let maxPoints: number | null
+  interface Props {
+    taskPoints: TaskPoints;
+    maxPoints: number | null;
+  }
+
+  let { taskPoints, maxPoints }: Props = $props();
 </script>
 
 <!--
@@ -15,7 +19,7 @@ A component for showing task points data.
     <div id="points">
       {taskPoints.current_points} / {maxPoints}
     </div>
-    <progress value={taskPoints.current_points} max={maxPoints} />
+    <progress value={taskPoints.current_points} max={maxPoints}></progress>
   {/if}
 </div>
 

@@ -260,7 +260,7 @@ interface NotifyFunction {
 
 
 // type StateKey = 'courses' | 'downloadPath' | 'loginData' | 'taskPoints'
-enum StateKey {
+export enum StateKey {
   Courses = 'courses',
   DownloadPath = 'downloadPath',
   LoginData = 'loginData',
