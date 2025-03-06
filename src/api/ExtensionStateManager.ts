@@ -13,7 +13,8 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints } from '../common/types'
+import { Course, CourseStatus, LoginData, TaskPoints, TimData } from '../common/types'
+import path from 'path'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -24,24 +25,6 @@ export default class ExtensionStateManager {
 
   static setContext(ctx: vscode.ExtensionContext) {
     this.globalState = ctx.globalState
-  }
-
-  // TODO: why is download path written in globalstate when it is defined in settings (from where it can be read from, too)
-
-  /**
-   * Sets the path for downloading tasks to the Global State.
-   * @param path - The path where the tasks will be downloaded.
-   */
-  static setDownloadPath(path: string) {
-    this.writeToGlobalState(StateKey.DownloadPath, path)
-  }
-
-  /**
-   * Retrieves the download path from the Global State.
-   * @returns The download path stored in the Global State.
-   */
-  static getDownloadPath(): string {
-    return this.readFromGlobalState(StateKey.DownloadPath)
   }
 
   /**
@@ -136,7 +119,69 @@ export default class ExtensionStateManager {
     if (taskPoints === undefined) {
       return undefined
     }
-    return taskPoints[taskSetPath][ideTaskId]
+    try {
+      console.log("reading points")
+      let pointsData = taskPoints[taskSetPath][ideTaskId]
+      console.log(pointsData)
+      return pointsData
+    } catch (error) {
+      console.log(error)
+      return {current_points : 0}
+    }
+    
+  }
+
+  /**
+   * Tim data is saved for later use as an Array of TimData objects:
+   * [{.timData object}, {.timData object}, ...]
+   * Only the tasks data is saved from .timdata files
+   */
+  static setTimData(timData: TimData) {
+
+    let allTimData : Array<TimData> = this.readFromGlobalState(StateKey.TimData)
+    let save = true
+    if (allTimData === undefined) {
+      allTimData = []
+    }
+
+    allTimData.forEach(element => {
+      // If an element has the same ide_task_id and path it is the same unique timdata object -> dont save a duplicate
+      if (element.ide_task_id === timData.ide_task_id && element.path === timData.path) {
+        // console.log("Data already saved!")
+        save = false
+      }
+    })
+
+    // Only save timdata if it's not a dublicate
+    if (save) {
+      // console.log("writing timdata")
+      // console.log(allTimData)
+
+      allTimData.push(timData)      
+      this.writeToGlobalState(StateKey.TimData, allTimData)
+    }    
+  }
+
+  /**
+   * returns the first timData object that includes the given taskId as an ide_task_id
+   */
+  static getTaskTimData(demoName: string, taskId: string): TimData | undefined{
+    let timData = undefined
+    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
+    allTimData.forEach(element => {
+      // Find a timdata object with the given taskId
+      if (element.ide_task_id === taskId) {
+        // Make sure the task set is correct
+        let pathParts = element.path.split(path.posix.sep)
+        // console.log("parts: ")
+        // console.log(pathParts)
+        let demo = pathParts.at(-1)
+        if (demoName == demo) {
+          timData = element
+        }        
+      }
+      })
+      return timData
   }
 
   static reset() {
@@ -149,6 +194,7 @@ export default class ExtensionStateManager {
     this.writeToGlobalState(StateKey.LoginData, undefined)
     this.writeToGlobalState(StateKey.TaskPoints, undefined)
     this.writeToGlobalState(StateKey.DownloadPath, undefined)
+    this.writeToGlobalState(StateKey.TimData, undefined)
   }
 
   /**
@@ -259,10 +305,11 @@ interface NotifyFunction {
 }
 
 
-// type StateKey = 'courses' | 'downloadPath' | 'loginData' | 'taskPoints'
+// type StateKey = 'courses' | 'loginData' | 'taskPoints'
 export enum StateKey {
   Courses = 'courses',
   DownloadPath = 'downloadPath',
   LoginData = 'loginData',
-  TaskPoints = 'taskPoints'
+  TaskPoints = 'taskPoints',
+  TimData = 'timData'
 }

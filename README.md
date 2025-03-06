@@ -14,7 +14,13 @@ https://tim.jyu.fi/view/kurssit/tie/proj/2024/tide/dokumentit/kayttoohjeet/tim-v
 ### Quick start guide
 
 1. Clone the repository
-2. Install the dependencies by running `npm install`
+2. Install the dependencies
+- Normally: run `npm install`
+- Workaround for [npm issue #4263](https://github.com/npm/cli/issues/4263):
+    - remove node_modules
+    - remove package-lock.json
+    - run `npm cache clean -f`
+    - run `npm install`
 3. Compile the Svelte components by running `npm run svelte-compile` or `npm run svelte-watch`
 4. Open the project in Visual Studio Code
 5. Launch the `Run Extension` configuration from the `Run and Debug` tab

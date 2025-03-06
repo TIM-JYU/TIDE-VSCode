@@ -16,6 +16,8 @@ import Logger from './utilities/logger'
 import { SidebarProvider } from './ui/panels/SidebarProvider'
 import ExtensionStateManager from './api/ExtensionStateManager'
 import UiController from './ui/UiController'
+import { CourseTaskProvider } from './ui/panels/TaskExplorerProvider'
+import { TaskPanelProvider } from './ui/panels/TaskPanelProvider'
 
 // This method is called when your extension is activated
 export function activate(ctx: vscode.ExtensionContext) {
@@ -31,6 +33,17 @@ export function activate(ctx: vscode.ExtensionContext) {
   // Creates and registers the side menu on the left
   const sidebarProvider = new SidebarProvider(ctx.extensionUri)
   ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-sidebar', sidebarProvider))
+
+  // Creates ans registers the treeview for course tasks
+  const courseTasksTreeview = new CourseTaskProvider()
+  ctx.subscriptions.push(vscode.window.registerTreeDataProvider('tide-tasks-treeview', courseTasksTreeview))
+  if (ExtensionStateManager.getLoginData().isLogged) {
+    vscode.commands.executeCommand('tide.refreshTree')
+  }
+
+  // Creates and registers the taskpanel menu on the left
+  const taskPanelProvider = new TaskPanelProvider(ctx.extensionUri)
+  ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider))
 }
 
 // This method is called when your extension is deactivated
