@@ -1,4 +1,10 @@
 <script lang="ts">
+  interface Props {
+    toggle?: import('svelte').Snippet;
+    menucontent?: import('svelte').Snippet;
+  }
+
+  let { toggle, menucontent }: Props = $props();
   // without these (empty) tags, svelte language server shows errors else where
 </script>
 <!-- 
@@ -9,10 +15,10 @@ From Svelte.dev On Hover Menu: https://svelte.dev/repl/2f5ab01c05f84790bcb94a0f7
 
 <div>
   <button>
-    <slot name="toggle" />
+    {@render toggle?.()}
   </button>
   <menu>
-    <slot name="menucontent" />
+    {@render menucontent?.()}
   </menu>
 </div>
 
