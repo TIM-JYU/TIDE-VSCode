@@ -60,60 +60,14 @@
         case 'SubmitResult': {
           // Todo: This tries to show points, but it's not yet implemented
           onTaskSubmitted()
-          console.log(message.value)
           break
         }
       }
     })
   })
 
-  /**
-   * Sends message to TaskPanel about submitting exercise
-   */
-  function submitTask() {
-    const msg: WebviewMessage = {
-      type: 'SubmitTask',
-      value: undefined,
-    }
-    tsvscode.postMessage(msg)
-  }
-
   function onTaskSubmitted() {
     updateTaskPoints()
-  }
-
-  /**
-   * Shows the output console
-   */
-  function showOutput() {
-    const msg: WebviewMessage = {
-      type: 'ShowOutput',
-      value: undefined,
-    }
-    tsvscode.postMessage(msg)
-  }
-
-  /**
-   * Resets the task file to it's initial stage from TIM.
-   * @param taskId ide task id of the task
-   */
-  function resetExercise() {
-    if (timData) {
-      tsvscode.postMessage({
-        type: 'ResetExercise',
-        value: {
-          path: timData.path,
-          taskId: timData.ide_task_id,
-        },
-      })
-    }
-  }
-
-  function resetNoneditableAreas() {
-    tsvscode.postMessage({
-      type: 'ResetNoneditableAreas',
-      value: undefined,
-    })
   }
 
   function updateTaskPoints() {
@@ -146,22 +100,18 @@ This component manages the display of task information and interaction with task
   <span class="loader"></span>
 {:else}
   <div class="task-panel">
-    <h1>{workspace} - {timData.ide_task_id}</h1>
     {#if timData.header !== null}
-      <h2>{timData.header}</h2>
+      <h3>{timData.header}</h3>
     {:else}
-      <h2>{timData.task_files[0].file_name}</h2>
+      <h3>{timData.task_files[0].file_name}</h3>
     {/if}
     <div class="instructions">
       {#if timData.stem !== null}
         <p>{timData.stem}</p>
       {:else}
-        <p>To see the instructions, please open the exercise in TIM.</p>
+        <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-    </div>
-
-    <div>
-      <a href={'https://tim.jyu.fi/view/' + timData.path}>Open the exercise in TIM</a>
+        <a href={'https://tim.jyu.fi/view/' + timData.path}>Open exercise in TIM</a>
     </div>
 
     <hr />
@@ -171,119 +121,56 @@ This component manages the display of task information and interaction with task
       <p>This task does not reward points.</p>
       {:else}
       <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
-      <button onclick={updateTaskPoints}>Update points from TIM</button>
+      
+      <button onclick={updateTaskPoints}>Update points</button>
       {/if}
-
-      <hr />
-      <!-- Why are submit and show output buttons in "points-section"? -->
-      <button class="submit-exercise" onclick={submitTask} disabled={!isLoggedIn}
-        >Submit Exercise</button
-      >
-      <button onclick={showOutput}>Show Output</button>
-      <!-- <p>Passed Tests</p>
-            <div class="progress-bar">
-                <div class="progress" style="width: 75%"></div>
-            </div> -->
-    </div>
-
-    <hr />
-
-    <!-- Checks if the task has several files, if it does then reset exercise button cannot be used and is not shown to user -->
-    <div class="reset-section">
-      {#if timData.task_files.length < 2}
-        <button onclick={resetExercise} disabled={!isLoggedIn}>Reset Exercise</button>
-        <!-- <button>Fetch Latest Answer</button> -->
-      {/if}
-      <button onclick={resetNoneditableAreas}>
-        <!-- TODO: better text for button -->
-        Reset noneditable areas
-      </button>
     </div>
   </div>
 {/if}
 
 <style>
   .task-panel {
-    padding: 20px;
     border: none;
-    width: 90%;
-    max-width: 600px;
-    margin: 20px auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  .task-panel h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
+  .task-panel h3 {
+    margin: 0;
+    font-weight: bold;
   }
 
   .task-panel p {
-    margin-bottom: 10px;
+    margin: 0.5em 0 0.5em 0;
+    font-size: small;
   }
 
-  .progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    overflow: hidden;
+  .task-panel a {
+    margin: 0.5em 0 0.5em 0;
+    font-size: small;
   }
 
-  .progress {
-    height: 100%;
-    background-color: #28a745;
-    transition: width 0.3s ease-in-out;
-  }
-
-  .points-section {
-    margin-top: 20px;
-  }
-
-  .reset-section {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .reset-section button {
-    margin-bottom: 10px;
-    background-color: #d2042d;
-  }
-
-  .reset-section button:hover {
-    background-color: #93021f;
-  }
-
-  .points-section button,
-  .reset-section button {
-    margin-right: 10px;
-    border: none;
-    width: 130px;
-    border-radius: 5px;
-    padding: 8px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  button {
+    background-color: #007ACC;
+    font-size: small;
     color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+    width: 100%;
+    margin: 5px 0 5px 0;
   }
 
-  .points-section button {
-    background-color: #007acc;
-  }
-
-  .points-section button:hover {
-    background-color: #00558e;
+  button:hover {
+    background-color: #005F9E;
   }
 
   .task-panel hr {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border: none;
     border-top: 1px inset #ccc;
     width: 100%;
-  }
-
-  .submit-exercise {
-    margin-bottom: 10px;
   }
 
   .loader {
@@ -295,10 +182,6 @@ This component manages the display of task information and interaction with task
     display: inline-block;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
-  }
-
-  button:disabled {
-    background: grey;
   }
 
   @keyframes rotation {

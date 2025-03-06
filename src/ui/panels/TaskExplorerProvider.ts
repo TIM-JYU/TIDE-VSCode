@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import UiController from '../UiController'
+import { TimData } from '../../common/types'
 
 
 // Class for handling TreeView data
@@ -38,8 +39,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         tabGroups.forEach(async group => {
             await vscode.window.tabGroups.close(group)
                 })
-
-        UiController.closeTaskPanel()
     }
 
     // Opens all tasks found in the children of the given item
@@ -141,7 +140,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                         // console.log("Found file!")
                         // console.log(element)
                         if (current.endsWith('.timdata')) {
-                            // skip
+                            // Save the tim data for the extension to use later
+                            // console.log("Found timData!")
+                            // console.log(current)
+
+                            this.readAndSaveTimData(current)
+
                         } else {
                             let newNode = new CourseTaskTreeItem(element, current, "file")
                             parent.add_child(newNode)
@@ -160,6 +164,43 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                     }
                 })
             }
+        }
+    }
+
+    /**
+     * Read a .timdata file and save tasks objects found
+     * @param filePath path to the .timdata file about to be read
+     */
+    private async readAndSaveTimData(filePath: string) {
+        try {
+            // Read the timdata object from the file
+            const timDataRaw = fs.readFileSync(filePath)
+            const timData = JSON.parse(timDataRaw.toString())
+            
+            //console.log(timData)
+
+            // course_parts includes all task sets (demos)
+            let courseParts = Object.keys(timData.course_parts)
+            courseParts.forEach(demo => {
+                let taskData = timData.course_parts[demo].tasks
+                let keys = Object.keys(taskData)
+                keys.forEach(element => {
+                    // Save each task as separate objects into TimData
+                    const newTimData : TimData = timData.course_parts[demo].tasks[element]
+                    ExtensionStateManager.setTimData(newTimData)
+                })
+            })
+
+            /* // Create an Array of the tasks in .timdata
+            const taskData = timData.course_parts[coursePath].tasks
+            let keys = Object.keys(taskData)
+            // And save each task object to TimData
+            keys.forEach(element => {
+                const newTimData : TimData = timData.course_parts[coursePath].tasks[element]
+                ExtensionStateManager.setTimData(newTimData)
+            })  */           
+        } catch (err) {
+            console.log(err)
         }
     }
 
@@ -208,15 +249,171 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
         let title = item.label? item.label.toString() : ""
         let result = new vscode.TreeItem(title, item.collapsibleState)
+        let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
+        // This finally showed the icon
+        // TODO: Logic for choosing the right icon
+        console.log("getting treeview item")
+        if (item.type == 'file') {
+            // Find the names of the tasks ide_task_id and the task set from the files path
+            let itemPath = item.path
+            // console.log(path)
+            let pathSplit = itemPath.split(path.sep)
+            // ide_task_id
+            let id = pathSplit.at(-2)
+            // task set name
+            let demo = pathSplit.at(-3)
+            // console.log(id)
+            // console.log(demo)
+
+            // Find the points data of this task file from ExtensionStateManager
+            if (id && demo) {
+                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+                if (timData) {
+                    // Task Max points
+                    let maxPoints = timData.max_points
+                    if (maxPoints == null) {
+                        maxPoints = 0
+                    }
+                    if (maxPoints == 0) {
+                        iconPath = ""
+                    } else {
+                        // Current task points
+                        const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+                        if (maxPoints && currentPoints && currentPoints.current_points) {
+                            // Maximum points received from the task
+                            if (currentPoints?.current_points == maxPoints) {
+                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                                // Some points received from the task
+                            } else if (currentPoints?.current_points > 0) {
+                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                                // Zero points received from the task
+                            } else {
+                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
+                            }
+                        }
+                    }
+                }
+            } else {
+                vscode.window.showErrorMessage("Error parsing task path!")
+            }
+        } else {
+            // Write directory icon logic here
+            iconPath = ""
+
+            // Calculate maxPoints sum for tasks in this directory
+            let maxPointsForDir = this.calculateMaxPoints(item, 0)
+            console.log(maxPointsForDir)
+
+            // Calculate currentPoints sum for tasks in this directory
+            let currentPointsForDir = this.calculateCurrentPoints(item, 0)
+            console.log(currentPointsForDir)
+
+            if (maxPointsForDir > 0) {
+                if (maxPointsForDir == currentPointsForDir) {
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                } else if (currentPointsForDir > 0) {
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                } else {
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
+                }
+            } else {
+                iconPath = ""
+            }
+
+            let children = item.children
+            children.forEach(child => {
+                console.log(child)
+            })
+            // Find all .timdata task objects for each task inside the children of this
+            // Calculate the maximum points for the sum of those tasks
+            // Calculate the current points for the sum of those tasks
+            // Pick the correct icon
+
+        }
+        // let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
         result.command = {
             command : 'tide.item_clicked',
             title : title,
-            arguments: [item]
+            arguments: [item],
         }
+        result.iconPath = iconPath
         return result
     }
 
-    // and getChildren
+    /**
+     * Calculates a sum of maxPoints for tasks within the items children
+     * @param item the treeview item for which the sum is calculated
+     * @param sum current sum
+     * @returns calculated max points
+     */
+    public calculateMaxPoints(item: CourseTaskTreeItem, sum: number): number {
+        let children = item.children
+        let pointsSum = sum
+        let readyCheck = false
+        if (children.length > 0) {
+            children.forEach(child => {
+                if (child.type === 'dir') {
+                    pointsSum += this.calculateMaxPoints(child, sum)
+                } else {
+                    // type === 'file' -> ready to find max points
+                    readyCheck = true
+                }
+            })
+            if (readyCheck) {
+                let pathSplit = item.path.split(path.sep)
+                let demo = pathSplit.at(-2)
+                let taskId = pathSplit.at(-1)
+                if (demo && taskId) {
+                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                    if (timData && timData.max_points) {
+                        pointsSum += timData?.max_points
+                        return pointsSum
+                    }
+                }
+            }
+        }
+        return pointsSum
+    }
+
+    /**
+     * Calculates the current points sum of the tasks within the items children
+     * @param item the treeview item for which the sum is calculated
+     * @param sum current sum
+     * @returns calculated current points sum
+     */
+    public calculateCurrentPoints(item: CourseTaskTreeItem, sum: number): number {
+        let children = item.children
+        let pointsSum = sum
+        let readyCheck = false
+        if (children.length > 0) {
+            children.forEach(child => {
+                if (child.type === 'dir') {
+                    pointsSum += this.calculateCurrentPoints(child, sum)
+                } else {
+                    // type === 'file' -> ready to find max points
+                    readyCheck = true
+                }
+            })
+            if (readyCheck) {
+                let pathSplit = item.path.split(path.sep)
+                let demo = pathSplit.at(-2)
+                let taskId = pathSplit.at(-1)
+                if (demo && taskId) {
+                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                    if (timData) {
+                        let pointsData = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+                        if (pointsData && pointsData.current_points) {
+                            pointsSum += pointsData.current_points
+                            return pointsSum
+                        }                        
+                    }
+                }
+            }
+        }
+        return pointsSum
+    }
+
+    // Returns treeview items children
     public getChildren(element : CourseTaskTreeItem | undefined): vscode.ProviderResult<CourseTaskTreeItem[]> {
         if (element === undefined) {
             return this.course_data
@@ -239,9 +436,9 @@ class CourseTaskTreeItem extends vscode.TreeItem {
     // and is passed to the base class
     // path = path to file or dir
     // type = type of item (file or dir)
-    constructor(label: string, path: string, type: "file" | "dir") {
+    constructor(label: string, itemPath: string, type: "file" | "dir") {
         super(label)
-        this.path = path
+        this.path = itemPath
         this.type = type
         if (this.type === "file") {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None
@@ -257,3 +454,4 @@ class CourseTaskTreeItem extends vscode.TreeItem {
         this.children.push(child)
     }
 }
+

@@ -15,6 +15,8 @@ import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
+import { get } from 'http'
+
 
 export default class Tide {
   public static async debug() {
