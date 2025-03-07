@@ -1,0 +1,120 @@
+import * as vscode from 'vscode'
+import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
+import { LoginData, TaskPoints, WebviewMessage, TimData } from '../../common/types'
+import { getDefaultHtmlForWebview } from '../utils'
+import Tide from '../../api/tide'
+import path from 'path'
+import UiController from '../UiController'
+import Logger from '../../utilities/logger'
+
+/**
+ * Provides the TaskPanel menu in the extension's sidebar.
+ */
+export class TaskPanelProvider implements vscode.WebviewViewProvider {
+    private _view?: vscode.WebviewView
+    private static activeTextEditor?: vscode.TextEditor
+
+    constructor(private readonly _extensionUri: vscode.Uri) {
+        ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this))
+
+        vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+            TaskPanelProvider.activeTextEditor = editor
+            if (editor) {
+                const timData = await this.getTimData()
+                this.sendTimData(timData)
+                if (timData?.path && timData?.ide_task_id) {
+                    this.sendTaskPoints(ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id))
+                }
+            } else {
+                this.sendTimData(undefined)
+            }
+        });
+    }
+
+    resolveWebviewView(webviewView: vscode.WebviewView) {
+        this._view = webviewView
+        webviewView.webview.options = {
+            enableScripts: true,
+            localResourceRoots: [this._extensionUri],
+        }
+        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
+
+        webviewView.webview.onDidReceiveMessage(this.handleWebviewMessage.bind(this))
+        this.sendLoginData();
+    }
+
+    /**
+     * Handles messages received from the webview.
+     */
+    private async handleWebviewMessage(msg: WebviewMessage) {
+        switch (msg.type) {
+            case 'OnInfo':
+                msg.value && vscode.window.showInformationMessage(msg.value)
+                break
+            case 'OnError':
+                msg.value && UiController.showError(msg.value)
+                break
+            case 'RequestLoginData':
+                this.sendLoginData()
+                break
+            case 'UpdateTaskPoints':
+                Tide.getTaskPoints(msg.value.taskSetPath, msg.value.ideTaskId, this.sendTaskPoints.bind(this))
+                break
+        }
+    }
+
+    /**
+     * Sends login data to the webview.
+     */
+    private async sendLoginData() {    
+        const loginData = ExtensionStateManager.getLoginData()
+        await this._view?.webview.postMessage({ type: 'LoginData', value: loginData })
+    }
+
+    /**
+     * Sends task points to the webview.
+     */
+    private sendTaskPoints(points: TaskPoints | undefined) {    
+        this._view?.webview.postMessage({ type: 'TaskPoints', value: points })
+    }
+
+    /**
+     * Retrieves TIM data for the active text editor.
+     */
+    private async getTimData(): Promise<TimData | undefined> {
+        if (!TaskPanelProvider.activeTextEditor) return undefined;
+
+        try {
+            const doc = TaskPanelProvider.activeTextEditor.document
+            const currentDir = path.dirname(doc.fileName)
+            // Find the names of the tasks ide_task_id and the task set from the files path
+            let itemPath = currentDir
+            // console.log(path)
+            let pathSplit = itemPath.split(path.sep)
+            // ide_task_id
+            let id = pathSplit.at(-1)
+            // task set name
+            let demo = pathSplit.at(-2)
+            if (demo && id) {
+                return(ExtensionStateManager.getTaskTimData(demo, id))
+            }
+        } catch {
+            return undefined
+        }
+    }
+
+    /**
+     * Sends TIM data to the webview.
+     */
+    private async sendTimData(timData: TimData | undefined) {
+        await this._view?.webview.postMessage({ type: 'UpdateTimData', value: timData })
+    }
+
+    private _getHtmlForWebview(webview: vscode.Webview) {
+        return getDefaultHtmlForWebview(webview, this._extensionUri, 'TaskPanel')
+    }
+
+    public revive(panel: vscode.WebviewView) {
+        this._view = panel
+    }
+}

@@ -15,6 +15,8 @@ import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
+import { get } from 'http'
+
 
 export default class Tide {
   public static async debug() {
@@ -96,11 +98,11 @@ export default class Tide {
     }
 
     const courseName = path.basename(path.dirname(taskSetPath))
-    // append course name to the base download path
-    const downloadPath = path.join(path.normalize(downloadPathBase), courseName)
-
-    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', downloadPath], (data: string) => {
-        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
+    const taskName = path.basename(taskSetPath)
+    const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
+    const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
+    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
+        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
       // if (taskCreationFeedback.success) {
