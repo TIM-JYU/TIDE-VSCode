@@ -13,7 +13,7 @@
     courses: Array<Course>;
     defaultExpandedState: boolean;
     isLoggedIn: boolean;
-    customUrl: String;
+    customUrl: string;
   }
 
   let {
