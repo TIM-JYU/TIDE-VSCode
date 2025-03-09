@@ -212,7 +212,9 @@ export default class Tide {
     
     let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string
     if (customUrl && customUrl.trim() !== "") {
-      env_modified.URL = customUrl
+      // Ensure that the custom url ends with a slash
+      const formattedUrl = customUrl.trim().endsWith("/") ? customUrl.trim() : customUrl.trim() + "/"
+      env_modified.URL = formattedUrl
     }
     else {
       env_modified.URL = "https://tim.jyu.fi/"

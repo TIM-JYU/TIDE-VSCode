@@ -64,12 +64,17 @@
           break
         }
         case 'CustomUrl': {
-          customUrl = message.value
+          customUrl = ensureTrailingSlash(message.value)
           break
         }
       }
     })
   })
+
+  // Ensure that the URL has a trailing slash
+  function ensureTrailingSlash(url: string): string {
+    return url.endsWith('/') ? url : url + '/'
+  }
 
   function onTaskSubmitted() {
     updateTaskPoints()
