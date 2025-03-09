@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from 'svelte/legacy'
 
   /**
    * @author Hannes Koivusipilä
@@ -17,11 +17,10 @@
   let customUrl: string = $state('')
   let courses: Array<Course> = $state([])
   let loginData: LoginData = $state({
-    isLogged: false
+    isLogged: false,
   })
   let isLoggedIn: boolean = $derived(loginData?.isLogged ?? false)
   let coursesRefreshing: boolean = $state(false)
-
 
   function refreshCourses() {
     coursesRefreshing = true
@@ -29,6 +28,11 @@
       type: 'RefreshCourseData',
       value: undefined,
     })
+  }
+
+  // Ensure that the URL has a trailing slash
+  function ensureTrailingSlash(url: string): string {
+    return url.endsWith('/') ? url : url + '/'
   }
 
   /**
@@ -52,7 +56,7 @@
           break
         }
         case 'CustomUrl': {
-          customUrl = message.value
+          customUrl = ensureTrailingSlash(message.value)
           break
         }
       }
@@ -74,8 +78,7 @@
     if (downloadPath === null) {
       directoryNotSet()
     }
-  });
-  
+  })
 </script>
 
 <!--
@@ -115,7 +118,7 @@ updates the courses' status, and handles downloading task sets and opening works
       defaultExpandedState={true}
       statusOfCourses={'active'}
       courses={courses.filter((c) => c.status === 'active')}
-      customUrl={customUrl}
+      {customUrl}
       {isLoggedIn}
     />
 
@@ -123,7 +126,7 @@ updates the courses' status, and handles downloading task sets and opening works
       defaultExpandedState={false}
       statusOfCourses={'hidden'}
       courses={courses.filter((c) => c.status === 'hidden')}
-      customUrl={customUrl}
+      {customUrl}
       {isLoggedIn}
     />
   {/if}

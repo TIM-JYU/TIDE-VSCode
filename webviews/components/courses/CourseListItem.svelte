@@ -56,7 +56,7 @@
     </Menu>
   </header>
   <div>
-    <a class="link" href={ customUrl + course.path}>Open material page</a>
+    <a class="link" href={ customUrl + 'view/' + course.path}>Open material page</a>
   </div>
   <button
     class="expand-collapse-button"
