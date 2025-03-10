@@ -74,7 +74,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     /**
      * Sends task points to the webview.
      */
-    private sendTaskPoints(points: TaskPoints | undefined) {    
+    private sendTaskPoints(points: TaskPoints | undefined) {
         this._view?.webview.postMessage({ type: 'TaskPoints', value: points })
     }
 

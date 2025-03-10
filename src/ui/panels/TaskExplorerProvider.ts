@@ -187,18 +187,9 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 keys.forEach(element => {
                     // Save each task as separate objects into TimData
                     const newTimData : TimData = timData.course_parts[demo].tasks[element]
-                    ExtensionStateManager.setTimData(newTimData)
+                    ExtensionStateManager.addTimData(newTimData)
                 })
-            })
-
-            /* // Create an Array of the tasks in .timdata
-            const taskData = timData.course_parts[coursePath].tasks
-            let keys = Object.keys(taskData)
-            // And save each task object to TimData
-            keys.forEach(element => {
-                const newTimData : TimData = timData.course_parts[coursePath].tasks[element]
-                ExtensionStateManager.setTimData(newTimData)
-            })  */           
+            })     
         } catch (err) {
             console.log(err)
         }

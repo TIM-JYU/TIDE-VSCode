@@ -152,7 +152,25 @@ export default class CoursePanel {
         }
         case 'DownloadTaskSet': {
           const taskSetPath = msg.value
-          Tide.downloadTaskSet(taskSetPath)
+          await Tide.downloadTaskSet(taskSetPath)
+
+          // Update the treeview after downloading a new task set
+
+          await ExtensionStateManager.updateTimData(taskSetPath)
+
+          const timData = ExtensionStateManager.getTimData()
+          console.log(timData)
+
+          timData.forEach(async dataElement => {
+            // Only update task points for tasks of the downloaded task set AND if the task scores points at all
+            if (dataElement.path == taskSetPath && dataElement.max_points) {
+              await Tide.getTaskPoints(dataElement.path, dataElement.ide_task_id, (data: string) => {
+                console.log(data)
+              })
+            }
+          })
+
+          vscode.commands.executeCommand('tide.refreshTree')
           break
         }
         case 'OpenWorkspace': {
