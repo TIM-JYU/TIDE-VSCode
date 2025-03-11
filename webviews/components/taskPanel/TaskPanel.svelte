@@ -33,6 +33,7 @@
   let isLoggedIn = $state(false)
   let workspace: string = $state('')
   let taskPoints: TaskPoints = $state({ current_points: undefined })
+  let customUrl: string = $state('')
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -62,9 +63,18 @@
           onTaskSubmitted()
           break
         }
+        case 'CustomUrl': {
+          customUrl = ensureTrailingSlash(message.value)
+          break
+        }
       }
     })
   })
+
+  // Ensure that the URL has a trailing slash
+  function ensureTrailingSlash(url: string): string {
+    return url.endsWith('/') ? url : url + '/'
+  }
 
   function onTaskSubmitted() {
     updateTaskPoints()
@@ -111,7 +121,7 @@ This component manages the display of task information and interaction with task
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-        <a href={'https://tim.jyu.fi/view/' + timData.path}>Open exercise in TIM</a>
+        <a href={ customUrl + "view/" + timData.path}>Open exercise in TIM</a>
     </div>
 
     <hr />

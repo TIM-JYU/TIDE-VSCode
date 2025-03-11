@@ -13,13 +13,15 @@
     courses: Array<Course>;
     defaultExpandedState: boolean;
     isLoggedIn: boolean;
+    customUrl: string;
   }
 
   let {
     statusOfCourses,
     courses,
     defaultExpandedState,
-    isLoggedIn
+    isLoggedIn,
+    customUrl
   }: Props = $props();
 
   let isExpanded = $state(defaultExpandedState)
@@ -43,7 +45,7 @@ or opening workspaces.
 
 {#if isExpanded}
   {#each courses as course}
-    <CourseListItem {course} {isLoggedIn} />
+    <CourseListItem {course} {isLoggedIn} {customUrl} />
   {/each}
 {/if}
 
