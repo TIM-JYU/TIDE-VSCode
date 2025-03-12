@@ -78,7 +78,18 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
     
     // Refresh the treeview with courses inside File Download Path in settings
+    // TODO: Only show files and directories which are a part of a TIM Course
     private refreshTree() {
+
+        // THIS PART IS ONLY USED FOR LEARNING PURPOSES
+
+        const courses = ExtensionStateManager.getCourses()
+        const points = ExtensionStateManager.getAllTaskPoints()
+        console.log(courses)
+        console.log(points)
+
+        // LEARNING STOPS HERE
+
         let loginData = ExtensionStateManager.getLoginData()
         // console.log(loginData)
         if (loginData.isLogged) {
@@ -100,20 +111,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         } else {
             // Check that the path exists
             if (this.pathExists(rootDir)) {
-                // Find all files and directories in the given path
+                // Find all files and directories in the File Download Path set by the user
                 fs.readdirSync(rootDir).forEach(element => {
-                    // console.log("Reading main course dir")
-                    // console.log(element)
                     let current = path.join(rootDir,element)
                     if (fs.statSync(current).isFile()) {
-                        // console.log("Found file instead of course dir!")
+                        // We should ignore files inside the root directory, and only look for course directories
                     } else {
-                        if (current.endsWith('.vscode')) {
-                            // skip
-                        } else {
-                            this.course_data.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
-                            this.read_course_directory(current, this.course_data.at(-1))
-                        }
+                        this.course_data.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
+                        this.read_course_directory(current, this.course_data.at(-1))
                     }
                 })
             }
@@ -236,14 +241,17 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         
     }
 
-    // we need to implement getTreeItem to receive items from our tree view
+    /**
+     * This method needs to be implemented in order to show the TreeItems in the TreeView
+     * The result is given the information inside our implementation of a TreeviewItem (CourseTaskTreeItem)
+     * and a status icon is calculated based on current task points and max points
+     * @param item The item that is going to be shown
+     * @returns a vscode.TreeItem that can be shown in a treeview component
+     */
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
         let title = item.label? item.label.toString() : ""
         let result = new vscode.TreeItem(title, item.collapsibleState)
         let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
-        // This finally showed the icon
-        // TODO: Logic for choosing the right icon
-        console.log("getting treeview item")
         if (item.type == 'file') {
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = item.path
@@ -253,8 +261,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             let id = pathSplit.at(-2)
             // task set name
             let demo = pathSplit.at(-3)
-            // console.log(id)
-            // console.log(demo)
 
             // Find the points data of this task file from ExtensionStateManager
             if (id && demo) {
@@ -293,11 +299,9 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
             // Calculate maxPoints sum for tasks in this directory
             let maxPointsForDir = this.calculateMaxPoints(item, 0)
-            console.log(maxPointsForDir)
 
             // Calculate currentPoints sum for tasks in this directory
             let currentPointsForDir = this.calculateCurrentPoints(item, 0)
-            console.log(currentPointsForDir)
 
             if (maxPointsForDir > 0) {
                 if (maxPointsForDir == currentPointsForDir) {
@@ -310,18 +314,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             } else {
                 iconPath = ""
             }
-
-            let children = item.children
-            children.forEach(child => {
-                console.log(child)
-            })
-            // Find all .timdata task objects for each task inside the children of this
-            // Calculate the maximum points for the sum of those tasks
-            // Calculate the current points for the sum of those tasks
-            // Pick the correct icon
-
         }
-        // let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
         result.command = {
             command : 'tide.item_clicked',
             title : title,

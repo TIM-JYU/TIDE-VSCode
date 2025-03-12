@@ -151,26 +151,34 @@ export default class CoursePanel {
           break
         }
         case 'DownloadTaskSet': {
-          const taskSetPath = msg.value
-          await Tide.downloadTaskSet(taskSetPath)
+          try {
+            const taskSetPath = msg.value
 
-          // Update the treeview after downloading a new task set
+            // Download a new Task Set
+            await Tide.downloadTaskSet(taskSetPath)
 
-          await ExtensionStateManager.updateTimData(taskSetPath)
+            // Update TimData with the newly written data
+            ExtensionStateManager.updateTimData(taskSetPath)
 
-          const timData = ExtensionStateManager.getTimData()
-          console.log(timData)
+            // Get TimData for reading
+            const dataPromise = ExtensionStateManager.getTimData()
 
-          timData.forEach(async dataElement => {
-            // Only update task points for tasks of the downloaded task set AND if the task scores points at all
-            if (dataElement.path == taskSetPath && dataElement.max_points) {
-              await Tide.getTaskPoints(dataElement.path, dataElement.ide_task_id, (data: string) => {
-                console.log(data)
-              })
-            }
-          })
+            // Fetch Task Points for the newly downloaded tasks from TIM
+            await Promise.all(dataPromise.map(async (dataObject) => {
+              // Only fetch points for new tasks
+              if (dataObject.path == taskSetPath && dataObject.max_points) {
+                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
+                  console.log(data)
+                })
+              }
+            }))
 
-          vscode.commands.executeCommand('tide.refreshTree')
+            // Refresh TreeView with the new data
+            vscode.commands.executeCommand('tide.refreshTree')
+
+          } catch (error) {
+            console.log('Downloading a new taskset had an error: ' + error)
+          }
           break
         }
         case 'OpenWorkspace': {
