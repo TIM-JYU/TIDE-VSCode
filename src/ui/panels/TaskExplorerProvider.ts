@@ -270,18 +270,18 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
                 if (timData) {
                     // Task Max points
-                    let maxPoints = timData.max_points
-                    if (maxPoints == null) {
-                        maxPoints = 0
+                    let max_points = timData.max_points
+                    if (max_points == null) {
+                        max_points = 0
                     }
-                    if (maxPoints == 0) {
+                    if (max_points == 0) {
                         iconPath = ""
                     } else {
                         // Current task points
                         const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-                        if (maxPoints && currentPoints && currentPoints.current_points) {
+                        if (max_points && currentPoints && currentPoints.current_points) {
                             // Maximum points received from the task
-                            if (currentPoints?.current_points == maxPoints) {
+                            if (currentPoints?.current_points == max_points) {
                                 iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
                                 // Some points received from the task
                             } else if (currentPoints?.current_points > 0) {
@@ -300,16 +300,16 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             // Write directory icon logic here
             iconPath = ""
 
-            // Calculate maxPoints sum for tasks in this directory
-            let maxPointsForDir = this.calculateMaxPoints(item, 0)
-            console.log(maxPointsForDir)
+            // Calculate max_points sum for tasks in this directory
+            let dir_max_points = this.calculate_max_points(item, 0)
+            console.log(dir_max_points)
 
             // Calculate currentPoints sum for tasks in this directory
             let currentPointsForDir = this.calculateCurrentPoints(item, 0)
             console.log(currentPointsForDir)
 
-            if (maxPointsForDir > 0) {
-                if (maxPointsForDir == currentPointsForDir) {
+            if (dir_max_points > 0) {
+                if (dir_max_points == currentPointsForDir) {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
                 } else if (currentPointsForDir > 0) {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
@@ -341,19 +341,19 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
 
     /**
-     * Calculates a sum of maxPoints for tasks within the items children
+     * Calculates a sum of max points for tasks within the items children
      * @param item the treeview item for which the sum is calculated
      * @param sum current sum
      * @returns calculated max points
      */
-    public calculateMaxPoints(item: CourseTaskTreeItem, sum: number): number {
+    public calculate_max_points(item: CourseTaskTreeItem, sum: number): number {
         let children = item.children
         let pointsSum = sum
         let readyCheck = false
         if (children.length > 0) {
             children.forEach(child => {
                 if (child.type === 'dir') {
-                    pointsSum += this.calculateMaxPoints(child, sum)
+                    pointsSum += this.calculate_max_points(child, sum)
                 } else {
                     // type === 'file' -> ready to find max points
                     readyCheck = true
