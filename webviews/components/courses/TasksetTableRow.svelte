@@ -25,13 +25,11 @@
   <td>{taskset.tasks.length}</td>
   <!-- <td>6/8</td> -->
   <td>
-    {#if taskset.downloadPath === undefined}
-      <button onclick={downloadTaskSet}>Download taskset</button>
-    {/if}
+    <button onclick={downloadTaskSet}>Download taskset</button>
   </td>
 {:else}
   <td colspan="2">Unavailable</td>
-{/if}
+0{/if}
 
 <style>
   td {

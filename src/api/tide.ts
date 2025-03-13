@@ -102,9 +102,11 @@ export default class Tide {
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
     this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
-        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
-        /* Updating the tree view to reflect changes */
-        vscode.commands.executeCommand('tide.refreshTree') 
+    ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
+    /* Updating the tree view to reflect changes */
+    vscode.commands.executeCommand('tide.refreshTree') 
+
+    
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
       // if (taskCreationFeedback.success) {
