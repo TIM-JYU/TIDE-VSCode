@@ -29,7 +29,7 @@
   </td>
 {:else}
   <td colspan="2">Unavailable</td>
-0{/if}
+{/if}
 
 <style>
   td {
