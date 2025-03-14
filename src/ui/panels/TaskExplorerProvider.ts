@@ -78,24 +78,15 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
     
     // Refresh the treeview with courses inside File Download Path in settings
-    // TODO: Only show files and directories which are a part of a TIM Course
     private refreshTree() {
-
-        // THIS PART IS ONLY USED FOR LEARNING PURPOSES
-
-        const courses = ExtensionStateManager.getCourses()
-        const points = ExtensionStateManager.getAllTaskPoints()
-        console.log(courses)
-        console.log(points)
-
-        // LEARNING STOPS HERE
-
         let loginData = ExtensionStateManager.getLoginData()
-        // console.log(loginData)
         if (loginData.isLogged) {
             this.course_data = []
             this.read_root_directory()
+            // This needs to be called in order to show the data in the treeview
             this.m_onDidChangeTreeData.fire(undefined)
+            const courses = ExtensionStateManager.getCourses()
+            console.log(courses)
         } else {
             vscode.window.showErrorMessage("Login to browse courses and tasks!")
         }
@@ -104,7 +95,16 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // Reads downloaded course directories, creates the parent nodes into course_data,
     // and starts reading each courses contents with the recursive function read_course_directory
     private read_root_directory() {
-        let rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+        const rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+        const courseData = ExtensionStateManager.getCourses()
+
+        // Check if the user has fetched course data from TIM
+        if (!courseData) {
+            // Inform user if course data isn't found
+            vscode.window.showInformationMessage("Course data was not found. Make sure you have TIDE courses added in TIM, and refresh course data from the My Courses- page!")
+            return
+        }
+
         // Check that the user has set a download path
         if (rootDir == undefined) {
             vscode.window.showErrorMessage("Error while reading fileDownloadPath. Edit fileDownloadPath in Settings!")
@@ -117,8 +117,17 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                     if (fs.statSync(current).isFile()) {
                         // We should ignore files inside the root directory, and only look for course directories
                     } else {
-                        this.course_data.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
-                        this.read_course_directory(current, this.course_data.at(-1))
+                        // Find TIDE Course directories in the root directory
+                        courseData.map(course => {
+
+                            const coursePathParts = course.path.split(path.posix.sep)
+
+                            // Only show active TIDE Course directories in the treeview 
+                            if (coursePathParts.includes(element) && course.status == 'active') {
+                                this.course_data.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
+                                this.read_course_directory(current, this.course_data.at(-1))
+                            }
+                        })
                     }
                 })
             }
@@ -127,6 +136,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
     // Reads the given path and adds found files and directories as the given parents children
     // recursively until all nodes have been added
+    // TODO: Should we filter out directories and files that aren't a part of a task set?
+    // TODO: Should there be separation between task set directories and task directories?
     private read_course_directory(dir: string, parent: CourseTaskTreeItem | undefined) {
         if (dir == undefined) {
             vscode.window.showErrorMessage("Error while reading course path!")
@@ -134,69 +145,29 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             vscode.window.showErrorMessage("Error reading course directory: Undefined parent")
         } else {
             let courseDirPath: string = dir
-            // Find all elements in the directory
             if (this.pathExists(courseDirPath)) {
+                // Find all elements in the directory and go through them in a loop
                 fs.readdirSync(courseDirPath).forEach(element => {
-                    // console.log("Reading course items")
-                    // console.log(element)
                     let current = path.join(courseDirPath,element)
                     // If the current element is a file, add it to the parents children and stop the recursion
                     if (fs.statSync(current).isFile()) {
-                        // console.log("Found file!")
-                        // console.log(element)
                         if (current.endsWith('.timdata')) {
-                            // Save the tim data for the extension to use later
-                            // console.log("Found timData!")
-                            // console.log(current)
-
-                            this.readAndSaveTimData(current)
-
+                            // .timdata files are read when task sets are downloaded so we can ignore them here
                         } else {
+                            // Create a new node and add it to its parents children
                             let newNode = new CourseTaskTreeItem(element, current, "file")
                             parent.add_child(newNode)
                         }
                     // If the current element is a directory, add it to the parents children and continue the recursion
                     } else {
-                        // console.log("Found dir!")
-                        // console.log(element)
-                        if (current.endsWith('.vscode')) {
-                            // skip
-                        } else {
-                            let newNode = new CourseTaskTreeItem(element, current, "dir")
-                            parent.add_child(newNode)
-                            this.read_course_directory(current, newNode)
-                        }
+                        // Create a new node and add it to its parents children
+                        let newNode = new CourseTaskTreeItem(element, current, "dir")
+                        parent.add_child(newNode)
+                        // Continue recursion
+                        this.read_course_directory(current, newNode)
                     }
                 })
             }
-        }
-    }
-
-    /**
-     * Read a .timdata file and save tasks objects found
-     * @param filePath path to the .timdata file about to be read
-     */
-    private async readAndSaveTimData(filePath: string) {
-        try {
-            // Read the timdata object from the file
-            const timDataRaw = fs.readFileSync(filePath)
-            const timData = JSON.parse(timDataRaw.toString())
-            
-            //console.log(timData)
-
-            // course_parts includes all task sets (demos)
-            let courseParts = Object.keys(timData.course_parts)
-            courseParts.forEach(demo => {
-                let taskData = timData.course_parts[demo].tasks
-                let keys = Object.keys(taskData)
-                keys.forEach(element => {
-                    // Save each task as separate objects into TimData
-                    const newTimData : TimData = timData.course_parts[demo].tasks[element]
-                    ExtensionStateManager.addTimData(newTimData)
-                })
-            })     
-        } catch (err) {
-            console.log(err)
         }
     }
 
@@ -255,7 +226,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         if (item.type == 'file') {
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = item.path
-            // console.log(path)
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-2)

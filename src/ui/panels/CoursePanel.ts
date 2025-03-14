@@ -170,6 +170,9 @@ export default class CoursePanel {
                 await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
                   console.log(data)
                 })
+              } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
+                // Set the current points of pointsless tasks to 0 in order to avoid errors
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
               }
             }))
 
@@ -200,6 +203,8 @@ export default class CoursePanel {
         }
         case 'SetCourseStatus': {
           ExtensionStateManager.setCourseStatus(msg.value.id, msg.value.status)
+          // Refresh TreeView with the new data
+          vscode.commands.executeCommand('tide.refreshTree')
           break
         }
         case 'RefreshCourseData': {
