@@ -31,7 +31,6 @@
     isLogged: false
   })
   let isLoggedIn = $state(false)
-  let workspace: string = $state('')
   let taskPoints: TaskPoints = $state({ current_points: undefined })
   let customUrl: string = $state('')
 
@@ -48,10 +47,6 @@
         }
         case 'LoginData': {
           loginData = message.value
-          break
-        }
-        case 'UpdateWorkspaceName': {
-          workspace = message.value
           break
         }
         case 'TaskPoints': {

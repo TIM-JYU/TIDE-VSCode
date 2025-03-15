@@ -17,23 +17,6 @@
       value: taskset.path,
     })
   }
-
-  /**
-   * Opens a workspace for the specified task set.
-   */
-  function openWorkspace() {
-    tsvscode.postMessage({
-      type: 'OpenWorkspace',
-      value: taskset.downloadPath,
-    })
-    window.addEventListener('message', (event) => {
-      const message = event.data;
-
-      if (message.type === 'WorkspaceError') {
-        taskset.downloadPath = undefined;
-      }
-    });
-  }
 </script>
 
 <td id="name-cell">{taskset.name}</td>
@@ -42,11 +25,7 @@
   <td>{taskset.tasks.length}</td>
   <!-- <td>6/8</td> -->
   <td>
-    {#if taskset.downloadPath === undefined}
-      <button onclick={downloadTaskSet}>Download taskset</button>
-    {:else}
-      <button onclick={openWorkspace}>Open in workspace</button>
-    {/if}
+    <button onclick={downloadTaskSet}>Download taskset</button>
   </td>
 {:else}
   <td colspan="2">Unavailable</td>
