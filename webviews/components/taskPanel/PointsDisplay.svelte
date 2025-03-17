@@ -3,10 +3,10 @@
 
   interface Props {
     taskPoints: TaskPoints;
-    max_points: number | null;
+    maxPoints: number | null;
   }
 
-  let { taskPoints, max_points }: Props = $props();
+  let { taskPoints, maxPoints }: Props = $props();
 </script>
 
 <!--
@@ -14,12 +14,12 @@
 A component for showing task points data.
 -->
 <div>
-  {#if taskPoints && taskPoints.current_points !== undefined && max_points !== null}
+  {#if taskPoints && taskPoints.current_points !== undefined && maxPoints !== null}
     <div id="points">
       <span>Task points</span>
-      <span>{taskPoints.current_points} / {max_points}</span>
+      <span>{taskPoints.current_points} / {maxPoints}</span>
     </div>
-    <progress value={taskPoints.current_points} max={max_points} aria-label="Task progress"></progress>
+    <progress value={taskPoints.current_points} max={maxPoints} aria-label="Task progress"></progress>
   {/if}
 </div>
 
