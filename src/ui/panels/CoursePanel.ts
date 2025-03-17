@@ -77,6 +77,20 @@ export default class CoursePanel {
     this.panel.webview.postMessage(msg)
   }
 
+  /**
+   * Sends user defined url for the tim instance address from the settings
+   * The intended recepient is Courses.svelte.
+   * @param customUrl 
+   */
+  private sendCustomUrl() {
+    const customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    const msg: WebviewMessage = {
+      type: "CustomUrl",
+      value: customUrl,
+    }
+    this.panel.webview.postMessage(msg)
+  }
+
   public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
 
@@ -184,19 +198,6 @@ export default class CoursePanel {
           }
           break
         }
-        case 'OpenWorkspace': {
-          const tasksetPath = msg.value;
-          //check that the local folder exists
-          if (!fs.existsSync(tasksetPath)) {
-            vscode.window.showErrorMessage(`Path does not exist: ${tasksetPath} \n Please download the taskset` );
-              this.panel.webview.postMessage({
-              type: 'WorkspaceError',
-            });
-            return;
-          }
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(tasksetPath))
-          break
-        }
         case 'RequestLoginData': {
           this.sendLoginData(ExtensionStateManager.getLoginData())
           break
@@ -255,6 +256,7 @@ export default class CoursePanel {
     this.sendLoginData(loginData)
     const courses = ExtensionStateManager.getCourses()
     this.sendCourseData(courses)
+    this.sendCustomUrl()
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {

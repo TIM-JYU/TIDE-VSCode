@@ -142,6 +142,7 @@ export interface WebviewMessage {
  */
 export type MessageType =
   | 'CourseData'
+  | 'CustomUrl'
   | 'DownloadTaskSet'
   | 'Login'
   | 'LoginData'
@@ -149,7 +150,6 @@ export type MessageType =
   | 'OnError'
   | 'OnInfo'
   | 'OpenSettings'
-  | 'OpenWorkspace'
   | 'RefreshCourseData'
   | 'RequestLoginData'
   | 'ResetExercise'
@@ -164,4 +164,3 @@ export type MessageType =
   | 'TaskPoints'
   | 'UpdateTaskPoints'
   | 'UpdateTimData'
-  | 'UpdateWorkspaceName'

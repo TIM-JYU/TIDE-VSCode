@@ -210,6 +210,19 @@ export default class Tide {
     let buffer = ''
     let errorBuffer = ''
 
+    // Use a copy of process.env to pass custom url to the child process 
+    const env_modified = {...process.env}
+    
+    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string
+    if (customUrl && customUrl.trim() !== "") {
+      // Ensure that the custom url ends with a slash
+      const formattedUrl = customUrl.trim().endsWith("/") ? customUrl.trim() : customUrl.trim() + "/"
+      env_modified.URL = formattedUrl
+    }
+    else {
+      env_modified.URL = "https://tim.jyu.fi/"
+    }
+
     // To run an uncompiled version of the CLI tool:
     // 1. Point the cli tool path in your extension settings to the main.py -file
     //const ar = ["run", "python", vscode.workspace.getConfiguration().get("tide.cliPath") as string, ...args];
@@ -219,6 +232,7 @@ export default class Tide {
     const childProcess = cp.spawn(
       vscode.workspace.getConfiguration().get('TIM-IDE.cliPath') as string,
       args,
+      {"env" : env_modified}
     )
 
     childProcess.stdout.on('data', (data) => {

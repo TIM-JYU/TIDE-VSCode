@@ -29,6 +29,15 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
                 this.sendTimData(undefined)
             }
         });
+
+        // Listen for changes in the customUrl setting
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            if (event.affectsConfiguration('TIM-IDE.customUrl')) {
+                this.sendCustomUrl()
+            }
+        });
+
+        this.sendCustomUrl()
     }
 
     resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -41,6 +50,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage(this.handleWebviewMessage.bind(this))
         this.sendLoginData();
+        this.sendCustomUrl();
     }
 
     /**
@@ -60,6 +70,9 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             case 'UpdateTaskPoints':
                 Tide.getTaskPoints(msg.value.taskSetPath, msg.value.ideTaskId, this.sendTaskPoints.bind(this))
                 break
+            case 'CustomUrl':
+                this.sendCustomUrl()
+                break
         }
     }
 
@@ -76,6 +89,15 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
      */
     private sendTaskPoints(points: TaskPoints | undefined) {
         this._view?.webview.postMessage({ type: 'TaskPoints', value: points })
+    }
+
+    /**
+     * Sends custom Url from the settings
+     */
+    private sendCustomUrl() {
+        const customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+        this._view?.webview.postMessage({ type: "CustomUrl", value: customUrl})
+        console.log(customUrl)
     }
 
     /**
