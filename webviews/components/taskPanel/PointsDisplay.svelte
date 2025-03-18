@@ -14,7 +14,7 @@
 A component for showing task points data.
 -->
 <div>
-  {#if taskPoints && taskPoints.current_points !== undefined && taskMaxPoints !== null}
+  {#if taskPoints && taskPoints.current_points !== null && taskMaxPoints !== null}
     <div id="points">
       <span>Task points</span>
       <span>{taskPoints.current_points} / {taskMaxPoints}</span>
