@@ -2,16 +2,15 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import UiController from '../UiController'
 import { TimData } from '../../common/types'
 
 
 // Class for handling TreeView data
 export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTreeItem> {
 
-    // course_data holds the parent nodes for each course
+    // courseData holds the parent nodes for each course
     // each parent node holds the directories and tasks of the courses as children
-    private course_data: CourseTaskTreeItem [] = []
+    private courseData: CourseTaskTreeItem [] = []
 
     // with the vscode.EventEmitter we can refresh our  tree view
     private m_onDidChangeTreeData: vscode.EventEmitter<CourseTaskTreeItem | undefined> = new vscode.EventEmitter<CourseTaskTreeItem | undefined>()
@@ -21,17 +20,17 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // Register commands required to handle the treeview
     constructor() {
         // Treeview commands
-        vscode.commands.registerCommand('tide.item_clicked', item => this.item_clicked(item))
+        vscode.commands.registerCommand('tide.itemClicked', item => this.itemClicked(item))
         vscode.commands.registerCommand('tide.refreshTree', () => this.refreshTree())
         vscode.commands.registerCommand('tide.wipeTreeAndEditors', () => this.wipeTreeAndEditors())
 
         // Context menu commands (right-click menu)
-        vscode.commands.registerCommand('tide.treeview_menu_open_tasks', item => this.open_tasks_in_this_dir(item))
+        vscode.commands.registerCommand('tide.treeviewMenuOpenTasks', item => this.openTasksInThisDir(item))
     }
 
     // Empty treeview and close files after a user logs out
     private async wipeTreeAndEditors() {
-        this.course_data = []
+        this.courseData = []
         this.m_onDidChangeTreeData.fire(undefined)
 
         // Closes open editors
@@ -42,12 +41,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
 
     // Opens all tasks found in the children of the given item
-    private open_tasks_in_this_dir(item: CourseTaskTreeItem) {
+    private openTasksInThisDir(item: CourseTaskTreeItem) {
         let currentItem = item
         // item might be a dir or a file
         if(currentItem.type == "dir") {
             currentItem.children.forEach(child => {
-                this.open_tasks_in_this_dir(child)
+                this.openTasksInThisDir(child)
             })
         } else {
             try {
@@ -80,40 +79,54 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // Refresh the treeview with courses inside File Download Path in settings
     private refreshTree() {
         let loginData = ExtensionStateManager.getLoginData()
-        // console.log(loginData)
         if (loginData.isLogged) {
-            this.course_data = []
-            this.read_root_directory()
+            this.courseData = []
+            this.readRootDirectory()
+            // This needs to be called in order to show the data in the treeview
             this.m_onDidChangeTreeData.fire(undefined)
+            const courses = ExtensionStateManager.getCourses()
+            console.log(courses)
         } else {
             vscode.window.showErrorMessage("Login to browse courses and tasks!")
         }
     }
 
-    // Reads downloaded course directories, creates the parent nodes into course_data,
-    // and starts reading each courses contents with the recursive function read_course_directory
-    private read_root_directory() {
-        let rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+    // Reads downloaded course directories, creates the parent nodes into courseData,
+    // and starts reading each courses contents with the recursive function readCourseDirectory
+    private readRootDirectory() {
+        const rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+        const courseData = ExtensionStateManager.getCourses()
+
+        // Check if the user has fetched course data from TIM
+        if (!courseData) {
+            // Inform user if course data isn't found
+            vscode.window.showInformationMessage("Course data was not found. Make sure you have TIDE courses added in TIM, and refresh course data from the My Courses- page!")
+            return
+        }
+
         // Check that the user has set a download path
         if (rootDir == undefined) {
             vscode.window.showErrorMessage("Error while reading fileDownloadPath. Edit fileDownloadPath in Settings!")
         } else {
             // Check that the path exists
             if (this.pathExists(rootDir)) {
-                // Find all files and directories in the given path
+                // Find all files and directories in the File Download Path set by the user
                 fs.readdirSync(rootDir).forEach(element => {
-                    // console.log("Reading main course dir")
-                    // console.log(element)
                     let current = path.join(rootDir,element)
                     if (fs.statSync(current).isFile()) {
-                        // console.log("Found file instead of course dir!")
+                        // We should ignore files inside the root directory, and only look for course directories
                     } else {
-                        if (current.endsWith('.vscode')) {
-                            // skip
-                        } else {
-                            this.course_data.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
-                            this.read_course_directory(current, this.course_data.at(-1))
-                        }
+                        // Find TIDE Course directories in the root directory
+                        courseData.map(course => {
+
+                            const coursePathParts = course.path.split(path.posix.sep)
+
+                            // Only show active TIDE Course directories in the treeview 
+                            if (coursePathParts.includes(element) && course.status == 'active') {
+                                this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
+                                this.readCourseDirectory(current, this.courseData.at(-1))
+                            }
+                        })
                     }
                 })
             }
@@ -122,85 +135,38 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
     // Reads the given path and adds found files and directories as the given parents children
     // recursively until all nodes have been added
-    private read_course_directory(dir: string, parent: CourseTaskTreeItem | undefined) {
+    // TODO: Should we filter out directories and files that aren't a part of a task set?
+    // TODO: Should there be separation between task set directories and task directories?
+    private readCourseDirectory(dir: string, parent: CourseTaskTreeItem | undefined) {
         if (dir == undefined) {
             vscode.window.showErrorMessage("Error while reading course path!")
         } else if (parent == undefined) {
             vscode.window.showErrorMessage("Error reading course directory: Undefined parent")
         } else {
             let courseDirPath: string = dir
-            // Find all elements in the directory
             if (this.pathExists(courseDirPath)) {
+                // Find all elements in the directory and go through them in a loop
                 fs.readdirSync(courseDirPath).forEach(element => {
-                    // console.log("Reading course items")
-                    // console.log(element)
                     let current = path.join(courseDirPath,element)
                     // If the current element is a file, add it to the parents children and stop the recursion
                     if (fs.statSync(current).isFile()) {
-                        // console.log("Found file!")
-                        // console.log(element)
                         if (current.endsWith('.timdata')) {
-                            // Save the tim data for the extension to use later
-                            // console.log("Found timData!")
-                            // console.log(current)
-
-                            this.readAndSaveTimData(current)
-
+                            // .timdata files are read when task sets are downloaded so we can ignore them here
                         } else {
+                            // Create a new node and add it to its parents children
                             let newNode = new CourseTaskTreeItem(element, current, "file")
-                            parent.add_child(newNode)
+                            parent.addChild(newNode)
                         }
                     // If the current element is a directory, add it to the parents children and continue the recursion
                     } else {
-                        // console.log("Found dir!")
-                        // console.log(element)
-                        if (current.endsWith('.vscode')) {
-                            // skip
-                        } else {
-                            let newNode = new CourseTaskTreeItem(element, current, "dir")
-                            parent.add_child(newNode)
-                            this.read_course_directory(current, newNode)
-                        }
+                        // Create a new node and add it to its parents children
+                        let newNode = new CourseTaskTreeItem(element, current, "dir")
+                        parent.addChild(newNode)
+                        // Continue recursion
+                        this.readCourseDirectory(current, newNode)
                     }
                 })
             }
-        }
-    }
-
-    /**
-     * Read a .timdata file and save tasks objects found
-     * @param filePath path to the .timdata file about to be read
-     */
-    private async readAndSaveTimData(filePath: string) {
-        try {
-            // Read the timdata object from the file
-            const timDataRaw = fs.readFileSync(filePath)
-            const timData = JSON.parse(timDataRaw.toString())
-            
-            //console.log(timData)
-
-            // course_parts includes all task sets (demos)
-            let courseParts = Object.keys(timData.course_parts)
-            courseParts.forEach(demo => {
-                let taskData = timData.course_parts[demo].tasks
-                let keys = Object.keys(taskData)
-                keys.forEach(element => {
-                    // Save each task as separate objects into TimData
-                    const newTimData : TimData = timData.course_parts[demo].tasks[element]
-                    ExtensionStateManager.setTimData(newTimData)
-                })
-            })
-
-            /* // Create an Array of the tasks in .timdata
-            const taskData = timData.course_parts[coursePath].tasks
-            let keys = Object.keys(taskData)
-            // And save each task object to TimData
-            keys.forEach(element => {
-                const newTimData : TimData = timData.course_parts[coursePath].tasks[element]
-                ExtensionStateManager.setTimData(newTimData)
-            })  */           
-        } catch (err) {
-            console.log(err)
         }
     }
 
@@ -216,7 +182,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         }
 
     // Handles clicks on treeview items
-    public item_clicked(item: CourseTaskTreeItem) {
+    public itemClicked(item: CourseTaskTreeItem) {
 
         // Try to open the document
         try {
@@ -245,43 +211,43 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         
     }
 
-    // we need to implement getTreeItem to receive items from our tree view
+    /**
+     * This method needs to be implemented in order to show the TreeItems in the TreeView
+     * The result is given the information inside our implementation of a TreeviewItem (CourseTaskTreeItem)
+     * and a status icon is calculated based on current task points and max points
+     * @param item The item that is going to be shown
+     * @returns a vscode.TreeItem that can be shown in a treeview component
+     */
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
         let title = item.label? item.label.toString() : ""
         let result = new vscode.TreeItem(title, item.collapsibleState)
         let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
-        // This finally showed the icon
-        // TODO: Logic for choosing the right icon
-        console.log("getting treeview item")
         if (item.type == 'file') {
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = item.path
-            // console.log(path)
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-2)
             // task set name
             let demo = pathSplit.at(-3)
-            // console.log(id)
-            // console.log(demo)
 
             // Find the points data of this task file from ExtensionStateManager
             if (id && demo) {
                 const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
                 if (timData) {
-                    // Task Max points
-                    let max_points = timData.max_points
-                    if (max_points == null) {
-                        max_points = 0
+                    // Task Max points (max_points: number in .timData, maxPoints: string also exists in Tim and may be used in the future to describe how to gain maximum points from a task!)
+                    let taskMaxPoints = timData.max_points
+                    if (taskMaxPoints == null) {
+                        taskMaxPoints = 0
                     }
-                    if (max_points == 0) {
+                    if (taskMaxPoints == 0) {
                         iconPath = ""
                     } else {
                         // Current task points
                         const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-                        if (max_points && currentPoints && currentPoints.current_points) {
+                        if (taskMaxPoints && currentPoints && currentPoints.current_points) {
                             // Maximum points received from the task
-                            if (currentPoints?.current_points == max_points) {
+                            if (currentPoints?.current_points == taskMaxPoints) {
                                 iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
                                 // Some points received from the task
                             } else if (currentPoints?.current_points > 0) {
@@ -300,16 +266,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             // Write directory icon logic here
             iconPath = ""
 
-            // Calculate max_points sum for tasks in this directory
-            let dir_max_points = this.calculate_max_points(item, 0)
-            console.log(dir_max_points)
+            // Calculate taskMaxPoints sum for tasks in this directory
+            let taskMaxPointsForDir = this.calculateTaskMaxPoints(item, 0)
 
             // Calculate currentPoints sum for tasks in this directory
             let currentPointsForDir = this.calculateCurrentPoints(item, 0)
-            console.log(currentPointsForDir)
 
-            if (dir_max_points > 0) {
-                if (dir_max_points == currentPointsForDir) {
+            if (taskMaxPointsForDir > 0) {
+                if (taskMaxPointsForDir == currentPointsForDir) {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
                 } else if (currentPointsForDir > 0) {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
@@ -319,20 +283,9 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             } else {
                 iconPath = ""
             }
-
-            let children = item.children
-            children.forEach(child => {
-                console.log(child)
-            })
-            // Find all .timdata task objects for each task inside the children of this
-            // Calculate the maximum points for the sum of those tasks
-            // Calculate the current points for the sum of those tasks
-            // Pick the correct icon
-
         }
-        // let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'red-circle-svgrepo-com.svg')
         result.command = {
-            command : 'tide.item_clicked',
+            command : 'tide.itemClicked',
             title : title,
             arguments: [item],
         }
@@ -341,19 +294,19 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
 
     /**
-     * Calculates a sum of max points for tasks within the items children
+     * Calculates a sum of taskMaxPoints for tasks within the items children
      * @param item the treeview item for which the sum is calculated
      * @param sum current sum
      * @returns calculated max points
      */
-    public calculate_max_points(item: CourseTaskTreeItem, sum: number): number {
+    public calculateTaskMaxPoints(item: CourseTaskTreeItem, sum: number): number {
         let children = item.children
         let pointsSum = sum
         let readyCheck = false
         if (children.length > 0) {
             children.forEach(child => {
                 if (child.type === 'dir') {
-                    pointsSum += this.calculate_max_points(child, sum)
+                    pointsSum += this.calculateTaskMaxPoints(child, sum)
                 } else {
                     // type === 'file' -> ready to find max points
                     readyCheck = true
@@ -416,7 +369,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // Returns treeview items children
     public getChildren(element : CourseTaskTreeItem | undefined): vscode.ProviderResult<CourseTaskTreeItem[]> {
         if (element === undefined) {
-            return this.course_data
+            return this.courseData
         } else {
             return element.children
         }
@@ -449,7 +402,7 @@ class CourseTaskTreeItem extends vscode.TreeItem {
 
     // a public method to add childs, and with additional branches
     // we want to make the item collabsible
-    public add_child (child : CourseTaskTreeItem) {
+    public addChild (child : CourseTaskTreeItem) {
         // this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
         this.children.push(child)
     }

@@ -15,6 +15,7 @@ import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
 import { Course, CourseStatus, LoginData, TaskPoints, TimData } from '../common/types'
 import path from 'path'
+import * as fs from 'fs'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -131,12 +132,69 @@ export default class ExtensionStateManager {
     
   }
 
+  // This is for learning purposes only
+  static getAllTaskPoints(): TaskPoints |undefined {
+    const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
+    return taskPoints
+  }
+
+
   /**
-   * Tim data is saved for later use as an Array of TimData objects:
-   * [{.timData object}, {.timData object}, ...]
-   * Only the tasks data is saved from .timdata files
+   * Updates the timdata of a course, this should be called after downloading a new task set from tim, since it will modify the old .timdata file
+   * @param taskSetPath This path and the downloadpath the user has set are used to find the new .timdata file, which is then saved
+   * @returns 
    */
-  static setTimData(timData: TimData) {
+  static updateTimData(taskSetPath: string) {
+    let rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
+    if (rootDir == undefined) {
+      vscode.window.showErrorMessage("Error while reading fileDownloadPath. Edit fileDownloadPath in Settings!")
+    } else {
+        // Find the path to the new .timdata file
+        const taskSetPathSplit = taskSetPath.split(path.posix.sep)
+        const pathToTimDataDir = path.join(rootDir, taskSetPathSplit[1])
+        const pathToTimDataFile = path.join(pathToTimDataDir, '.timdata')
+        ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+    }
+  }
+
+  /**
+   * Read a .timdata file and save a TimData object for each task (demo) found in the file
+   * @param filePath path to a .timdata file
+   */ 
+  static readAndSaveTimData(filePath: string) {
+    try {
+        // Read the timdata object from the file
+        const timDataRaw = fs.readFileSync(filePath)
+        const timData = JSON.parse(timDataRaw.toString())
+        
+        //console.log(timData)
+
+        // course_parts includes all task sets (demos)
+        let courseParts = Object.keys(timData.course_parts)
+        courseParts.forEach(demo => {
+          let taskData = timData.course_parts[demo].tasks
+          let keys = Object.keys(taskData)
+          keys.forEach(element => {
+              // Save each task as separate objects into TimData
+              const newTimData : TimData = timData.course_parts[demo].tasks[element]
+              ExtensionStateManager.addTimData(newTimData)
+          })
+        })          
+    } catch (err) {
+        console.log(err)
+    }
+  }
+
+  /**
+   * Add a new TimData object (a Task parsed from a .timdata file)
+   * Each Task in Tim data is saved for later use as an Array of TimData objects:
+   * [{.timData task object}, {.timData task object}, ...]
+   * Only the tasks data (each task as one object) is saved from the .timdata files
+   * Duplicate TimData objects are not saved
+   * TODO: Is it necessary to update old TimData objects when a possible duplicate is found?
+   * @param timData a TimData object (a task in a .timdata file)
+   */
+  static addTimData(timData: TimData) {
 
     let allTimData : Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     let save = true
@@ -147,23 +205,35 @@ export default class ExtensionStateManager {
     allTimData.forEach(element => {
       // If an element has the same ide_task_id and path it is the same unique timdata object -> dont save a duplicate
       if (element.ide_task_id === timData.ide_task_id && element.path === timData.path) {
-        // console.log("Data already saved!")
         save = false
       }
     })
 
     // Only save timdata if it's not a dublicate
     if (save) {
-      // console.log("writing timdata")
-      // console.log(allTimData)
-
       allTimData.push(timData)      
       this.writeToGlobalState(StateKey.TimData, allTimData)
     }    
   }
 
   /**
-   * returns the first timData object that includes the given taskId as an ide_task_id
+   * Get all TimData
+   * @returns All TimData saved to globalstate
+   */
+  static getTimData(): Array<TimData> {
+    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
+    if (allTimData) {
+      return allTimData
+    } else {
+      return []
+    }
+  }
+
+  /**
+   * Get a TimData object
+   * @param demoName Name of the Demo that the TimData task is a part of
+   * @param taskId Task id of the TimData task
+   * @returns a unique TimData object with the given parameters, undefined is one is not found using the given parameters
    */
   static getTaskTimData(demoName: string, taskId: string): TimData | undefined{
     let timData = undefined
@@ -173,8 +243,6 @@ export default class ExtensionStateManager {
       if (element.ide_task_id === taskId) {
         // Make sure the task set is correct
         let pathParts = element.path.split(path.posix.sep)
-        // console.log("parts: ")
-        // console.log(pathParts)
         let demo = pathParts.at(-1)
         if (demoName == demo) {
           timData = element

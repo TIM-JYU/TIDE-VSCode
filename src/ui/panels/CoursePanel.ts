@@ -165,21 +165,37 @@ export default class CoursePanel {
           break
         }
         case 'DownloadTaskSet': {
-          const taskSetPath = msg.value
-          Tide.downloadTaskSet(taskSetPath)
-          break
-        }
-        case 'OpenWorkspace': {
-          const tasksetPath = msg.value;
-          //check that the local folder exists
-          if (!fs.existsSync(tasksetPath)) {
-            vscode.window.showErrorMessage(`Path does not exist: ${tasksetPath} \n Please download the taskset` );
-              this.panel.webview.postMessage({
-              type: 'WorkspaceError',
-            });
-            return;
+          try {
+            const taskSetPath = msg.value
+
+            // Download a new Task Set
+            await Tide.downloadTaskSet(taskSetPath)
+
+            // Update TimData with the newly written data
+            ExtensionStateManager.updateTimData(taskSetPath)
+
+            // Get TimData for reading
+            const dataPromise = ExtensionStateManager.getTimData()
+
+            // Fetch Task Points for the newly downloaded tasks from TIM
+            await Promise.all(dataPromise.map(async (dataObject) => {
+              // Only fetch points for new tasks
+              if (dataObject.path == taskSetPath && dataObject.max_points) {
+                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
+                  console.log(data)
+                })
+              } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
+                // Set the current points of pointsless tasks to 0 in order to avoid errors
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
+              }
+            }))
+
+            // Refresh TreeView with the new data
+            vscode.commands.executeCommand('tide.refreshTree')
+
+          } catch (error) {
+            console.log('Downloading a new taskset had an error: ' + error)
           }
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(tasksetPath))
           break
         }
         case 'RequestLoginData': {
@@ -188,6 +204,8 @@ export default class CoursePanel {
         }
         case 'SetCourseStatus': {
           ExtensionStateManager.setCourseStatus(msg.value.id, msg.value.status)
+          // Refresh TreeView with the new data
+          vscode.commands.executeCommand('tide.refreshTree')
           break
         }
         case 'RefreshCourseData': {

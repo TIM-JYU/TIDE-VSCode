@@ -15,7 +15,6 @@ import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
-import { get } from 'http'
 
 
 export default class Tide {
@@ -101,7 +100,7 @@ export default class Tide {
     const taskName = path.basename(taskSetPath)
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
-    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
+    await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
         ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
@@ -164,13 +163,17 @@ export default class Tide {
   }
 
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
-    this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
-      Logger.debug(data)
-      const points: TaskPoints = JSON.parse(data)
-      // TODO: should this be called elsewhere instead?
-      ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
-      callback(points)
-    })
+    try {
+      await this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
+        Logger.debug(data)
+        const points: TaskPoints = JSON.parse(data)
+        // TODO: should this be called elsewhere instead?
+        ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
+        callback(points)
+      })
+    } catch (error) {
+      console.log('Error while fetching task points: ' + error)
+    }
   }
 
   /**
