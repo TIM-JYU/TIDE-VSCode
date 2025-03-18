@@ -7,7 +7,6 @@
  * @date 2.5.2024
  */
 import * as vscode from 'vscode'
-import { TaskPanelProvider } from './panels/TaskPanelProvider'
 import CoursePanel from './panels/CoursePanel'
 
 export default class UiController {

@@ -8,7 +8,6 @@
  */
 
 import * as vscode from 'vscode'
-import ExtensionStateManager from '../api/ExtensionStateManager'
 import Logger from '../utilities/logger'
 
 export function registerEventListeners(ctx: vscode.ExtensionContext) {
