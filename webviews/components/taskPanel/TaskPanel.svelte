@@ -31,7 +31,7 @@
     isLogged: false
   })
   let isLoggedIn = $state(false)
-  let taskPoints: TaskPoints = $state({ current_points: undefined })
+  let taskPoints: TaskPoints = $state({ current_points: null })
   let customUrl: string = $state('')
 
   /**
