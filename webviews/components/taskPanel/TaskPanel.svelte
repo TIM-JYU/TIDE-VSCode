@@ -25,7 +25,9 @@
     path: '',
     stem: undefined,
     task_files: [],
-    type: ''
+    type: '',
+    deadline: null,
+    answer_limit: null
   })
   let loginData: LoginData = $state({
     isLogged: false
