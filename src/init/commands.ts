@@ -36,11 +36,26 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   /**
-   * Resets exercise. 
-   * TODO: choose overwrite or reset function to be used and fix tide cli command.
+   * Resets exercise of active task file.
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.resetExercise', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showErrorMessage('No active editor found.')
+        return
+      }
+      const doc = editor.document;
+      Tide.resetTask(doc.fileName)
+    }),
+  )
+
+
+  /**
+   * Restore last submission of active task file.
+   */
+  ctx.subscriptions.push(
+    vscode.commands.registerCommand('tide.restoreSubmission', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         vscode.window.showErrorMessage('No active editor found.')
