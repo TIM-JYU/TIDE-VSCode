@@ -103,6 +103,8 @@ export interface TimData {
   stem: string | undefined
   task_files: TaskFile[]
   type: string
+  deadline: string | null
+  answer_limit: number | null
 }
 
 export interface TaskFile {
