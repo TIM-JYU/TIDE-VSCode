@@ -146,6 +146,7 @@ export type MessageType =
   | 'CourseData'
   | 'CustomUrl'
   | 'DownloadTaskSet'
+  | 'DownloadTaskSetComplete'
   | 'Login'
   | 'LoginData'
   | 'Logout'
