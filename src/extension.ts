@@ -18,9 +18,10 @@ import ExtensionStateManager from './api/ExtensionStateManager'
 import UiController from './ui/UiController'
 import { CourseTaskProvider } from './ui/panels/TaskExplorerProvider'
 import { TaskPanelProvider } from './ui/panels/TaskPanelProvider'
+import Tide from './api/tide'
 
 // This method is called when your extension is activated
-export function activate(ctx: vscode.ExtensionContext) {
+export async function activate(ctx: vscode.ExtensionContext) {
   Logger.init('TIDE Logs')
   Logger.show()
   ExtensionStateManager.setContext(ctx)
@@ -29,6 +30,20 @@ export function activate(ctx: vscode.ExtensionContext) {
   init.registerEventListeners(ctx)
 
   // vscode.commands.executeCommand('tide.updateCoursesFromTim')
+
+  // Initialize Login and User Data
+  const userData = await Tide.checkLogin()
+  if (userData.logged_in) {
+            ExtensionStateManager.setLoginData({isLogged: true})
+            ExtensionStateManager.setUserData(userData)
+          } else {
+            ExtensionStateManager.setLoginData({isLogged: false})
+            ExtensionStateManager.setUserData(userData)
+          }
+  console.log(userData)
+  
+
+
 
   // Creates and registers the side menu on the left
   const sidebarProvider = new SidebarProvider(ctx.extensionUri)

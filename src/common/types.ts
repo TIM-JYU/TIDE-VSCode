@@ -121,6 +121,13 @@ export interface LoginData {
   isLogged: boolean
 }
 
+/**
+ * Username of the logged in user, null when logged out
+ */
+export interface UserData {
+  logged_in: string | null
+}
+
 export interface TaskPoints {
   current_points: number | undefined
 }

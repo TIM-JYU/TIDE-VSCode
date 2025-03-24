@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints, TimData } from '../common/types'
+import { Course, CourseStatus, LoginData, TaskPoints, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
 
@@ -62,6 +62,22 @@ export default class ExtensionStateManager {
    */
   public static getLoginData(): LoginData {
     return this.readFromGlobalState(StateKey.LoginData)
+  }
+
+  /**
+   * Sets user data to global state
+   * @param loggedInUserData UserData saved to the global state
+   */
+  public static setUserData(loggedInUserData: UserData) {
+    this.writeToGlobalState(StateKey.UserData, loggedInUserData)
+  }
+
+  /**
+   * Retrieves user data from global state
+   * @returns User Data saved to the global state
+   */
+  public static getUserData(): UserData {
+    return this.readFromGlobalState(StateKey.UserData)
   }
 
   /**
@@ -378,6 +394,7 @@ export enum StateKey {
   Courses = 'courses',
   DownloadPath = 'downloadPath',
   LoginData = 'loginData',
+  UserData = 'userData',
   TaskPoints = 'taskPoints',
   TimData = 'timData'
 }
