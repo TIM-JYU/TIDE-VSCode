@@ -60,13 +60,6 @@ export default class Tide {
     await this.runAndHandle(['check-login', '--json'], (data: string) => {
       Logger.info(`Login data: ${data}`)
       loggedInUserData = JSON.parse(data)
-      if (loggedInUserData.logged_in) {
-          ExtensionStateManager.setLoginData({isLogged: true})
-          ExtensionStateManager.setUserData(loggedInUserData)
-        } else {
-          ExtensionStateManager.setLoginData({isLogged: false})
-          ExtensionStateManager.setUserData(loggedInUserData)
-        }
     })
     return loggedInUserData
   }
