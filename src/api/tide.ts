@@ -10,12 +10,11 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints } from '../common/types'
+import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, UserData } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
-import { get } from 'http'
 
 
 export default class Tide {
@@ -50,6 +49,19 @@ export default class Tide {
       Logger.info(`Logout: ${data}`)
     })
     return { isLogged: false }
+  }
+
+  /**
+   * Executes tide check-login command.
+   * @returns Logged in user data as JSON
+   */
+  public static async checkLogin(): Promise<UserData> {
+    let loggedInUserData: UserData = { logged_in: null}
+    await this.runAndHandle(['check-login', '--json'], (data: string) => {
+      Logger.info(`Login data: ${data}`)
+      loggedInUserData = JSON.parse(data)
+    })
+    return loggedInUserData
   }
 
   /**
@@ -101,7 +113,7 @@ export default class Tide {
     const taskName = path.basename(taskSetPath)
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
-    this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
+    await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
         ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
@@ -164,13 +176,17 @@ export default class Tide {
   }
 
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
-    this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
-      Logger.debug(data)
-      const points: TaskPoints = JSON.parse(data)
-      // TODO: should this be called elsewhere instead?
-      ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
-      callback(points)
-    })
+    try {
+      await this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
+        Logger.debug(data)
+        const points: TaskPoints = JSON.parse(data)
+        // TODO: should this be called elsewhere instead?
+        ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
+        callback(points)
+      })
+    } catch (error) {
+      console.log('Error while fetching task points: ' + error)
+    }
   }
 
   /**
@@ -207,6 +223,19 @@ export default class Tide {
     let buffer = ''
     let errorBuffer = ''
 
+    // Use a copy of process.env to pass custom url to the child process 
+    const env_modified = {...process.env}
+    
+    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string
+    if (customUrl && customUrl.trim() !== "") {
+      // Ensure that the custom url ends with a slash
+      const formattedUrl = customUrl.trim().endsWith("/") ? customUrl.trim() : customUrl.trim() + "/"
+      env_modified.URL = formattedUrl
+    }
+    else {
+      env_modified.URL = "https://tim.jyu.fi/"
+    }
+
     // To run an uncompiled version of the CLI tool:
     // 1. Point the cli tool path in your extension settings to the main.py -file
     //const ar = ["run", "python", vscode.workspace.getConfiguration().get("tide.cliPath") as string, ...args];
@@ -216,6 +245,7 @@ export default class Tide {
     const childProcess = cp.spawn(
       vscode.workspace.getConfiguration().get('TIM-IDE.cliPath') as string,
       args,
+      {"env" : env_modified}
     )
 
     childProcess.stdout.on('data', (data) => {

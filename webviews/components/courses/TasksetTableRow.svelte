@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { TaskSet } from '../../../src/common/types'
+  import { onMount } from 'svelte'
+  import type { TaskSet, WebviewMessage } from '../../../src/common/types'
+
+  import LoaderButton from '../common/LoaderButton.svelte'
 
   interface Props {
     taskset: TaskSet;
@@ -8,31 +11,37 @@
 
   let { taskset, isLoggedIn }: Props = $props();
 
+  let downloadingTasks: boolean = $state(false)
+  
+  /* 
+   * Listens for messages from CoursePanel.ts.
+   */
+  onMount(() => 
+  {
+    window.addEventListener('message', (event) => 
+    {
+      const message: WebviewMessage = event.data
+      switch (message.type) 
+      {
+        case 'DownloadTaskSetComplete': 
+        {
+            downloadingTasks = false
+            break
+        }
+      }
+    })
+  })
+
+
   /**
    * Initiates the download of a task set identified by its path.
    */
   function downloadTaskSet() {
+    downloadingTasks = true
     tsvscode.postMessage({
       type: 'DownloadTaskSet',
       value: taskset.path,
     })
-  }
-
-  /**
-   * Opens a workspace for the specified task set.
-   */
-  function openWorkspace() {
-    tsvscode.postMessage({
-      type: 'OpenWorkspace',
-      value: taskset.downloadPath,
-    })
-    window.addEventListener('message', (event) => {
-      const message = event.data;
-
-      if (message.type === 'WorkspaceError') {
-        taskset.downloadPath = undefined;
-      }
-    });
   }
 </script>
 
@@ -42,11 +51,7 @@
   <td>{taskset.tasks.length}</td>
   <!-- <td>6/8</td> -->
   <td>
-    {#if taskset.downloadPath === undefined}
-      <button onclick={downloadTaskSet}>Download taskset</button>
-    {:else}
-      <button onclick={openWorkspace}>Open in workspace</button>
-    {/if}
+    <LoaderButton loading={downloadingTasks} text="Download taskset" textWhileLoading="Downloading..." onClick={downloadTaskSet} />
   </td>
 {:else}
   <td colspan="2">Unavailable</td>
@@ -63,17 +68,4 @@
     text-align: left;
   }
 
-  button {
-    background-color:rgb(0, 111, 185);
-    color: white;
-    border: none;
-    padding: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-    border-radius: 3px;
-  }
-
-  button:hover {
-    background-color:rgb(0, 83, 138);
-  }
 </style>

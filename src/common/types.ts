@@ -103,6 +103,8 @@ export interface TimData {
   stem: string | undefined
   task_files: TaskFile[]
   type: string
+  deadline: string | null
+  answer_limit: number | null
 }
 
 export interface TaskFile {
@@ -119,6 +121,13 @@ export interface TaskFile {
  */
 export interface LoginData {
   isLogged: boolean
+}
+
+/**
+ * Username of the logged in user, null when logged out
+ */
+export interface UserData {
+  logged_in: string | null
 }
 
 export interface TaskPoints {
@@ -142,14 +151,15 @@ export interface WebviewMessage {
  */
 export type MessageType =
   | 'CourseData'
+  | 'CustomUrl'
   | 'DownloadTaskSet'
+  | 'DownloadTaskSetComplete'
   | 'Login'
   | 'LoginData'
   | 'Logout'
   | 'OnError'
   | 'OnInfo'
   | 'OpenSettings'
-  | 'OpenWorkspace'
   | 'RefreshCourseData'
   | 'RequestLoginData'
   | 'ResetExercise'
@@ -164,4 +174,3 @@ export type MessageType =
   | 'TaskPoints'
   | 'UpdateTaskPoints'
   | 'UpdateTimData'
-  | 'UpdateWorkspaceName'

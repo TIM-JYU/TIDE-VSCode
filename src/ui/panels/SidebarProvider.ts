@@ -11,7 +11,6 @@ import * as vscode from 'vscode'
 import ExtensionStateManager, {StateKey} from '../../api/ExtensionStateManager'
 import { LoginData, MessageType, WebviewMessage } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
-import Logger from '../../utilities/logger'
 import UiController from '../UiController'
 
 export class SidebarProvider implements vscode.WebviewViewProvider {

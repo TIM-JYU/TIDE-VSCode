@@ -42,7 +42,7 @@
 			],
 			"view/item/context": [
 				{
-					"command": "tide.treeview_menu_open_tasks",
+					"command": "tide.treeviewMenuOpenTasks",
 					"when": "view == tide-tasks-treeview",
 					"group": "tide@0"
 				}
@@ -117,7 +117,7 @@
 				"category": "TIM-IDE"
 			},
 			{
-				"command": "tide.item_clicked",
+				"command": "tide.itemClicked",
 				"title": "Open item"
 			},
 			{
@@ -126,7 +126,7 @@
 				"icon": "$(refresh)"
 			},
 			{
-				"command": "tide.treeview_menu_open_tasks",
+				"command": "tide.treeviewMenuOpenTasks",
 				"title": "Open all tasks in this directory"
 			},
 			{
@@ -190,6 +190,11 @@
 				"TIM-IDE.cliPath": {
 					"type": "string",
 					"description": "Path to CLI tool"
+				},
+				"TIM-IDE.customUrl": {
+					"type": "string",
+					"default": "",
+					"description": "Custom URL for the tide CLI. Leave empty for the default https://tim.jyu.fi"
 				}
 			}
 		}
