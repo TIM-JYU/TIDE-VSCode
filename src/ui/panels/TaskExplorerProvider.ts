@@ -26,6 +26,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
         // Context menu commands (right-click menu)
         vscode.commands.registerCommand('tide.treeviewMenuOpenTasks', item => this.openTasksInThisDir(item))
+
     }
 
     // Empty treeview and close files after a user logs out
