@@ -25,7 +25,9 @@
     path: '',
     stem: undefined,
     task_files: [],
-    type: ''
+    type: '',
+    deadline: null,
+    answer_limit: null
   })
   let loginData: LoginData = $state({
     isLogged: false
@@ -125,7 +127,7 @@ This component manages the display of task information and interaction with task
       {#if timData.max_points == undefined}
       <p>This task does not reward points.</p>
       {:else}
-      <PointsDisplay {taskPoints} maxPoints={timData.max_points} />
+      <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
       
       <button onclick={updateTaskPoints}>Update points</button>
       {/if}

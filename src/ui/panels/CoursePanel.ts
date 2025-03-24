@@ -192,6 +192,11 @@ export default class CoursePanel {
 
             // Refresh TreeView with the new data
             vscode.commands.executeCommand('tide.refreshTree')
+            this.panel.webview.postMessage({
+              type: 'DownloadTaskSetComplete',
+              value: taskSetPath,
+            })
+
 
           } catch (error) {
             console.log('Downloading a new taskset had an error: ' + error)

@@ -91,12 +91,14 @@ updates the courses' status, and handles downloading task sets and opening works
 
 {#if isLoggedIn}
   <div>
-    <LoaderButton
-      text="Refresh"
-      textWhileLoading="Refreshing"
-      loading={coursesRefreshing}
-      onClick={refreshCourses}
-    />
+    <div class="refresh-button">
+        <LoaderButton
+        text="Refresh"
+        textWhileLoading="Refreshing"
+        loading={coursesRefreshing}
+        onClick={refreshCourses}
+        />
+    </div>
   </div>
 
   {#if downloadPath === null}
@@ -142,5 +144,10 @@ updates the courses' status, and handles downloading task sets and opening works
   h1 {
     margin-bottom: 2rem;
     font-size: 2rem;
+  }
+  .refresh-button {
+    position: absolute;
+    top: 10%;
+    right: 16%;
   }
 </style>
