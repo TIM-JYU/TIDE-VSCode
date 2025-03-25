@@ -131,7 +131,7 @@ export interface UserData {
 }
 
 export interface TaskPoints {
-  current_points: number | undefined
+  current_points: number | null
 }
 
 export interface TaskCreationFeedback {
