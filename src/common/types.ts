@@ -103,6 +103,8 @@ export interface TimData {
   stem: string | undefined
   task_files: TaskFile[]
   type: string
+  deadline: string | null
+  answer_limit: number | null
 }
 
 export interface TaskFile {
@@ -121,8 +123,15 @@ export interface LoginData {
   isLogged: boolean
 }
 
+/**
+ * Username of the logged in user, null when logged out
+ */
+export interface UserData {
+  logged_in: string | null
+}
+
 export interface TaskPoints {
-  current_points: number | undefined
+  current_points: number | null
 }
 
 export interface TaskCreationFeedback {
@@ -144,6 +153,7 @@ export type MessageType =
   | 'CourseData'
   | 'CustomUrl'
   | 'DownloadTaskSet'
+  | 'DownloadTaskSetComplete'
   | 'Login'
   | 'LoginData'
   | 'Logout'

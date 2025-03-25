@@ -128,8 +128,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.login', async () => {
-      let data = await Tide.login()
-      ExtensionStateManager.setLoginData(data)
+      let loginData = await Tide.login()
+      ExtensionStateManager.setLoginData(loginData)
+      let userData = await Tide.checkLogin()
+      ExtensionStateManager.setUserData(userData)
     }),
   )
 
@@ -140,6 +142,8 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     vscode.commands.registerCommand('tide.logout', async () => {
       let data = await Tide.logout()
       ExtensionStateManager.setLoginData(data)
+      let userData = await Tide.checkLogin()
+      ExtensionStateManager.setUserData(userData)
     }),
   )
 
