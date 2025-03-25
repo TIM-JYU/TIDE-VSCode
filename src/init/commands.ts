@@ -62,16 +62,24 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return
       }
       const doc = editor.document;
-      const currentDir = path.dirname(doc.fileName)
-      const taskId = path.basename(currentDir)
-      const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata')
-      const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
-      const timDataCourse = JSON.parse(timDataContent.toString())
-      const coursePath = Object.keys(timDataCourse.course_parts)[0]
-      const tasksetDir = path.dirname(path.dirname(currentDir))
-      Tide.overwriteTask(coursePath, taskId, tasksetDir)
+      const currentDir = path.dirname(doc.fileName);
+      const taskId = path.basename(currentDir);
+      
+      const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata');
+      const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath));
+      const timDataCourse = JSON.parse(timDataContent.toString());
+      
+      const coursePath = Object.keys(timDataCourse.course_parts)[0];
+      const tasksetDir = path.dirname(path.dirname(currentDir));
+      
+      const demo = path.basename(path.dirname(currentDir));
+      
+      const newCoursePath = path.join(path.dirname(coursePath), demo);
+      
+      Tide.overwriteTask(newCoursePath, taskId, tasksetDir);
     }),
   )
+  
 
   /**
    * Submits current task file to TIM.
