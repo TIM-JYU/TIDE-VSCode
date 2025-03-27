@@ -25,12 +25,16 @@
 		"menus": {
 			"editor/title": [
 				{
-					"command": "tide.submitTask",
-					"group": "navigation"
+					"command": "tide.resetExercise",
+					"group": "navigation@2"
 				},
 				{
-					"command": "tide.resetExercise",
-					"group": "navigation"
+					"command": "tide.restoreSubmission",
+					"group": "navigation@1"
+				},
+				{
+					"command": "tide.submitTask",
+					"group": "navigation@0"
 				}
 			],
 			"view/title": [
@@ -143,6 +147,12 @@
 				"title": "Reset",
 				"category": "TIM-IDE",
 				"description": "Resets exercise of active editor to initial state"
+			},
+			{
+				"command": "tide.restoreSubmission",
+				"title": "Restore",
+				"category": "TIM-IDE",
+				"description": "Restore last submission of active editor"
 			}
 		],
 		"viewsContainers": {
