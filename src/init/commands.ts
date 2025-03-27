@@ -17,6 +17,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
+import { TimData } from '../common/types'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -62,21 +63,25 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return
       }
       const doc = editor.document;
-      const currentDir = path.dirname(doc.fileName);
-      const taskId = path.basename(currentDir);
-      
-      const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata');
-      const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath));
-      const timDataCourse = JSON.parse(timDataContent.toString());
-      
-      const coursePath = Object.keys(timDataCourse.course_parts)[0];
+      const currentDir = path.dirname(doc.fileName)
       const tasksetDir = path.dirname(path.dirname(currentDir));
+      // Find the names of the tasks ide_task_id and the task set from the files path
+      let itemPath = currentDir
+      // console.log(path)
+      let pathSplit = itemPath.split(path.sep)
+      // ide_task_id
+      let id = pathSplit.at(-1)
+      // task set name
+      let demo = pathSplit.at(-2)
       
-      const demo = path.basename(path.dirname(currentDir));
-      
-      const newCoursePath = path.join(path.dirname(coursePath), demo);
-      
-      Tide.overwriteTask(newCoursePath, taskId, tasksetDir);
+      if (demo && id) {
+        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+        if (timData) {
+          Tide.overwriteTask(timData.path, timData.ide_task_id, tasksetDir);
+        } else {
+          vscode.window.showErrorMessage('TimData is undefined or invalid.');
+        }
+      }
     }),
   )
   
