@@ -16,6 +16,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
     constructor(private readonly _extensionUri: vscode.Uri) {
         ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this))
+        ExtensionStateManager.subscribe(StateKey.TaskPoints, this.getTaskPoints.bind(this))
 
         vscode.window.onDidChangeActiveTextEditor(async (editor) => {
             TaskPanelProvider.activeTextEditor = editor
@@ -82,6 +83,15 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     private async sendLoginData() {    
         const loginData = ExtensionStateManager.getLoginData()
         await this._view?.webview.postMessage({ type: 'LoginData', value: loginData })
+    }
+
+    private async getTaskPoints(){
+        const timData = await this.getTimData()
+        Logger.debug("TaskPanelProvider getTaskPoints")
+        Logger.debug(timData)
+        if (timData?.path && timData?.ide_task_id) {
+            this.sendTaskPoints(ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id))
+        }
     }
 
     /**

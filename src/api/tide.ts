@@ -171,7 +171,8 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
-      callback()
+      //Logger.debug(taskPath, path.basename(taskPath))
+      //this.getTaskPoints(taskPath, path.basename(taskPath), callback)
     })
   }
 
@@ -182,7 +183,6 @@ export default class Tide {
         const points: TaskPoints = JSON.parse(data)
         // TODO: should this be called elsewhere instead?
         ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
-        callback(points)
       })
     } catch (error) {
       console.log('Error while fetching task points: ' + error)
