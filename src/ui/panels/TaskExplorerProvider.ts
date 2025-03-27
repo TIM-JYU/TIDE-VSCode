@@ -265,6 +265,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 } else {
                     // Add a description for files that aren't a part of a Tide-Course
                     result.description = "Not a Tide-Course file!"
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
                 }
             } else {
                 vscode.window.showErrorMessage("Error parsing task path!")
@@ -296,7 +297,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 }
             } else {
                 // No icon and a warning for directories that aren't a part of a Tide-Course
-                iconPath = ""
+                iconPath = iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
                 result.description = "Not a Tide-Course directory!"
             }
             // Calculate taskMaxPoints sum for tasks in this directory
@@ -313,8 +314,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 } else {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
                 }
-            } else {
-                iconPath = ""
             }
         }
         result.command = {
