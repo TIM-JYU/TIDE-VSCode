@@ -203,7 +203,12 @@ export default class Tide {
     // this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
     const cliOutput = await this.spawnTideProcess(...args).catch((err) => {
       if (!ignoreErrors) {
-        UiController.showError(err)
+        if (err.includes('Address already in use')) {
+          Logger.debug(err)
+          UiController.showError('Finnish login in browser.');
+        }else{
+          UiController.showError(err)
+        }
       }
     })
     if (typeof cliOutput === 'string') {
