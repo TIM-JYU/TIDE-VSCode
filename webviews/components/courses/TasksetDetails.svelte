@@ -23,6 +23,7 @@ TODO: display deadline of task once TIM provides the data to TIDE-CLI
         <thead>
             <tr>
                 <th>Task</th>
+                <th>Submissions allowed</th>
                 <th>Deadline</th>
             </tr>
         </thead>
@@ -30,7 +31,20 @@ TODO: display deadline of task once TIM provides the data to TIDE-CLI
             {#each taskset.tasks as task}
                 <tr class="details-row">
                     <td>{task.ide_task_id}</td>
-                    <td>-</td>
+                    <td>
+                        {#if task.answer_limit != null}
+                            {task.answer_limit}
+                        {:else}
+                            -
+                        {/if}
+                    </td>
+                    <td>
+                        {#if task.deadline != null}
+                            {task.deadline}
+                        {:else}
+                            -
+                        {/if}
+                    </td>
                 </tr>
             {/each}
         </tbody>
