@@ -10,7 +10,7 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints } from '../common/types'
+import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, UserData } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -49,6 +49,19 @@ export default class Tide {
       Logger.info(`Logout: ${data}`)
     })
     return { isLogged: false }
+  }
+
+  /**
+   * Executes tide check-login command.
+   * @returns Logged in user data as JSON
+   */
+  public static async checkLogin(): Promise<UserData> {
+    let loggedInUserData: UserData = { logged_in: null}
+    await this.runAndHandle(['check-login', '--json'], (data: string) => {
+      Logger.info(`Login data: ${data}`)
+      loggedInUserData = JSON.parse(data)
+    })
+    return loggedInUserData
   }
 
   /**
@@ -143,7 +156,7 @@ export default class Tide {
    * Resets the noneditable parts of a task file to their original state.
    * @param filePath - path of the file to reset
    */
-  public static async resetNoneditableAreas(filePath: string) {
+  public static async resetTask(filePath: string) {
     vscode.commands.executeCommand('workbench.action.files.save')
     this.runAndHandle(['task', 'reset', filePath], (data: string) => {
       Logger.debug(data)

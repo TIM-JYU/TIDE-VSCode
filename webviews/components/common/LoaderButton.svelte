@@ -36,9 +36,6 @@
     cursor: pointer;
     transition: background 0.3s;
     border-radius: 3px;
-    position: absolute;
-    top: 10%;
-    right: 16%;
   }
 
   .loader-button:hover {
@@ -47,14 +44,6 @@
 
   .loader-button.loading {
     background-color: 005F9E;
-  }
-
-  @media (max-width: 512px) {
-    .loader-button {
-      position: relative;  
-      top: auto; 
-      right: auto;
-    }
   }
 
 </style>

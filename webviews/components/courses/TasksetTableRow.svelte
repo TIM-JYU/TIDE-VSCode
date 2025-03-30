@@ -1,6 +1,8 @@
 <script lang="ts">
-  import type { TaskSet } from '../../../src/common/types'
+  import { onMount } from 'svelte'
+  import type { TaskSet, WebviewMessage } from '../../../src/common/types'
   import TasksetDetails from './TasksetDetails.svelte'
+  import LoaderButton from '../common/LoaderButton.svelte'
 
   interface Props {
     taskset: TaskSet;
@@ -10,10 +12,33 @@
   let { taskset, isLoggedIn }: Props = $props();
   let showDetails: boolean = $state(false);
 
+  let downloadingTasks: boolean = $state(false)
+  
+  /* 
+   * Listens for messages from CoursePanel.ts.
+   */
+  onMount(() => 
+  {
+    window.addEventListener('message', (event) => 
+    {
+      const message: WebviewMessage = event.data
+      switch (message.type) 
+      {
+        case 'DownloadTaskSetComplete': 
+        {
+            downloadingTasks = false
+            break
+        }
+      }
+    })
+  })
+
+
   /**
    * Initiates the download of a task set identified by its path.
    */
   function downloadTaskSet() {
+    downloadingTasks = true
     tsvscode.postMessage({
       type: 'DownloadTaskSet',
       value: taskset.path,
@@ -42,7 +67,7 @@ Enables downloading task set.
   {#if taskset.tasks.length}
     <td>{taskset.tasks.length}</td>
     <td>
-      <button onclick={downloadTaskSet}>Download taskset</button>
+      <LoaderButton loading={downloadingTasks} text="Download taskset" textWhileLoading="Downloading..." onClick={downloadTaskSet} />
     </td>
   {:else}
     <td colspan="2">Unavailable</td>

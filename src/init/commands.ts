@@ -17,6 +17,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
+import { TimData } from '../common/types'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -36,8 +37,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   )
 
   /**
-   * Resets exercise. 
-   * TODO: choose overwrite or reset function to be used and fix tide cli command.
+   * Resets exercise of active task file.
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.resetExercise', async () => {
@@ -47,16 +47,42 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return
       }
       const doc = editor.document;
-      const currentDir = path.dirname(doc.fileName)
-      const taskId = path.basename(currentDir)
-      const timDataPath = path.join(path.dirname(path.dirname(currentDir)), '.timdata')
-      const timDataContent = await vscode.workspace.fs.readFile(vscode.Uri.file(timDataPath))
-      const timDataCourse = JSON.parse(timDataContent.toString())
-      const coursePath = Object.keys(timDataCourse.course_parts)[0]
-      const tasksetDir = path.dirname(path.dirname(currentDir))
-      Tide.overwriteTask(coursePath, taskId, tasksetDir)
+      Tide.resetTask(doc.fileName)
     }),
   )
+
+
+  /**
+   * Restore last submission of active task file.
+   */
+  ctx.subscriptions.push(
+    vscode.commands.registerCommand('tide.restoreSubmission', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showErrorMessage('No active editor found.')
+        return
+      }
+      const doc = editor.document;
+      const currentDir = path.dirname(doc.fileName)
+      const tasksetDir = path.dirname(path.dirname(currentDir));
+      // Find the names of the tasks ide_task_id and the task set from the files path
+      let pathSplit = currentDir.split(path.sep)
+      // ide_task_id
+      let id = pathSplit.at(-1)
+      // task set name
+      let demo = pathSplit.at(-2)
+      
+      if (demo && id) {
+        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+        if (timData) {
+          Tide.overwriteTask(timData.path, timData.ide_task_id, tasksetDir);
+        } else {
+          vscode.window.showErrorMessage('TimData is undefined or invalid.');
+        }
+      }
+    }),
+  )
+  
 
   /**
    * Submits current task file to TIM.
@@ -113,8 +139,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.login', async () => {
-      let data = await Tide.login()
-      ExtensionStateManager.setLoginData(data)
+      let loginData = await Tide.login()
+      ExtensionStateManager.setLoginData(loginData)
+      let userData = await Tide.checkLogin()
+      ExtensionStateManager.setUserData(userData)
     }),
   )
 
@@ -125,6 +153,8 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     vscode.commands.registerCommand('tide.logout', async () => {
       let data = await Tide.logout()
       ExtensionStateManager.setLoginData(data)
+      let userData = await Tide.checkLogin()
+      ExtensionStateManager.setUserData(userData)
     }),
   )
 

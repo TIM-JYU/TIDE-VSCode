@@ -123,8 +123,15 @@ export interface LoginData {
   isLogged: boolean
 }
 
+/**
+ * Username of the logged in user, null when logged out
+ */
+export interface UserData {
+  logged_in: string | null
+}
+
 export interface TaskPoints {
-  current_points: number | undefined
+  current_points: number | null
 }
 
 export interface TaskCreationFeedback {
@@ -146,6 +153,7 @@ export type MessageType =
   | 'CourseData'
   | 'CustomUrl'
   | 'DownloadTaskSet'
+  | 'DownloadTaskSetComplete'
   | 'Login'
   | 'LoginData'
   | 'Logout'
