@@ -13,8 +13,7 @@
 <!--
 @component
 This component creates a nested table that displays information 
-about indivitual tasks in task set. Visibility is toggled by TasksetTableRow.
-TODO: display deadline of task once TIM provides the data to TIDE-CLI
+about individual tasks in task set. Visibility is toggled by TasksetTableRow.
 -->
 
 <tr class="task-details">
