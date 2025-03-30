@@ -8,12 +8,36 @@
 
   let { taskset, isLoggedIn }: Props = $props();
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    const options = {
+        timeZone: "Europe/Helsinki",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false // Use 24-hour format
+    };
+
+    const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(date);
+
+    return formattedDate.replace(/(\d{2})\.(\d{2})\.(\d{4}),/, "$1/$2/$3,"); 
+
+
+}
+
 </script>
 
 <!--
 @component
 This component creates a nested table that displays information 
 about individual tasks in task set. Visibility is toggled by TasksetTableRow.
+
+Deadline is submitted as UTC+3 or UTC+2 based on summertime savings, but saved as UTC+0. 
+UTC is therefore not shown.
 -->
 
 <tr class="task-details">
@@ -22,7 +46,7 @@ about individual tasks in task set. Visibility is toggled by TasksetTableRow.
         <thead>
             <tr>
                 <th>Task</th>
-                <th>Submissions allowed</th>
+                <th>Limit of submissions</th>
                 <th>Deadline</th>
             </tr>
         </thead>
@@ -39,7 +63,7 @@ about individual tasks in task set. Visibility is toggled by TasksetTableRow.
                     </td>
                     <td>
                         {#if task.deadline != null}
-                            {task.deadline}
+                            {formatDate(task.deadline)}
                         {:else}
                             -
                         {/if}
