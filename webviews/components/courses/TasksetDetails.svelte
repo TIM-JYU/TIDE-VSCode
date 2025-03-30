@@ -78,30 +78,37 @@ UTC is therefore not shown.
 <style>
 
 .task-details{
-    background:rgb(44, 44, 44);
-    border-top: 1px solid rgb(25, 25, 25);
+    background:rgb(33, 33, 33);
+    border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
+    padding: 0px;
+    margin: 0px;
 }
 
 td {
-    border: none;
     text-align: center;
-    vertical-align: top;
-    padding: 0px;
     color: rgb(197, 197, 197);
     font-size: 14px;
   }
 
 .task-details-table{
+    background:rgb(32, 32, 32);
     width: 100%;
     table-layout: fixed;
+    border-collapse: collapse;
+    padding: 0px;
+    margin: 0px;
 }
 
 .task-details-table th{
     font-weight: normal;
+    background:rgb(33, 33, 33);
+    border-collapse: collapse;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .task-details-table td {
-    border-top: 1px solid rgb(32, 32, 32);
+    border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
 }
 
 

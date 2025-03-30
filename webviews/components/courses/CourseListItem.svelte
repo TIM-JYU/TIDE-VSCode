@@ -73,12 +73,11 @@ This component creates displays for individual courses.
   {#if isExpanded}
     <div class="course-content">
       <div class="course-summary">
-        <p>Course summary</p>
         <table>
           <thead>
             <tr>
               <th>Task set</th>
-              <th>Number of exercises</th>
+              <th>Number of tasks</th>
               <!-- <th>Status</th> -->
             </tr>
           </thead>
@@ -96,7 +95,7 @@ This component creates displays for individual courses.
 <style>
   .course-box {
     position: relative;
-    background-color:rgb(19, 19, 19);
+    background-color:rgb(21, 21, 21);
     padding-bottom: 3.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -106,6 +105,7 @@ This component creates displays for individual courses.
     min-width: 24em;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid rgb(21, 21, 21);
   }
 
   .course-title {
@@ -138,7 +138,7 @@ This component creates displays for individual courses.
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: rgb(155, 155, 155);
     background-color: transparent;
     border: none;
     width: 36px;
@@ -180,9 +180,6 @@ This component creates displays for individual courses.
     font-size: smaller;
   }
 
-  .course-summary {
-    border-top: 1px solid rgb(116, 116, 116);
-  }
 
   table {
     width: 100%;
@@ -194,7 +191,7 @@ This component creates displays for individual courses.
     border: none;
     text-align: center;
     padding: 8px;
-    background-color: rgb(19, 19, 19);;
+    background-color: rgb(21, 21, 21); /*same as .course-box background */
     font-weight: normal;
     font-size: smaller;
   }

@@ -81,8 +81,8 @@ Enables downloading task set.
 <style>
 
   tr{
-   background: #222222;
-   border-top: 1px solid rgb(25, 25, 25);
+   background:rgb(27, 27, 27);
+   border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
   }
 
   td {
@@ -126,8 +126,9 @@ Enables downloading task set.
   }
 
   .arrow {
-    margin-left: 2px;
-    transition: transform 0.3s ease;
+    margin-left: 5px;
+    display: inline-block;
+    transition: transform 0s;
   }
 
   .left-arrow {
