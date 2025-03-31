@@ -38,16 +38,12 @@
     border-radius: 3px;
   }
 
-  .loader-button-blue:hover {
-    background-color: #005F9E;
-  }
-
-  .loader-button-blue.loading {
+  .loader-button-blue:hover, .loader-button-blue.loading {
     background-color: #005F9E;
   }
 
   .loader-button-grey {
-    background-color:rgb(70, 70, 70);
+    background-color:rgb(54, 54, 54); 
     color: rgb(230, 230, 230);
     border: none;
     padding: 5px;
@@ -56,13 +52,10 @@
     border-radius: 3px;
   }
 
-  .loader-button-grey:hover {
-    background-color:rgb(49, 49, 49);
+  .loader-button-grey:hover, .loader-button-grey.loading {
+    background-color:rgb(44, 44, 44);
   }
 
-  .loader-button-grey.loading {
-    background-color: rgb(49, 49, 49);
-  }
 
 </style>
 
