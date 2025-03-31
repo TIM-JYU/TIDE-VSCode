@@ -167,9 +167,17 @@ export default class ExtensionStateManager {
     } else {
         // Find the path to the new .timdata file
         const taskSetPathSplit = taskSetPath.split(path.posix.sep)
-        const pathToTimDataDir = path.join(rootDir, taskSetPathSplit[1])
+        const dirPath = taskSetPathSplit.at(-2)
+        if (dirPath) {
+          const pathToTimDataDir = path.join(rootDir, dirPath)
+          const pathToTimDataFile = path.join(pathToTimDataDir, '.timdata')
+          ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+        } else {
+          Logger.error("Error in TimData path!")
+        }
+        /* const pathToTimDataDir = path.join(rootDir, taskSetPathSplit[-2])
         const pathToTimDataFile = path.join(pathToTimDataDir, '.timdata')
-        ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+        ExtensionStateManager.readAndSaveTimData(pathToTimDataFile) */
     }
   }
 

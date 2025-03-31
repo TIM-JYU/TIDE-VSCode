@@ -96,10 +96,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // and starts reading each courses contents with the recursive function readCourseDirectory
     private readRootDirectory() {
         const rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
-        const courseData = ExtensionStateManager.getCourses()
+        const extensionCourseData = ExtensionStateManager.getCourses()
 
         // Check if the user has fetched course data from TIM
-        if (!courseData) {
+        if (!extensionCourseData) {
             // Inform user if course data isn't found
             vscode.window.showInformationMessage("Course data was not found. Make sure you have TIDE courses added in TIM, and refresh course data from the My Courses- page!")
             return
@@ -114,22 +114,19 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 // Find all files and directories in the File Download Path set by the user
                 fs.readdirSync(rootDir).forEach(element => {
                     let current = path.join(rootDir,element)
-                    if (fs.statSync(current).isFile()) {
-                        // We should ignore files inside the root directory, and only look for course directories
-                    } else {
-                        // Find TIDE Course directories in the root directory
-                        courseData.map(course => {
-
-                            const coursePathParts = course.path.split(path.posix.sep)
-
-                            // Only show active TIDE Course directories in the treeview 
-                            if (coursePathParts.includes(element) && course.status == 'active') {
-                                this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
-                                this.readCourseDirectory(current, this.courseData.at(-1))
-                            }
-                        })
+                    // Only seek for course Directories
+                    if (fs.statSync(current).isDirectory()) {
+                        // Try to find an active course matching the directory name
+                        const activeCourse = extensionCourseData.find(course => course.path.includes(element) && course.status == 'active')
+                        // If a course was found, create a root node
+                        if (activeCourse) {
+                            this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
+                            this.readCourseDirectory(current, this.courseData.at(-1))
+                        }
                     }
                 })
+            } else {
+                vscode.window.showErrorMessage("Download path doesn't exist!")
             }
         }
     }
@@ -167,6 +164,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                         this.readCourseDirectory(current, newNode)
                     }
                 })
+            } else {
+                vscode.window.showErrorMessage("Directory path doesn't exist!")
             }
         }
     }
@@ -188,27 +187,27 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         // Try to open the document
         try {
             // When a dir is clicked do nothing
-        if (item.type == "dir") {
-            return
-        }
-        // When a file is clicked
-        // Open the document
-        vscode.workspace.openTextDocument(item.path).then( document => {
-            // After opening the document
-            vscode.window.showTextDocument(document).then( editor => {
-                // first 2 rows are informational, task code starts at row 3(index 2)
-                let pos = new vscode.Position(2,0)
-                // set cursos
-                editor.selection = new vscode.Selection(pos,pos)
-                // set focus to opened editor
-                editor.revealRange(new vscode.Range(pos,pos))
+            if (item.type == "dir") {
+                return
+            }
+            // When a file is clicked
+            // Open the document
+            vscode.workspace.openTextDocument(item.path).then( document => {
+                // After opening the document
+                vscode.window.showTextDocument(document).then( editor => {
+                    // first 2 rows are informational, task code starts at row 3(index 2)
+                    let pos = new vscode.Position(2,0)
+                    // set cursos
+                    editor.selection = new vscode.Selection(pos,pos)
+                    // set focus to opened editor
+                    editor.revealRange(new vscode.Range(pos,pos))
+                })
             })
-        })
-        } catch (error){
-            // Catch errors trying to open a document and refresh tree
-            vscode.window.showErrorMessage("Error, document might be deleted. Refreshing...")
-            this.refreshTree()
-        }
+            } catch (error){
+                // Catch errors trying to open a document and refresh tree
+                vscode.window.showErrorMessage("Error, document might be deleted. Refreshing...")
+                this.refreshTree()
+            }
         
     }
 
@@ -456,8 +455,10 @@ class CourseTaskTreeItem extends vscode.TreeItem {
     // and is passed to the base class
     // path = path to file or dir
     // type = type of item (file or dir)
+    // TODO: label: vscode.TreeItemLabel
     constructor(label: string, itemPath: string, type: "file" | "dir") {
         super(label)
+        this.label
         this.path = itemPath
         this.type = type
         if (this.type === "file") {
