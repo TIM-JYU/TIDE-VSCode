@@ -85,8 +85,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             this.readRootDirectory()
             // This needs to be called in order to show the data in the treeview
             this.m_onDidChangeTreeData.fire(undefined)
-            const courses = ExtensionStateManager.getCourses()
-            console.log(courses)
         } else {
             vscode.window.showErrorMessage("Login to browse courses and tasks!")
         }
@@ -117,9 +115,9 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                     // Only seek for course Directories
                     if (fs.statSync(current).isDirectory()) {
                         // Try to find an active course matching the directory name
-                        const activeCourse = extensionCourseData.find(course => course.path.includes(element) && course.status == 'active')
+                        const courseFound = this.findCourseWithPath(element)
                         // If a course was found, create a root node
-                        if (activeCourse) {
+                        if (courseFound) {
                             this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
                             this.readCourseDirectory(current, this.courseData.at(-1))
                         }
@@ -130,6 +128,26 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             }
         }
     }
+
+
+    /**
+      * Method to check if a course exists with a taskSet with the pathDir as a part of its path
+      * @param pathDir 
+      * @returns true if a course with a matching taskSet path is found, false otherwise
+      */
+    private findCourseWithPath(pathDir: string) {
+        let foundCourse: boolean = false
+        const extensionCourseData = ExtensionStateManager.getCourses()
+        extensionCourseData.forEach(course => {
+            course.taskSets.forEach(task => {
+                if (task.path.includes(pathDir) && course.status == 'active') {
+                    foundCourse = true
+                }
+            })
+        })
+        return foundCourse
+    }
+
 
     // Reads the given path and adds found files and directories as the given parents children
     // recursively until all nodes have been added

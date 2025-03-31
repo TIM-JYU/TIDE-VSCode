@@ -137,9 +137,7 @@ export default class ExtensionStateManager {
       return undefined
     }
     try {
-      console.log("reading points")
       let pointsData = taskPoints[taskSetPath][ideTaskId]
-      console.log(pointsData)
       return pointsData
     } catch (error) {
       console.log(error)
@@ -261,7 +259,7 @@ export default class ExtensionStateManager {
    */
   static getTaskTimData(demoName: string, taskId: string): TimData | undefined{
     let timData = undefined
-    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
+    const allTimData: Array<TimData> = this.getTimData()
     allTimData.forEach(element => {
       // Find a timdata object with the given taskId
       if (element.ide_task_id === taskId) {
