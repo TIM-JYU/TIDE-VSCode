@@ -170,13 +170,19 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
-      let pathSplit = taskPath.split(path.sep)
-      // id
-      let id = pathSplit.at(-2)
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
+      const currentDir = path.dirname(taskPath)
+      // Find the names of the tasks ide_task_id and the task set from the files path
+      let itemPath = currentDir
+      // console.log(path)
+      let pathSplit = itemPath.split(path.sep)
+      // ide_task_id
+      let id = pathSplit.at(-1)
       // task set name
-      let demo = pathSplit.at(-3)
-      if (demo && id) {
-        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+      let demo = pathSplit.at(-2)
+      if (demo && id && taskset) {
+        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
         if (timData) {
           this.getTaskPoints(timData.path, timData.ide_task_id, callback);
         } else {
