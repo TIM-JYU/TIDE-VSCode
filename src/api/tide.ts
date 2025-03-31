@@ -10,7 +10,7 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, UserData } from '../common/types'
+import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, TimData, UserData } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -170,7 +170,19 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
-      callback()
+      let pathSplit = taskPath.split(path.sep)
+      // id
+      let id = pathSplit.at(-2)
+      // task set name
+      let demo = pathSplit.at(-3)
+      if (demo && id) {
+        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+        if (timData) {
+          this.getTaskPoints(timData.path, timData.ide_task_id, callback);
+        } else {
+          vscode.window.showErrorMessage('TimData is undefined or invalid.');
+        }
+      }
     })
   }
 
@@ -181,7 +193,6 @@ export default class Tide {
         const points: TaskPoints = JSON.parse(data)
         // TODO: should this be called elsewhere instead?
         ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
-        callback(points)
       })
     } catch (error) {
       console.log('Error while fetching task points: ' + error)
