@@ -86,6 +86,7 @@ UTC is therefore not shown.
 
 .task-details-table{
     background:rgb(32, 32, 32);
+    color: rgb(197, 197, 197);
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
@@ -96,7 +97,7 @@ UTC is therefore not shown.
 .task-details-table th{
     font-weight: normal;
     font-size: 14px;
-    background:rgb(33, 33, 33);
+    background:rgb(30, 30, 30);
     border-collapse: collapse;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -104,7 +105,6 @@ UTC is therefore not shown.
 
 .task-details-table td {
     text-align: center;
-    color: rgb(197, 197, 197);
     font-size: 14px;
     border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
 }

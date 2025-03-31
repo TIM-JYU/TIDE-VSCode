@@ -114,7 +114,7 @@ This component creates displays for individual courses.
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
-    color: #007acc;
+    color:rgb(0, 153, 255);
   }
 
   .link:hover {
