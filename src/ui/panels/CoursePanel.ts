@@ -168,10 +168,8 @@ export default class CoursePanel {
         case 'DownloadTaskSet': {
           try {
             const taskSetPath = msg.value
-            Logger.debug('Downloading task set: ' + taskSetPath)
+            const course: Course =  ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
 
-            const course: Course = ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
-            Logger.debug('Course: ' + course)
             // Download a new Task Set
             await Tide.downloadTaskSet(course.name, taskSetPath)
 
