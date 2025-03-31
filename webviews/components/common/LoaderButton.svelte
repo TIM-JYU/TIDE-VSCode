@@ -28,9 +28,9 @@
 </button>
 
 <style>
-  .loader-button {
+  .loader-button-blue {
     background-color:rgb(0, 113, 189);
-    color: white;
+    color: rgb(230, 230, 230);
     border: none;
     padding: 5px;
     cursor: pointer;
@@ -38,12 +38,30 @@
     border-radius: 3px;
   }
 
-  .loader-button:hover {
+  .loader-button-blue:hover {
     background-color: #005F9E;
   }
 
-  .loader-button.loading {
-    background-color: 005F9E;
+  .loader-button-blue.loading {
+    background-color: #005F9E;
+  }
+
+  .loader-button-grey {
+    background-color:rgb(70, 70, 70);
+    color: rgb(230, 230, 230);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+  }
+
+  .loader-button-grey:hover {
+    background-color:rgb(49, 49, 49);
+  }
+
+  .loader-button-grey.loading {
+    background-color: rgb(49, 49, 49);
   }
 
 </style>
