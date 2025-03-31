@@ -370,6 +370,21 @@ export default class ExtensionStateManager {
       .filter((subscriber) => subscriber.key === key)
       .forEach((subscriber) => subscriber.onValueChange(value))
   }
+
+ 
+  /**
+   * Retrieves a course by its task set path.
+   * @param taskSetPath The path of the task set.
+   * @returns The course associated with the task set path.
+   */
+  public static getCourseByTasksetPath(taskSetPath: string): Course {
+    const courses = this.getCourses();
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.path === taskSetPath));
+    if (!course) {
+      throw new Error(`Course not found for task set path: ${taskSetPath}`);
+    }
+    return course;
+  }
 }
 
 /**

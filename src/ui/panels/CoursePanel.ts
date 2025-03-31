@@ -9,6 +9,7 @@
 import * as vscode from 'vscode'
 import * as fs from 'fs'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
+import Logger from '../../utilities/logger'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
@@ -167,9 +168,12 @@ export default class CoursePanel {
         case 'DownloadTaskSet': {
           try {
             const taskSetPath = msg.value
+            Logger.debug('Downloading task set: ' + taskSetPath)
 
+            const course: Course = ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
+            Logger.debug('Course: ' + course)
             // Download a new Task Set
-            await Tide.downloadTaskSet(taskSetPath)
+            await Tide.downloadTaskSet(course.name, taskSetPath)
 
             // Update TimData with the newly written data
             ExtensionStateManager.updateTimData(taskSetPath)
