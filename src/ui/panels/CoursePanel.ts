@@ -171,7 +171,7 @@ export default class CoursePanel {
             const course: Course =  ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
 
             // Download a new Task Set
-            await Tide.downloadTaskSet(course.name, taskSetPath)
+            await Tide.downloadTaskSet(course.name.toLowerCase(), taskSetPath)
 
             // Update TimData with the newly written data
             ExtensionStateManager.updateTimData(taskSetPath)
