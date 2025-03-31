@@ -59,7 +59,7 @@ Enables downloading task set.
 
 <tr>
   <td>
-    <button class="button-taskname" onclick={toggleDetails}>
+    <button class="button-taskname" onclick={toggleDetails} title="Show task set details">
       <span class="button-taskname-span">{taskset.name}</span>
       <span class="arrow {showDetails ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
     </button>
