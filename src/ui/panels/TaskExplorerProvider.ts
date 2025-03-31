@@ -2,7 +2,8 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { TimData } from '../../common/types'
+import { Course, TimData } from '../../common/types'
+import Logger from '../../utilities/logger'
 
 
 // Class for handling TreeView data
@@ -232,9 +233,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             // task set name
             let demo = pathSplit.at(-3)
 
+            const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(itemPath)))
+            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(itemPath)))
+
             // Find the points data of this task file from ExtensionStateManager
-            if (id && demo) {
-                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+            if (id && demo && taskset) {
+                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
                 if (timData) {
                     // Task Max points (max_points: number in .timData, maxPoints: string also exists in Tim and may be used in the future to describe how to gain maximum points from a task!)
                     let taskMaxPoints = timData.max_points
@@ -317,8 +321,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 let pathSplit = item.path.split(path.sep)
                 let demo = pathSplit.at(-2)
                 let taskId = pathSplit.at(-1)
-                if (demo && taskId) {
-                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(item.path))
+                const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(item.path))
+                if (demo && taskId && taskset) {
+                    let timData = ExtensionStateManager.getTaskTimData(taskset.path, demo, taskId)
                     if (timData && timData.max_points) {
                         pointsSum += timData?.max_points
                         return pointsSum
@@ -352,8 +358,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 let pathSplit = item.path.split(path.sep)
                 let demo = pathSplit.at(-2)
                 let taskId = pathSplit.at(-1)
-                if (demo && taskId) {
-                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(item.path))
+                const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(item.path))
+                if (demo && taskId && taskset) {
+                    let timData = ExtensionStateManager.getTaskTimData(taskset.path, demo, taskId)
                     if (timData) {
                         let pointsData = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
                         if (pointsData && pointsData.current_points) {
