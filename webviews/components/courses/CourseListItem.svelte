@@ -72,22 +72,20 @@ This component creates displays for individual courses.
   </button>
   {#if isExpanded}
     <div class="course-content">
-      <div class="course-summary">
-        <table>
-          <thead>
-            <tr>
-              <th>Task set</th>
-              <th>Number of tasks</th>
-              <!-- <th>Status</th> -->
-            </tr>
-          </thead>
-          <tbody>
-            {#each course.taskSets as taskset}
-              <TasksetTableRow {taskset} {isLoggedIn} />
-            {/each}
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Task set</th>
+            <th>Number of tasks</th>
+            <!-- <th>Status</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          {#each course.taskSets as taskset}
+            <TasksetTableRow {taskset} {isLoggedIn} />
+          {/each}
+        </tbody>
+      </table>
     </div>
   {/if}
 </div>
@@ -184,6 +182,7 @@ This component creates displays for individual courses.
   table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     box-sizing: content-box;
   }
 

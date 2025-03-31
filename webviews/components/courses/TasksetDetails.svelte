@@ -84,12 +84,6 @@ UTC is therefore not shown.
     margin: 0px;
 }
 
-td {
-    text-align: center;
-    color: rgb(197, 197, 197);
-    font-size: 14px;
-  }
-
 .task-details-table{
     background:rgb(32, 32, 32);
     width: 100%;
@@ -101,6 +95,7 @@ td {
 
 .task-details-table th{
     font-weight: normal;
+    font-size: 14px;
     background:rgb(33, 33, 33);
     border-collapse: collapse;
     padding-top: 5px;
@@ -108,6 +103,9 @@ td {
 }
 
 .task-details-table td {
+    text-align: center;
+    color: rgb(197, 197, 197);
+    font-size: 14px;
     border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
 }
 
