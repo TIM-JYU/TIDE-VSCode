@@ -39,9 +39,14 @@
   
 </script>
 
+<!--
+@component
+This component creates displays for individual courses.  
+-->
+
 <div class="course-box">
   <header>
-    <p class="courseTitle">{course.name}</p>
+    <p class="course-title">{course.name}</p>
     <Menu>
       {#snippet toggle()}
             <span >&#8942;</span>
@@ -71,15 +76,13 @@
         <thead>
           <tr>
             <th>Task set</th>
-            <th>Number of exercises</th>
-            <!-- <th>Points</th> -->
+            <th>Number of tasks</th>
+            <!-- <th>Status</th> -->
           </tr>
         </thead>
         <tbody>
           {#each course.taskSets as taskset}
-            <tr>
-              <TasksetTableRow {taskset} {isLoggedIn} />
-            </tr>
+            <TasksetTableRow {taskset} {isLoggedIn} />
           {/each}
         </tbody>
       </table>
@@ -90,7 +93,7 @@
 <style>
   .course-box {
     position: relative;
-    background-color:rgb(19, 19, 19);
+    background-color:rgb(21, 21, 21);
     padding-bottom: 3.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -100,9 +103,10 @@
     min-width: 24em;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid rgb(21, 21, 21);
   }
 
-  .courseTitle {
+  .course-title {
     margin-left: 1.5rem;
     margin-top: 1.5rem;
   }
@@ -110,7 +114,7 @@
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
-    color: #007acc;
+    color:rgb(0, 153, 255);
   }
 
   .link:hover {
@@ -132,7 +136,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: rgb(155, 155, 155);
     background-color: transparent;
     border: none;
     width: 36px;
@@ -168,9 +172,17 @@
     box-sizing: content-box;
   }
 
+  .course-content p{
+    margin-left: 1.5rem;
+    margin-top: 1.5rem;
+    font-size: smaller;
+  }
+
+
   table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     box-sizing: content-box;
   }
 
@@ -178,16 +190,9 @@
     border: none;
     text-align: center;
     padding: 8px;
-    background-color: rgb(19, 19, 19);;
+    background-color: rgb(21, 21, 21); /*same as .course-box background */
     font-weight: normal;
     font-size: smaller;
   }
 
-  tbody tr:nth-child(odd) {
-    background-color: #222222;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #444444;
-  }
 </style>

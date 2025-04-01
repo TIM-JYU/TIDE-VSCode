@@ -89,6 +89,8 @@ export interface Task {
   doc_id: number
   ide_task_id: string
   path: string
+  deadline: string | null
+  answer_limit: number | null
 }
 
 /**
