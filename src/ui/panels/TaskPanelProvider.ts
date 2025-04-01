@@ -93,9 +93,13 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
     /**
      * Sends custom Url from the settings
+     * Use default address "https://tim.jyu.fi/", if customUrl is empty
      */
     private sendCustomUrl() {
-        const customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+        let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+        if (!customUrl) {
+            customUrl = "https://tim.jyu.fi/";
+        }
         this._view?.webview.postMessage({ type: "CustomUrl", value: customUrl})
         console.log(customUrl)
     }
