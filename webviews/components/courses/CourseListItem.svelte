@@ -24,7 +24,7 @@
       const message: WebviewMessage = event.data
       switch (message.type) 
       {
-        case 'DownloadTaskSetComplete': 
+        case 'DownloadCourseTasksComplete': 
         {
             downloadingTasks = false
             break
@@ -57,11 +57,11 @@
   /**
    * Initiates the download of a tasks identified by its path.
    */
-  function downloadTaskSet() {
+  function downloadAllCourseTasks() {
     downloadingTasks = true
     tsvscode.postMessage({
-      type: 'DownloadTaskSet',
-      value: taskset.path,
+      type: 'DownloadCourseTasks',
+      value: course.path,
     })
   }
   
@@ -109,7 +109,7 @@ This component creates displays for individual courses.
                 loading={downloadingTasks} 
                 text="Download all tasks" 
                 textWhileLoading="Downloading..." 
-                onClick={downloadTaskSet} 
+                onClick={downloadAllCourseTasks} 
               />
             </th>
           </tr>

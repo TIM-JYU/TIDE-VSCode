@@ -203,6 +203,45 @@ export default class CoursePanel {
           }
           break
         }
+        case 'DownloadCourseTasks': {
+          try {
+            const coursePath = msg.value
+
+            // Download all tasks in course
+            await Tide.downloadCourseTasks(coursePath)
+
+            // Update TimData with the newly written data
+            ExtensionStateManager.updateTimData(coursePath)
+
+            // Get TimData for reading
+            const dataPromise = ExtensionStateManager.getTimData()
+
+            // Fetch Task Points for the newly downloaded tasks from TIM
+            await Promise.all(dataPromise.map(async (dataObject) => {
+              // Only fetch points for new tasks
+              if (dataObject.path == coursePath && dataObject.max_points) {
+                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
+                  console.log(data)
+                })
+              } else if (dataObject.path == coursePath && dataObject.max_points == null) {
+                // Set the current points of pointsless tasks to 0 in order to avoid errors
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
+              }
+            }))
+
+            // Refresh TreeView with the new data
+            vscode.commands.executeCommand('tide.refreshTree')
+            this.panel.webview.postMessage({
+              type: 'DownloadCourseTasksComplete',
+              value: coursePath,
+            })
+
+
+          } catch (error) {
+            console.log('Downloading a new taskset had an error: ' + error)
+          }
+          break
+        }
         case 'RequestLoginData': {
           this.sendLoginData(ExtensionStateManager.getLoginData())
           break
