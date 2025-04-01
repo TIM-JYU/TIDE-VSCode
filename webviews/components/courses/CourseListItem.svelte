@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import type { Course, CourseStatus } from '../../../src/common/types'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'
+  import LoaderButton from '../common/LoaderButton.svelte'
 
   interface Props {
     course: Course;
@@ -11,8 +13,25 @@
   }
 
   let { course, isLoggedIn, customUrl }: Props = $props();
-
   let isExpanded: boolean = $state(false)
+  let downloadingTasks: boolean = $state(false)
+  let oppositeStatus: CourseStatus = $derived(course.status === 'active' ? 'hidden' : 'active')
+
+   onMount(() => 
+  {
+    window.addEventListener('message', (event) => 
+    {
+      const message: WebviewMessage = event.data
+      switch (message.type) 
+      {
+        case 'DownloadTaskSetComplete': 
+        {
+            downloadingTasks = false
+            break
+        }
+      }
+    })
+  })
 
   /**
    * Updates the status of a course to a new status.
@@ -35,7 +54,16 @@
     isExpanded = !isExpanded
   }
 
-  let oppositeStatus: CourseStatus = $derived(course.status === 'active' ? 'hidden' : 'active')
+  /**
+   * Initiates the download of a tasks identified by its path.
+   */
+  function downloadTaskSet() {
+    downloadingTasks = true
+    tsvscode.postMessage({
+      type: 'DownloadTaskSet',
+      value: taskset.path,
+    })
+  }
   
 </script>
 
@@ -60,9 +88,7 @@ This component creates displays for individual courses.
           {/snippet}
     </Menu>
   </header>
-  <div>
     <a class="link" href={ customUrl + 'view/' + course.path}>Open material page</a>
-  </div>
   <button
     class="expand-collapse-button"
     aria-expanded={isExpanded}
@@ -77,7 +103,15 @@ This component creates displays for individual courses.
           <tr>
             <th>Task set</th>
             <th>Number of tasks</th>
-            <!-- <th>Status</th> -->
+            <th>
+              <LoaderButton 
+                class="loader-button-blue" 
+                loading={downloadingTasks} 
+                text="Download all tasks" 
+                textWhileLoading="Downloading..." 
+                onClick={downloadTaskSet} 
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -114,7 +148,7 @@ This component creates displays for individual courses.
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
-    color:rgb(0, 153, 255);
+    color:rgb(0, 127, 211);
   }
 
   .link:hover {
@@ -170,12 +204,6 @@ This component creates displays for individual courses.
     max-width: 100%;
     overflow-x: auto;
     box-sizing: content-box;
-  }
-
-  .course-content p{
-    margin-left: 1.5rem;
-    margin-top: 1.5rem;
-    font-size: smaller;
   }
 
 
