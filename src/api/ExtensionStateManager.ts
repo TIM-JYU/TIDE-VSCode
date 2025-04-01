@@ -118,7 +118,6 @@ export default class ExtensionStateManager {
   }
 
   static setTaskPoints(taskSetPath: string, ideTaskId: string, taskPoints: TaskPoints) {
-    Logger.debug(`Saving task points for ${taskSetPath} ${ideTaskId}`, taskPoints)
     // TODO: This could be a hashmap
     let taskPointsData = this.readFromGlobalState(StateKey.TaskPoints)
     if (taskPointsData === undefined) {
@@ -164,15 +163,15 @@ export default class ExtensionStateManager {
   static updateTimData(taskSetPath: string) {
     const course: Course = this.getCourseByTasksetPath(taskSetPath)
     const taskset = course.taskSets.find(taskSet => taskSet.path === taskSetPath)
-    Logger.debug(`Course found`,taskset)
-    let rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     if (taskset) {
         // Find the path to the new .timdata file
         if (!taskset.downloadPath) {
             throw new Error('Download path is undefined for the task set.');
+        }else {
+          const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
+          ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
         }
-        const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
-        ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+        
     }
   }
 
