@@ -3,7 +3,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { Course, TimData } from '../../common/types'
-import Logger from '../../utilities/logger'
 
 
 // Class for handling TreeView data

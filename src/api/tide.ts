@@ -199,6 +199,7 @@ export default class Tide {
         const points: TaskPoints = JSON.parse(data)
         // TODO: should this be called elsewhere instead?
         ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
+        vscode.commands.executeCommand('tide.refreshTree')
       })
     } catch (error) {
       console.log('Error while fetching task points: ' + error)
