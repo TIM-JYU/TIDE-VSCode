@@ -115,24 +115,39 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 // Find all files and directories in the File Download Path set by the user
                 fs.readdirSync(rootDir).forEach(element => {
                     let current = path.join(rootDir,element)
-                    if (fs.statSync(current).isFile()) {
-                        // We should ignore files inside the root directory, and only look for course directories
-                    } else {
-                        // Find TIDE Course directories in the root directory
-                        courseData.map(course => {
-
-                            const coursePathParts = course.path.split(path.posix.sep)
-
-                            // Only show active TIDE Course directories in the treeview 
-                            if (coursePathParts.includes(element) && course.status == 'active') {
-                                this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
-                                this.readCourseDirectory(current, this.courseData.at(-1))
-                            }
-                        })
+                    // Only seek for course Directories
+                    if (fs.statSync(current).isDirectory()) {
+                        // Try to find an active course matching the directory name
+                        const courseFound = this.findCourseWithPath(element)
+                        // If a course was found, create a root node
+                        if (courseFound) {
+                            this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
+                            this.readCourseDirectory(current, this.courseData.at(-1))
+                        }
                     }
                 })
+            } else {
+                vscode.window.showErrorMessage("Download path doesn't exist!")
             }
         }
+    }
+
+    /**
+      * Method to check if a course exists with a taskSet with the pathDir as a part of its path
+      * @param pathDir 
+      * @returns true if a course with a matching taskSet path is found, false otherwise
+      */
+    private findCourseWithPath(pathDir: string) {
+        let foundCourse: boolean = false
+        const extensionCourseData = ExtensionStateManager.getCourses()
+        extensionCourseData.forEach(course => {
+            course.taskSets.forEach(task => {
+                if (task.downloadPath?.includes(pathDir.toLocaleLowerCase()) && course.status == 'active') {
+                    foundCourse = true
+                }
+            })
+        })
+        return foundCourse
     }
 
     // Reads the given path and adds found files and directories as the given parents children
