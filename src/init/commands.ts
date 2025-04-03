@@ -43,7 +43,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     vscode.commands.registerCommand('tide.resetExercise', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showErrorMessage('No active editor found.')
+        vscode.window.showErrorMessage('No active file to reset.')
         return
       }
       const doc = editor.document;
@@ -59,7 +59,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     vscode.commands.registerCommand('tide.restoreSubmission', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showErrorMessage('No active editor found.')
+        vscode.window.showErrorMessage('No active file to restore.')
         return
       }
       const doc = editor.document;
