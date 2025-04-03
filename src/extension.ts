@@ -63,7 +63,6 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
   // Creates and registers taskbar item for displaying answer_limit warnings
   const answerLimitStatusBarItem = new AnswerLimitStatusBarItem(vscode.StatusBarAlignment.Right, 500)
-  answerLimitStatusBarItem.show()
   ctx.subscriptions.push(answerLimitStatusBarItem)
 }
 

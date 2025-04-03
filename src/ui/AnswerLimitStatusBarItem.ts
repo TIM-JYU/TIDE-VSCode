@@ -32,7 +32,7 @@ export default class AnswerLimitStatusBarItem {
             AnswerLimitStatusBarItem.activeEditor = editor
             if (editor) {
                 const timData = await this.getTimData()
-                console.log(editor)
+                timData?.answer_limit ? this.statusBarItem.show() : this.statusBarItem.hide()
             }
         })
     }
