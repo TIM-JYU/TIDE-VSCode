@@ -17,7 +17,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
-import { TimData } from '../common/types'
+import { Course, TimData } from '../common/types'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -65,15 +65,19 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const doc = editor.document;
       const currentDir = path.dirname(doc.fileName)
       const tasksetDir = path.dirname(path.dirname(currentDir));
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(currentDir))
+      Logger.debug('Taskset:', taskset)
       // Find the names of the tasks ide_task_id and the task set from the files path
-      let pathSplit = currentDir.split(path.sep)
+      let itemPath = currentDir
+      // console.log(path)
+      let pathSplit = itemPath.split(path.sep)
       // ide_task_id
       let id = pathSplit.at(-1)
       // task set name
       let demo = pathSplit.at(-2)
-      
-      if (demo && id) {
-        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+      if (demo && id && taskset) {
+        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
         if (timData) {
           Tide.overwriteTask(timData.path, timData.ide_task_id, tasksetDir);
         } else {

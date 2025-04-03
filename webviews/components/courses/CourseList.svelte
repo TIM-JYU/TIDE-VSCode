@@ -62,11 +62,11 @@ or opening workspaces.
     cursor: pointer;
     border: none;
     background: none;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: bold;
     margin-top: 1.5rem;
     padding: 0;
-    color: white;
+    color: rgb(197, 197, 197);
   }
 
   .button-header-span::first-letter {
@@ -108,13 +108,5 @@ or opening workspaces.
   *::before,
   *::after {
     box-sizing: border-box;
-  }
-
-  .arrow {
-    transition: transform 0.5s ease;
-  }
-
-  .down-arrow {
-    transform: rotate(0deg);
   }
 </style>
