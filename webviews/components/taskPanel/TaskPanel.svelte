@@ -132,6 +132,12 @@ This component manages the display of task information and interaction with task
       <button onclick={updateTaskPoints}>Update points</button>
       {/if}
     </div>
+
+    <div>
+      {#if timData.answer_limit !== null}
+      <p>For this task, you can only get points from the first {timData.answer_limit} submissions.</p>
+      {/if}
+    </div>
   </div>
 {/if}
 
