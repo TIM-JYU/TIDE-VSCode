@@ -1,13 +1,12 @@
-/**
- * Class for Status Bar item displaying answer limit related information
- * to users when loading tasks that have set answer_limit value in TIM.
- */
-
 import * as vscode from 'vscode'
 import { TimData } from '../common/types'
 import path from 'path'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 
+/**
+ * Class for Status Bar item displaying answer limit related information
+ * to users when loading tasks that have set answer_limit value in TIM.
+ */
 export default class AnswerLimitStatusBarItem {
     readonly name: string = 'Answer limit for current task'
     readonly text: string = `$(alert) Limited number of submissions allowed`
