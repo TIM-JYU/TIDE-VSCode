@@ -452,6 +452,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 result = true
             }
         })
+        const courseData = ExtensionStateManager.getCourses()
+        courseData.forEach(element => {
+            if (element.name.toLocaleLowerCase() === labelString) {
+                result = true
+            }
+        })
         return result
     }
 }
