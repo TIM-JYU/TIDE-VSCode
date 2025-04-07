@@ -117,6 +117,23 @@ export default class ExtensionStateManager {
     this.writeToGlobalState(StateKey.Courses, courses)
   }
 
+  /**
+   *set download paths for tasksets after downloading all tasks in course
+   * @param coursePath - The path of the course.
+   * @param localCoursePath - The path where the course will be downloaded.
+   */
+  static setCourseTasksDownloadPath(coursePath: string, localCoursePath: string) {
+    const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
+    courses.forEach((course) => { 
+        if (course.path === coursePath) {
+          course.taskSets.forEach((taskSet) => {
+            taskSet.downloadPath = path.join(localCoursePath, taskSet.name)
+        })
+      }
+    })
+    this.writeToGlobalState(StateKey.Courses, courses)
+  }
+
   static setTaskPoints(taskSetPath: string, ideTaskId: string, taskPoints: TaskPoints) {
     // TODO: This could be a hashmap
     let taskPointsData = this.readFromGlobalState(StateKey.TaskPoints)

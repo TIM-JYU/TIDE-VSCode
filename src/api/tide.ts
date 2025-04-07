@@ -168,7 +168,7 @@ export default class Tide {
     const courseName = path.basename(path.dirname(coursePath))
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     await this.runAndHandle(['task','create-course', '-p', coursePath, '-d', localCoursePath], (data: string) => {
-        ExtensionStateManager.setTaskSetDownloadPath(coursePath, localCoursePath)
+        ExtensionStateManager.setCourseTasksDownloadPath(coursePath, localCoursePath)
     })
   }
 
