@@ -174,19 +174,19 @@ export default class ExtensionStateManager {
 
   /**
    * Updates the timdata of a course, this should be called after downloading a new task set from tim, since it will modify the old .timdata file
-   * @param taskSetPath This path and the downloadpath the user has set are used to find the new .timdata file, which is then saved
+   * @param taskSetOrCoursePath  either tasksSetPath or coursePath. This path and the downloadpath the user has set are used to find the new .timdata file, which is then saved
    * @returns 
    */
-  static updateTimData(taskSetPath: string) {
+  static updateTimData(taskSetOrCoursePath: string) {
     let rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     if (rootDir == undefined) {
       vscode.window.showErrorMessage("Error while reading fileDownloadPath. Edit fileDownloadPath in Settings!")
     } else {
-        // Find the path to the new .timdata file
-        const taskSetPathSplit = taskSetPath.split(path.posix.sep)
-        const pathToTimDataDir = path.join(rootDir, taskSetPathSplit[1])
-        const pathToTimDataFile = path.join(pathToTimDataDir, '.timdata')
-        ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+      // Find the path to the new .timdata file
+      const pathSplit = taskSetOrCoursePath.split(path.posix.sep)
+      const pathToTimDataDir = path.join(rootDir, pathSplit[1])
+      const pathToTimDataFile = path.join(pathToTimDataDir, '.timdata')
+      ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
     }
   }
 
