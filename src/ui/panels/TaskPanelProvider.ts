@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
-import { LoginData, TaskPoints, WebviewMessage, TimData } from '../../common/types'
+import getCourseByTasksetPath from '../../api/ExtensionStateManager'
+import { LoginData, TaskPoints, WebviewMessage, TimData, Course } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Tide from '../../api/tide'
 import path from 'path'
@@ -16,6 +17,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
     constructor(private readonly _extensionUri: vscode.Uri) {
         ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this))
+        ExtensionStateManager.subscribe(StateKey.TaskPoints, this.getTaskPoints.bind(this))
 
         vscode.window.onDidChangeActiveTextEditor(async (editor) => {
             TaskPanelProvider.activeTextEditor = editor
@@ -84,6 +86,13 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         await this._view?.webview.postMessage({ type: 'LoginData', value: loginData })
     }
 
+    private async getTaskPoints(){
+        const timData = await this.getTimData()
+        if (timData?.path && timData?.ide_task_id) {
+            this.sendTaskPoints(ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id))
+        }
+    }
+
     /**
      * Sends task points to the webview.
      */
@@ -112,6 +121,8 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
         try {
             const doc = TaskPanelProvider.activeTextEditor.document
+            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(doc.fileName)))
+            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(doc.fileName)))
             const currentDir = path.dirname(doc.fileName)
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = currentDir
@@ -121,8 +132,8 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             let id = pathSplit.at(-1)
             // task set name
             let demo = pathSplit.at(-2)
-            if (demo && id) {
-                return(ExtensionStateManager.getTaskTimData(demo, id))
+            if (demo && id && taskset) {
+                return(ExtensionStateManager.getTaskTimData(taskset.path, demo, id))
             }
         } catch {
             return undefined

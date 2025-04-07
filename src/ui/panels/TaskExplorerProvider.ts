@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { TimData } from '../../common/types'
+import { Course, TimData } from '../../common/types'
 
 
 // Class for handling TreeView data
@@ -114,24 +114,39 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 // Find all files and directories in the File Download Path set by the user
                 fs.readdirSync(rootDir).forEach(element => {
                     let current = path.join(rootDir,element)
-                    if (fs.statSync(current).isFile()) {
-                        // We should ignore files inside the root directory, and only look for course directories
-                    } else {
-                        // Find TIDE Course directories in the root directory
-                        courseData.map(course => {
-
-                            const coursePathParts = course.path.split(path.posix.sep)
-
-                            // Only show active TIDE Course directories in the treeview 
-                            if (coursePathParts.includes(element) && course.status == 'active') {
-                                this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
-                                this.readCourseDirectory(current, this.courseData.at(-1))
-                            }
-                        })
+                    // Only seek for course Directories
+                    if (fs.statSync(current).isDirectory()) {
+                        // Try to find an active course matching the directory name
+                        const courseFound = this.findCourseWithPath(element)
+                        // If a course was found, create a root node
+                        if (courseFound) {
+                            this.courseData.push(new CourseTaskTreeItem("Course: " + element, current, "dir"))
+                            this.readCourseDirectory(current, this.courseData.at(-1))
+                        }
                     }
                 })
+            } else {
+                vscode.window.showErrorMessage("Download path doesn't exist!")
             }
         }
+    }
+
+    /**
+      * Method to check if a course exists with a taskSet with the pathDir as a part of its path
+      * @param pathDir 
+      * @returns true if a course with a matching taskSet path is found, false otherwise
+      */
+    private findCourseWithPath(pathDir: string) {
+        let foundCourse: boolean = false
+        const extensionCourseData = ExtensionStateManager.getCourses()
+        extensionCourseData.forEach(course => {
+            course.taskSets.forEach(task => {
+                if (task.downloadPath?.includes(pathDir.toLocaleLowerCase()) && course.status == 'active') {
+                    foundCourse = true
+                }
+            })
+        })
+        return foundCourse
     }
 
     // Reads the given path and adds found files and directories as the given parents children
@@ -232,9 +247,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             // task set name
             let demo = pathSplit.at(-3)
 
+            const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(itemPath)))
+            const taskset = course.taskSets.find(taskSet => itemPath.includes(taskSet.downloadPath ?? ""))
+
             // Find the points data of this task file from ExtensionStateManager
-            if (id && demo) {
-                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(demo, id)
+            if (id && demo && taskset) {
+                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
                 if (timData) {
                     // Task Max points (max_points: number in .timData, maxPoints: string also exists in Tim and may be used in the future to describe how to gain maximum points from a task!)
                     let taskMaxPoints = timData.max_points
@@ -259,14 +277,44 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                             }
                         }
                     }
+                } else {
+                    // Add a description for files that aren't a part of a Tide-Course
+                    result.description = "Not a Tide-Course file!"
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
                 }
             } else {
                 vscode.window.showErrorMessage("Error parsing task path!")
             }
         } else {
-            // Write directory icon logic here
-            iconPath = ""
+            // Directory icon logic
 
+            // Checks if the treeItem is a part of a Tide-Course
+            const dirCheck = this.isCourseDir(item.label)
+
+            // Calculate correct icon for Tide-Course directories
+            if (dirCheck) {
+                // Calculate taskMaxPoints sum for tasks in this directory
+                let taskMaxPointsForDir = this.calculateTaskMaxPoints(item, 0)
+
+                // Calculate currentPoints sum for tasks in this directory
+                let currentPointsForDir = this.calculateCurrentPoints(item, 0)
+
+                if (taskMaxPointsForDir > 0) {
+                    if (taskMaxPointsForDir == currentPointsForDir) {
+                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                    } else if (currentPointsForDir > 0) {
+                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                    } else {
+                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
+                    }
+                } else {
+                    iconPath = ""
+                }
+            } else {
+                // No icon and a warning for directories that aren't a part of a Tide-Course
+                iconPath = iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
+                result.description = "Not a Tide-Course directory!"
+            }
             // Calculate taskMaxPoints sum for tasks in this directory
             let taskMaxPointsForDir = this.calculateTaskMaxPoints(item, 0)
 
@@ -281,8 +329,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 } else {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
                 }
-            } else {
-                iconPath = ""
             }
         }
         result.command = {
@@ -317,8 +363,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 let pathSplit = item.path.split(path.sep)
                 let demo = pathSplit.at(-2)
                 let taskId = pathSplit.at(-1)
-                if (demo && taskId) {
-                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(item.path))
+                const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(item.path))
+                if (demo && taskId && taskset) {
+                    let timData = ExtensionStateManager.getTaskTimData(taskset.path, demo, taskId)
                     if (timData && timData.max_points) {
                         pointsSum += timData?.max_points
                         return pointsSum
@@ -352,8 +400,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 let pathSplit = item.path.split(path.sep)
                 let demo = pathSplit.at(-2)
                 let taskId = pathSplit.at(-1)
-                if (demo && taskId) {
-                    let timData = ExtensionStateManager.getTaskTimData(demo, taskId)
+                const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(item.path))
+                const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(item.path))
+                if (demo && taskId && taskset) {
+                    let timData = ExtensionStateManager.getTaskTimData(taskset.path, demo, taskId)
                     if (timData) {
                         let pointsData = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
                         if (pointsData && pointsData.current_points) {
@@ -374,6 +424,41 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         } else {
             return element.children
         }
+    }
+
+     /**
+     * Checks if the treeItem is a part of a Tide-Course
+     * @param label is used to find a connection to a Tide-Course
+     * @returns True if the directory label is a part of a Tide-Course, False otherwise
+     */
+     public isCourseDir(label: string | vscode.TreeItemLabel | undefined): boolean {
+        let labelString = label?.toString()
+        let result = false
+        if (!labelString) {
+            return result
+        }
+        // Edit the root directories to 
+        if (labelString.includes("Course: ")) {
+            labelString = labelString.replace("Course: ","")
+        }
+        // Search TimData for the directory name in ide_task_id or path
+        const timData = ExtensionStateManager.getTimData()
+        timData.forEach(element => {
+            if (element.ide_task_id === labelString) {
+                result = true
+            }
+            const pathParts = element.path.split(path.posix.sep)
+            if (pathParts.includes(labelString)) {
+                result = true
+            }
+        })
+        const courseData = ExtensionStateManager.getCourses()
+        courseData.forEach(element => {
+            if (element.name.toLocaleLowerCase() === labelString) {
+                result = true
+            }
+        })
+        return result
     }
 }
 
