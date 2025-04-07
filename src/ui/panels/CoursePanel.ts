@@ -78,12 +78,16 @@ export default class CoursePanel {
   }
 
   /**
-   * Sends user defined url for the tim instance address from the settings
+   * Sends user defined url for the tim instance address from the settings.
+   * Use default address "https://tim.jyu.fi/", if customUrl is empty
    * The intended recepient is Courses.svelte.
    * @param customUrl 
    */
   private sendCustomUrl() {
-    const customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    if (!customUrl) {
+      customUrl = "https://tim.jyu.fi/";
+    }
     const msg: WebviewMessage = {
       type: "CustomUrl",
       value: customUrl,
