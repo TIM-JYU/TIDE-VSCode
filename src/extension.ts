@@ -19,6 +19,7 @@ import UiController from './ui/UiController'
 import { CourseTaskProvider } from './ui/panels/TaskExplorerProvider'
 import { TaskPanelProvider } from './ui/panels/TaskPanelProvider'
 import Tide from './api/tide'
+import AnswerLimitStatusBarItem from './ui/AnswerLimitStatusBarItem'
 
 // This method is called when your extension is activated
 export async function activate(ctx: vscode.ExtensionContext) {
@@ -59,6 +60,10 @@ export async function activate(ctx: vscode.ExtensionContext) {
   // Creates and registers the taskpanel menu on the left
   const taskPanelProvider = new TaskPanelProvider(ctx.extensionUri)
   ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider))
+
+  // Creates and registers taskbar item for displaying answer_limit warnings
+  const answerLimitStatusBarItem = new AnswerLimitStatusBarItem(vscode.StatusBarAlignment.Right, 500)
+  ctx.subscriptions.push(answerLimitStatusBarItem)
 }
 
 // This method is called when your extension is deactivated
