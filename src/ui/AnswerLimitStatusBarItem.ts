@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { TimData } from '../common/types'
+import { Course, TimData } from '../common/types'
 import path from 'path'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 
@@ -56,6 +56,8 @@ export default class AnswerLimitStatusBarItem {
 
         try {
             const doc = AnswerLimitStatusBarItem.activeEditor.document
+            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(doc.fileName)))
+            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(doc.fileName)))
             const currentDir = path.dirname(doc.fileName)
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = currentDir
@@ -65,8 +67,8 @@ export default class AnswerLimitStatusBarItem {
             let id = pathSplit.at(-1)
             // task set name
             let demo = pathSplit.at(-2)
-            if (demo && id) {
-                return (ExtensionStateManager.getTaskTimData(demo, id))
+            if (demo && id && taskset) {
+                return(ExtensionStateManager.getTaskTimData(taskset.path, demo, id))
             }
         } catch {
             return undefined
