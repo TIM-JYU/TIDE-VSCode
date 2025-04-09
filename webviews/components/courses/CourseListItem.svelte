@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import type { Course, CourseStatus } from '../../../src/common/types'
+  import type { Course, CourseStatus, WebviewMessage} from '../../../src/common/types'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'

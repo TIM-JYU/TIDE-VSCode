@@ -8,7 +8,7 @@
 
   let { taskset, isLoggedIn }: Props = $props();
 
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
     const date = new Date(dateString);
 
     const options = {
