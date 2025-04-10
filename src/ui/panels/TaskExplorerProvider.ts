@@ -277,14 +277,44 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                             }
                         }
                     }
+                } else {
+                    // Add a description for files that aren't a part of a Tide-Course
+                    result.description = "Not a Tide-Course file!"
+                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
                 }
             } else {
                 vscode.window.showErrorMessage("Error parsing task path!")
             }
         } else {
-            // Write directory icon logic here
-            iconPath = ""
+            // Directory icon logic
 
+            // Checks if the treeItem is a part of a Tide-Course
+            const dirCheck = this.isCourseDir(item.label)
+
+            // Calculate correct icon for Tide-Course directories
+            if (dirCheck) {
+                // Calculate taskMaxPoints sum for tasks in this directory
+                let taskMaxPointsForDir = this.calculateTaskMaxPoints(item, 0)
+
+                // Calculate currentPoints sum for tasks in this directory
+                let currentPointsForDir = this.calculateCurrentPoints(item, 0)
+
+                if (taskMaxPointsForDir > 0) {
+                    if (taskMaxPointsForDir == currentPointsForDir) {
+                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                    } else if (currentPointsForDir > 0) {
+                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                    } else {
+                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
+                    }
+                } else {
+                    iconPath = ""
+                }
+            } else {
+                // No icon and a warning for directories that aren't a part of a Tide-Course
+                iconPath = iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
+                result.description = "Not a Tide-Course directory!"
+            }
             // Calculate taskMaxPoints sum for tasks in this directory
             let taskMaxPointsForDir = this.calculateTaskMaxPoints(item, 0)
 
@@ -299,8 +329,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 } else {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
                 }
-            } else {
-                iconPath = ""
             }
         }
         result.command = {
@@ -396,6 +424,41 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         } else {
             return element.children
         }
+    }
+
+     /**
+     * Checks if the treeItem is a part of a Tide-Course
+     * @param label is used to find a connection to a Tide-Course
+     * @returns True if the directory label is a part of a Tide-Course, False otherwise
+     */
+     public isCourseDir(label: string | vscode.TreeItemLabel | undefined): boolean {
+        let labelString = label?.toString()
+        let result = false
+        if (!labelString) {
+            return result
+        }
+        // Edit the root directories to 
+        if (labelString.includes("Course: ")) {
+            labelString = labelString.replace("Course: ","")
+        }
+        // Search TimData for the directory name in ide_task_id or path
+        const timData = ExtensionStateManager.getTimData()
+        timData.forEach(element => {
+            if (element.ide_task_id === labelString) {
+                result = true
+            }
+            const pathParts = element.path.split(path.posix.sep)
+            if (pathParts.includes(labelString)) {
+                result = true
+            }
+        })
+        const courseData = ExtensionStateManager.getCourses()
+        courseData.forEach(element => {
+            if (element.name.toLocaleLowerCase() === labelString) {
+                result = true
+            }
+        })
+        return result
     }
 }
 

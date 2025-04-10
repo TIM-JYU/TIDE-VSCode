@@ -256,7 +256,7 @@ export default class ExtensionStateManager {
    */
   static getTaskTimData(taskPath: string, demoName: string, taskId: string): TimData | undefined{
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
-    const timData = allTimData.find((timData) => timData.path === path.join(path.dirname(taskPath),demoName) && timData.ide_task_id === taskId)
+    const timData = allTimData.find((timData) => timData.path.includes(taskPath) && timData.ide_task_id === taskId)
     return timData
   }
 
