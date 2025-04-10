@@ -93,6 +93,7 @@ updates the courses' status, and handles downloading task sets and opening works
   <div>
     <div class="refresh-button">
         <LoaderButton
+        class="loader-button-blue"
         text="Refresh"
         textWhileLoading="Refreshing"
         loading={coursesRefreshing}

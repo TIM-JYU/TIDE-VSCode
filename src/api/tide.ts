@@ -10,7 +10,7 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, UserData } from '../common/types'
+import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, TimData, UserData } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -100,7 +100,7 @@ export default class Tide {
    * Downloads task set from TIM; creates files for each task
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
-  public static async downloadTaskSet(taskSetPath: string) {
+  public static async downloadTaskSet(courseName:string, taskSetPath: string) {
     const downloadPathBase: string | undefined = vscode.workspace
       .getConfiguration()
       .get('TIM-IDE.fileDownloadPath')
@@ -109,7 +109,6 @@ export default class Tide {
       return
     }
 
-    const courseName = path.basename(path.dirname(taskSetPath))
     const taskName = path.basename(taskSetPath)
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
@@ -156,7 +155,7 @@ export default class Tide {
    * Resets the noneditable parts of a task file to their original state.
    * @param filePath - path of the file to reset
    */
-  public static async resetNoneditableAreas(filePath: string) {
+  public static async resetTask(filePath: string) {
     vscode.commands.executeCommand('workbench.action.files.save')
     this.runAndHandle(['task', 'reset', filePath], (data: string) => {
       Logger.debug(data)
@@ -171,7 +170,25 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.debug(data)
-      callback()
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
+      const currentDir = path.dirname(taskPath)
+      // Find the names of the tasks ide_task_id and the task set from the files path
+      let itemPath = currentDir
+      // console.log(path)
+      let pathSplit = itemPath.split(path.sep)
+      // ide_task_id
+      let id = pathSplit.at(-1)
+      // task set name
+      let demo = pathSplit.at(-2)
+      if (demo && id && taskset) {
+        const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
+        if (timData) {
+          this.getTaskPoints(timData.path, timData.ide_task_id, callback);
+        } else {
+          vscode.window.showErrorMessage('TimData is undefined or invalid.');
+        }
+      }
     })
   }
 
@@ -182,7 +199,7 @@ export default class Tide {
         const points: TaskPoints = JSON.parse(data)
         // TODO: should this be called elsewhere instead?
         ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
-        callback(points)
+        vscode.commands.executeCommand('tide.refreshTree')
       })
     } catch (error) {
       console.log('Error while fetching task points: ' + error)
