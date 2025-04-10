@@ -137,15 +137,12 @@ export default class ExtensionStateManager {
       return undefined
     }
     try {
-      console.log("reading points")
       let pointsData = taskPoints[taskSetPath][ideTaskId]
-      console.log(pointsData)
       return pointsData
     } catch (error) {
       console.log(error)
       return {current_points : 0}
-    }
-    
+    } 
   }
 
   // This is for learning purposes only
@@ -184,9 +181,7 @@ export default class ExtensionStateManager {
         // Read the timdata object from the file
         const timDataRaw = fs.readFileSync(filePath)
         const timData = JSON.parse(timDataRaw.toString())
-        
-        //console.log(timData)
-
+      
         // course_parts includes all task sets (demos)
         let courseParts = Object.keys(timData.course_parts)
         courseParts.forEach(demo => {
