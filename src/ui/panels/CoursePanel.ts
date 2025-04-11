@@ -9,6 +9,7 @@
 import * as vscode from 'vscode'
 import * as fs from 'fs'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
+import Logger from '../../utilities/logger'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
@@ -78,12 +79,16 @@ export default class CoursePanel {
   }
 
   /**
-   * Sends user defined url for the tim instance address from the settings
+   * Sends user defined url for the tim instance address from the settings.
+   * Use default address "https://tim.jyu.fi/", if customUrl is empty
    * The intended recepient is Courses.svelte.
    * @param customUrl 
    */
   private sendCustomUrl() {
-    const customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    if (!customUrl) {
+      customUrl = "https://tim.jyu.fi/";
+    }
     const msg: WebviewMessage = {
       type: "CustomUrl",
       value: customUrl,
@@ -167,9 +172,10 @@ export default class CoursePanel {
         case 'DownloadTaskSet': {
           try {
             const taskSetPath = msg.value
+            const course: Course =  ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
 
             // Download a new Task Set
-            await Tide.downloadTaskSet(taskSetPath)
+            await Tide.downloadTaskSet(course.name.toLowerCase(), taskSetPath)
 
             // Update TimData with the newly written data
             ExtensionStateManager.updateTimData(taskSetPath)
