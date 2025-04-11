@@ -251,7 +251,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             let demo = pathSplit.at(-3)
 
             const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(itemPath)))
-            const taskset = course.taskSets.find(taskSet => itemPath.includes(taskSet.downloadPath ?? ""))
+            // Identify a course file by taskSet data and 
+            const taskset = course.taskSets.find(taskSet => {
+                if (taskSet.downloadPath) {
+                    if (itemPath.includes(taskSet.downloadPath)) {
+                        return taskSet
+                    }
+                }
+            })
 
             // Find the points data of this task file from ExtensionStateManager
             if (id && demo && taskset) {
@@ -340,41 +347,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             arguments: [item],
         }
         result.iconPath = iconPath
-        return result
-    }
-
-    /**
-     * Checks if the treeItem is a part of a Tide-Course
-     * @param label is used to find a connection to a Tide-Course
-     * @returns True if the directory label is a part of a Tide-Course, False otherwise
-     */
-    public isCourseDir(label: string | vscode.TreeItemLabel | undefined): boolean {
-        let labelString = label?.toString()
-        
-        let result = false
-
-        if (!labelString) {
-            return result
-        }
-        
-        // Edit the root directories to 
-        if (labelString.includes("Course: ")) {
-            labelString = labelString.replace("Course: ","")
-        }
-
-        // Search TimData for the directory name in ide_task_id or path
-        const timData = ExtensionStateManager.getTimData()
-
-        timData.forEach(element => {
-            if (element.ide_task_id === labelString) {
-                result = true
-            }
-            const pathParts = element.path.split(path.posix.sep)
-            if (pathParts.includes(labelString)) {
-                result = true
-            }
-        })
-
         return result
     }
 
