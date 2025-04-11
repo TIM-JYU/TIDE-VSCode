@@ -140,7 +140,7 @@ export default class ExtensionStateManager {
       let pointsData = taskPoints[taskSetPath][ideTaskId]
       return pointsData
     } catch (error) {
-      console.log(error)
+      Logger.info(String(error))
       return {current_points : 0}
     } 
   }
@@ -194,7 +194,7 @@ export default class ExtensionStateManager {
           })
         })          
     } catch (err) {
-        console.log(err)
+        Logger.info(String(err))
     }
   }
 

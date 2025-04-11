@@ -201,7 +201,7 @@ export default class Tide {
         vscode.commands.executeCommand('tide.refreshTree')
       })
     } catch (error) {
-      console.log('Error while fetching task points: ' + error)
+      Logger.info('Error while fetching task points: ' + error)
     }
   }
 
