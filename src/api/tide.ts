@@ -29,15 +29,21 @@ export default class Tide {
    */
   public static async login(): Promise<LoginData> {
     let loginData = { isLogged: false }
-    await this.runAndHandle(['login', '--json'], (data: string) => {
-      const jsonStart = data.indexOf('{')
-      const jsonString = data.slice(jsonStart)
-      const parsedData = JSON.parse(jsonString)
-      loginData = { isLogged: parsedData['login_success'] }
-      if (!loginData.isLogged) {
-        UiController.showError('Login failed.')
-      }
-    })
+
+    try {
+      await this.runAndHandle(['login', '--json'], (data: string) => {
+        const jsonStart = data.indexOf('{')
+        const jsonString = data.slice(jsonStart)
+        const parsedData = JSON.parse(jsonString)
+        loginData = { isLogged: parsedData['login_success'] }
+        if (!loginData.isLogged) {
+          UiController.showError('Login failed.')
+        }
+      })
+    } catch (error) {
+      Logger.error('Error while logging in: ' + error)
+      UiController.showError('Login failed due to an error.')
+    }
     return loginData
   }
 
@@ -201,7 +207,7 @@ export default class Tide {
         vscode.commands.executeCommand('tide.refreshTree')
       })
     } catch (error) {
-      Logger.info('Error while fetching task points: ' + error)
+      Logger.error('Error while fetching task points: ' + error)
     }
   }
 
@@ -215,21 +221,16 @@ export default class Tide {
     args: Array<string>,
     handler: HandlerFunction,
     ignoreErrors: boolean = false,
-  ) {
-    // this.spawnTideProcess(...args).then((data) => handler(data), (err) => UiController.showError(err))
-    const cliOutput = await this.spawnTideProcess(...args).catch((err) => {
-      if (!ignoreErrors) {
-        if (err.includes('Address already in use')) {
-          Logger.debug(err)
-          UiController.showError('Finnish login in browser.');
-        }else{
-          UiController.showError(err)
-        }
+  ): Promise<void> {
+    try {
+      const cliOutput = await this.spawnTideProcess(...args)
+      if (typeof cliOutput === 'string') {
+        await handler(cliOutput)
       }
-    })
-    if (typeof cliOutput === 'string') {
-      // !! ts lang server or eslint claims this await has no effect but it actually does !!
-      await handler(cliOutput)
+    } catch (err) {
+      if (!ignoreErrors) {
+        throw err 
+      }
     }
   }
 

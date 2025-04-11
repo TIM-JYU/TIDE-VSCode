@@ -203,7 +203,7 @@ export default class CoursePanel {
 
 
           } catch (error) {
-            Logger.info('Downloading a new taskset had an error: ' + error)
+            Logger.error('Downloading a new taskset had an error: ' + error)
           }
           break
         }

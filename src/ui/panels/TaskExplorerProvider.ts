@@ -85,8 +85,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             this.readRootDirectory()
             // This needs to be called in order to show the data in the treeview
             this.m_onDidChangeTreeData.fire(undefined)
-        } else {
-            vscode.window.showErrorMessage("Login to browse courses and tasks!")
         }
     }
 
