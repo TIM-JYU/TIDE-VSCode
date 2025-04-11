@@ -383,7 +383,7 @@ export default class ExtensionStateManager {
    */
   public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && taskSet.downloadPath.includes(downloadPath)))
     if (!course) {
       throw new Error(`Course not found for task download path: ${downloadPath}`)
     }
