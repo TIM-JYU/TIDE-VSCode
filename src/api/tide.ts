@@ -51,9 +51,14 @@ export default class Tide {
    * Executes tide logout command.
    */
   public static async logout(): Promise<LoginData> {
-    await this.runAndHandle(['logout'], (data: string) => {
-      Logger.info(`Logout: ${data}`)
-    })
+    try {
+      await this.runAndHandle(['logout'], (data: string) => {
+        Logger.info(`Logout: ${data}`)
+      })
+    } catch (error) {
+      Logger.error('Error while logging out: ' + error)
+      UiController.showError('Logout failed due to an error.')
+    }
     return { isLogged: false }
   }
 
