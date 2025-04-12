@@ -157,34 +157,22 @@ export default class ExtensionStateManager {
 
   /**
    * Updates the timdata of a course, this should be called after downloading a new task set from tim, since it will modify the old .timdata file
-   * @param itemPath taskset path or course page path. This path and the downloadpath the user has set are used to find the new .timdata file, which is then saved
+   * @param taskSetPath This path and the downloadpath the user has set are used to find the new .timdata file, which is then saved
    * @returns 
-   * When course path is used all exercises in course have been downloaded.
-   * When taskset path is used only that taskset has been downloaded.
    */
-  static updateTimData(itemPath: string, isCoursePath: boolean) {
-    if(isCoursePath){
-      //update every taskset's timdata in course path
-      const course: Course = this.getCourseByCoursePath(itemPath)
-      course.taskSets.forEach((taskset) => {
-        ExtensionStateManager.updateTimDataForTaskSet(taskset)
-      })
-    } else {
-      //find taskset and update its' timdata
-      const course: Course = this.getCourseByTasksetPath(itemPath)
-      const taskset = course.taskSets.find(taskSet => taskSet.path === itemPath)
-      if (taskset) {
-        ExtensionStateManager.updateTimDataForTaskSet(taskset)
-      }
+  static updateTimData(taskSetPath: string) {
+    const course: Course = this.getCourseByTasksetPath(taskSetPath)
+    const taskset = course.taskSets.find(taskSet => taskSet.path === taskSetPath)
+    if (taskset) {
+        // Find the path to the new .timdata file
+        if (!taskset.downloadPath) {
+            throw new Error('Download path is undefined for the task set.');
+        }else {
+          const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
+          ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+        }
+        
     }
-  }
-
-  private static updateTimDataForTaskSet(taskset: TaskSet) {
-    if (!taskset.downloadPath) {
-      throw new Error('Download path is undefined for the task set.');
-    }
-    const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata');
-    ExtensionStateManager.readAndSaveTimData(pathToTimDataFile);
   }
 
   /**

@@ -180,7 +180,7 @@ export default class CoursePanel {
             await Tide.downloadTaskSet(course.name.toLowerCase(), taskSetPath)
 
             // Update TimData with the newly written data
-            ExtensionStateManager.updateTimData(taskSetPath, false)
+            ExtensionStateManager.updateTimData(taskSetPath)
 
             // Get TimData for reading
             const dataPromise = ExtensionStateManager.getTimData()
@@ -220,7 +220,7 @@ export default class CoursePanel {
             // Download all tasks and update TimData
             for (const taskset of course.taskSets) {              
               await Tide.downloadTaskSet(course.name.toLowerCase(), taskset.path)
-              ExtensionStateManager.updateTimData(taskset.path, false)
+              ExtensionStateManager.updateTimData(taskset.path)
             }
 
             // Get TimData for reading
