@@ -113,7 +113,6 @@ export default class Tide {
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
     await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
-      console.log('data', data)  
       ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
