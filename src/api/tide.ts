@@ -113,7 +113,8 @@ export default class Tide {
     const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
     const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
     await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
-        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
+      console.log('data', data)  
+      ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
       // TODO: --json flag is not yet implemented in cli tool 
       // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
       // if (taskCreationFeedback.success) {
@@ -150,27 +151,6 @@ export default class Tide {
       },
     )
   }
-
-  /**
-   * Downloads all tasks in course from TIM; creates files for each task
-   * @param {string} coursePath - path to course page.
-   */
-  public static async downloadCourseTasks(coursePath: string) {
-    const downloadPathBase: string | undefined = vscode.workspace
-      .getConfiguration()
-      .get('TIM-IDE.fileDownloadPath')
-    if (downloadPathBase === undefined) {
-      UiController.showError('Download path not set!')
-      return
-    }
-
-    const courseName = path.basename(coursePath).toLowerCase()
-    const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
-    await this.runAndHandle(['task','create-course', '-p', coursePath, '-d', localCoursePath], (data: string) => {
-        ExtensionStateManager.setCourseTasksDownloadPath(coursePath, localCoursePath)
-    })
-  }
-
 
   /**
    * Resets the noneditable parts of a task file to their original state.

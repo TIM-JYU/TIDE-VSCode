@@ -215,12 +215,13 @@ export default class CoursePanel {
           try {
             //coursePath is path to course page in TIM. Not path to course folder.
             const coursePath = msg.value
+            const course: Course = ExtensionStateManager.getCourseByCoursePath(coursePath)
 
-            // Download all tasks in course
-            await Tide.downloadCourseTasks(coursePath)
-
-            // Update TimData with the newly written data
-            ExtensionStateManager.updateTimData(coursePath, true)
+            // Download all tasks and update TimData
+            for (const taskset of course.taskSets) {              
+              await Tide.downloadTaskSet(course.name.toLowerCase(), taskset.path)
+              ExtensionStateManager.updateTimData(taskset.path, false)
+            }
 
             // Get TimData for reading
             const dataPromise = ExtensionStateManager.getTimData()
