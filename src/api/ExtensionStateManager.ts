@@ -194,7 +194,7 @@ export default class ExtensionStateManager {
           })
         })          
     } catch (err) {
-        Logger.info(String(err))
+        Logger.error(String(err))
     }
   }
 

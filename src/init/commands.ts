@@ -67,7 +67,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const tasksetDir = path.dirname(path.dirname(currentDir));
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
       const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(currentDir))
-      Logger.debug('Taskset:', taskset)
       // Find the names of the tasks ide_task_id and the task set from the files path
       let itemPath = currentDir
       let pathSplit = itemPath.split(path.sep)
