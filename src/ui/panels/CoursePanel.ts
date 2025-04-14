@@ -14,6 +14,8 @@ import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
 import UiController from '../UiController'
+import path from 'path'
+
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -204,6 +206,47 @@ export default class CoursePanel {
 
           } catch (error) {
             Logger.error('Downloading a new taskset had an error: ' + error)
+          }
+          break
+        }
+        case 'DownloadCourseTasks': {
+          try {
+            //coursePath is path to course page in TIM. Not path to course folder.
+            const coursePath = msg.value
+            const course: Course = ExtensionStateManager.getCourseByCoursePath(coursePath)
+
+            // Download all tasks and update TimData
+            for (const taskset of course.taskSets) {              
+              await Tide.downloadTaskSet(course.name.toLowerCase(), taskset.path)
+              ExtensionStateManager.updateTimData(taskset.path)
+            }
+
+            // Get TimData for reading
+            const dataPromise = ExtensionStateManager.getTimData()
+
+            // Fetch Task Points for the newly downloaded tasks from TIM
+            await Promise.all(dataPromise.map(async (dataObject) => {
+              // Only fetch points for new tasks
+              const baseCoursePath = path.dirname(coursePath)
+              if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points) {
+                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
+                  console.log(data)
+                })
+              } else if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points == null) {
+                // Set the current points of pointsless tasks to 0 in order to avoid errors
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
+              }
+            }))
+
+            // Refresh TreeView with the new data
+            vscode.commands.executeCommand('tide.refreshTree')
+            this.panel.webview.postMessage({
+              type: 'DownloadCourseTasksComplete',
+              value: coursePath,
+            })
+
+          } catch (error) {
+            console.log('Downloading a new taskset had an error: ' + error)
           }
           break
         }

@@ -11,7 +11,6 @@
 
   let { taskset, isLoggedIn }: Props = $props();
   let showDetails: boolean = $state(false);
-
   let downloadingTasks: boolean = $state(false)
   
   /* 
