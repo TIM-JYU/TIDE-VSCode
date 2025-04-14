@@ -42,7 +42,7 @@ export default class Tide {
       })
     } catch (error) {
       Logger.error('Error while logging in: ' + error)
-      UiController.showError('Login failed due to an error.')
+      UiController.showError('Login failed.')
     }
     return loginData
   }
@@ -57,7 +57,7 @@ export default class Tide {
       })
     } catch (error) {
       Logger.error('Error while logging out: ' + error)
-      UiController.showError('Logout failed due to an error.')
+      UiController.showError('Logout failed.')
     }
     return { isLogged: false }
   }
@@ -76,7 +76,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while checking login: ' + error)
-      UiController.showError('Login check failed due to an error.')
+      UiController.showError('Login check failed.')
     }
     return loggedInUserData
   }
@@ -94,7 +94,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while fetching courses: ' + error)
-      UiController.showError('Failed to fetch courses due to an error.')
+      UiController.showError('Failed to fetch courses.')
     }
     return courses
   }
@@ -120,7 +120,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while fetching tasks: ' + error)
-      UiController.showError('Failed to fetch tasks due to an error.')
+      UiController.showError('Failed to fetch tasks.')
     }
     return tasks
   }
@@ -156,7 +156,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while downloading task set: ' + error)
-      UiController.showError('Failed to download task set due to an error.')
+      UiController.showError('Failed to download task set.')
     }
   }
 
@@ -173,7 +173,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while overwriting task set: ' + error)
-      UiController.showError('Failed to overwrite task set due to an error.')
+      UiController.showError('Failed to overwrite task set.')
     }
   }
 
@@ -194,7 +194,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while overwriting task: ' + error)
-      UiController.showError('Failed to overwrite task due to an error.')
+      UiController.showError('Failed to overwrite task.')
     }
   }
 
@@ -211,7 +211,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while resetting task: ' + error)
-      UiController.showError('Failed to reset task due to an error.')
+      UiController.showError('Failed to reset task.')
     }
   }
 
@@ -246,7 +246,7 @@ export default class Tide {
     }
     catch (error) {
       Logger.error('Error while submitting task: ' + error)
-      UiController.showError('Failed to submit task due to an error.')
+      UiController.showError('Failed to submit task.')
     }
 
   }
@@ -262,7 +262,7 @@ export default class Tide {
       })
     } catch (error) {
       Logger.error('Error while fetching task points: ' + error)
-      UiController.showError('Failed to fetch task points due to an error.')
+      UiController.showError('Failed to fetch task points.')
     }
   }
 
