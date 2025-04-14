@@ -132,16 +132,18 @@ export default class ExtensionStateManager {
 
   static getTaskPoints(taskSetPath: string, ideTaskId: string): TaskPoints | undefined {
     // const taskPoints = this.readFromGlobalState('taskPoints')
-    const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
-    if (taskPoints === undefined) {
-      return undefined
-    }
-    try {
-      let pointsData = taskPoints[taskSetPath][ideTaskId]
-      return pointsData
+    try  {
+      const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
+      if (taskPoints === undefined) {
+        return undefined
+      }
+      if(taskPoints[taskSetPath][ideTaskId]){
+        return taskPoints[taskSetPath][ideTaskId]
+      }else{
+        return {current_points : 0}
+      }
     } catch (error) {
       Logger.error(String(error))
-      return {current_points : 0}
     } 
   }
 
