@@ -99,9 +99,30 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return;
       }
       const taskPath = editor.document.uri.fsPath;
+      
+      // If changes, check if user wants to save and submit task to TIM
+      if (editor.document.isDirty) {
+        const messageOpts: vscode.MessageOptions = {
+          "detail": "Only the most recent saved file is submitted to TIM.",
+          "modal": true
+        }
+        const modalOpts: string[] = [
+          'Continue without saving'
+        ]
+        vscode.window.showInformationMessage(
+          'Unsaved Changes in Current File',
+          messageOpts,
+          ...modalOpts
+        ).then((answer) => {
+          if (answer === 'Cancel') {
+            return;
+          }
+        })
+      }
+      
       // TODO: callback should maybe be a show output function
       const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
-      Tide.submitTask(taskPath, callback)
+      Tide.submitTask(taskPath, callback) 
     }),
   )
 
