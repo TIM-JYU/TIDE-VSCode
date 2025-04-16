@@ -202,7 +202,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.timIcon', () => {
-      // vscode.commands.executeCommand('workbench.action.quickOpen', '>TIDE: ', 'tide:workspaceActive')
       vscode.commands.executeCommand('workbench.action.quickOpen', '>TIDE: ')
     })
   )
