@@ -26,18 +26,22 @@
 			"editor/title": [
 				{
 					"command": "tide.resetExercise",
+					"when": "editorFocus",
 					"group": "navigation@3"
 				},
 				{
 					"command": "tide.restoreSubmission",
+					"when": "editorFocus",
 					"group": "navigation@2"
 				},
 				{
 					"command": "tide.submitTask",
+					"when": "editorFocus",
 					"group": "navigation@1"
 				},
 				{
 					"command": "tide.timIcon",
+					"when": "editorFocus",
 					"group": "navigation@0"
 				}
 			],
