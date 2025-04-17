@@ -103,26 +103,35 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
         const messageOpts: vscode.MessageOptions = {
-          "detail": "Only the most recent saved file is submitted to TIM.",
+          "detail": "Do you wish to save the changes before submitting the task to TIM?\nUnsaved changes won't be submitted.",
           "modal": true
         }
         const modalOpts: string[] = [
-          'Continue without saving'
+          'Save and Submit',
+          'Submit without Saving',
         ]
         vscode.window.showInformationMessage(
-          'Unsaved Changes in Current File',
+          'There are Unsaved Changes in the Current File',
           messageOpts,
           ...modalOpts
         ).then((answer) => {
-          if (answer === 'Cancel') {
-            return;
+          if (answer === 'Save and Submit') {
+            // Lets save the file
+            
+            const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
+            Tide.submitTask(taskPath, callback) 
+          }
+          else if (answer === 'Submit without Saving') {
+            // TODO: callback should maybe be a show output function
+            const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
+            Tide.submitTask(taskPath, callback)
+          }
+          else {
+            console.log("cancel")
           }
         })
       }
       
-      // TODO: callback should maybe be a show output function
-      const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
-      Tide.submitTask(taskPath, callback) 
     }),
   )
 
