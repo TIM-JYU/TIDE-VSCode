@@ -92,7 +92,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * Submits current task file to TIM.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.submitTask', () => {
+    vscode.commands.registerCommand('tide.submitTask', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         vscode.window.showErrorMessage('No active file to submit.');
@@ -110,28 +110,38 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
           'Save and Submit',
           'Submit without Saving',
         ]
-        vscode.window.showInformationMessage(
+        const selection = await vscode.window.showInformationMessage(
           'There are Unsaved Changes in the Current File',
           messageOpts,
           ...modalOpts
-        ).then((answer) => {
-          if (answer === 'Save and Submit') {
-            // Lets save the file
-            
-            const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
-            Tide.submitTask(taskPath, callback) 
-          }
-          else if (answer === 'Submit without Saving') {
-            // TODO: callback should maybe be a show output function
+        )
+        
+        if (!selection) {
+          return
+        }
+
+        if (selection === 'Submit without Saving') {
+          const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
+          Tide.submitTask(taskPath, callback) 
+        }
+        else {
+          try {
+            const saved = await vscode.workspace.save(editor.document.uri)
+            if (!saved) {
+              vscode.window.showErrorMessage('Save failed - Current task has not been submitted!')
+              return
+            }
             const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
             Tide.submitTask(taskPath, callback)
+          } catch (error) {
+            vscode.window.showErrorMessage('Error occurred during the submission: ${error}')
           }
-          else {
-            console.log("cancel")
-          }
-        })
+        }
       }
-      
+      else {
+        const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
+        Tide.submitTask(taskPath, callback)
+      }
     }),
   )
 
