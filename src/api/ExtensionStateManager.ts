@@ -137,9 +137,7 @@ export default class ExtensionStateManager {
       return undefined
     }
     try {
-      console.log("reading points")
       let pointsData = taskPoints[taskSetPath][ideTaskId]
-      console.log(pointsData)
       return pointsData
     } catch (error) {
       console.log(error)

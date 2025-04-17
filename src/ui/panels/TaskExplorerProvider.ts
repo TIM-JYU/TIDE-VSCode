@@ -14,8 +14,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
     // with the vscode.EventEmitter we can refresh our  tree view
     private m_onDidChangeTreeData: vscode.EventEmitter<CourseTaskTreeItem | undefined> = new vscode.EventEmitter<CourseTaskTreeItem | undefined>()
-    // // and vscode will access the event by using a readonly onDidChangeTreeData (this member has to be named like here, otherwise vscode doesnt update our treeview.
+    // and vscode will access the event by using a readonly onDidChangeTreeData (this member has to be named like here, otherwise vscode doesnt update our treeview.
     readonly onDidChangeTreeData ? : vscode.Event<CourseTaskTreeItem | undefined> = this.m_onDidChangeTreeData.event
+
+    // Initialize icon paths for treeItems
+    private iconGreenStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+    private iconYellowStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+    private iconRedStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
+    private iconWarningStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
 
     // Register commands required to handle the treeview
     constructor() {
@@ -85,8 +91,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             this.readRootDirectory()
             // This needs to be called in order to show the data in the treeview
             this.m_onDidChangeTreeData.fire(undefined)
-            const courses = ExtensionStateManager.getCourses()
-            console.log(courses)
         } else {
             vscode.window.showErrorMessage("Login to browse courses and tasks!")
         }
@@ -96,10 +100,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // and starts reading each courses contents with the recursive function readCourseDirectory
     private readRootDirectory() {
         const rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
-        const courseData = ExtensionStateManager.getCourses()
+        const extensionCourseData = ExtensionStateManager.getCourses()
 
         // Check if the user has fetched course data from TIM
-        if (!courseData) {
+        if (!extensionCourseData) {
             // Inform user if course data isn't found
             vscode.window.showInformationMessage("Course data was not found. Make sure you have TIDE courses added in TIM, and refresh course data from the My Courses- page!")
             return
@@ -182,6 +186,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                         this.readCourseDirectory(current, newNode)
                     }
                 })
+            } else {
+                vscode.window.showErrorMessage("Directory path doesn't exist!")
             }
         }
     }
@@ -203,27 +209,27 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         // Try to open the document
         try {
             // When a dir is clicked do nothing
-        if (item.type == "dir") {
-            return
-        }
-        // When a file is clicked
-        // Open the document
-        vscode.workspace.openTextDocument(item.path).then( document => {
-            // After opening the document
-            vscode.window.showTextDocument(document).then( editor => {
-                // first 2 rows are informational, task code starts at row 3(index 2)
-                let pos = new vscode.Position(2,0)
-                // set cursos
-                editor.selection = new vscode.Selection(pos,pos)
-                // set focus to opened editor
-                editor.revealRange(new vscode.Range(pos,pos))
+            if (item.type == "dir") {
+                return
+            }
+            // When a file is clicked
+            // Open the document
+            vscode.workspace.openTextDocument(item.path).then( document => {
+                // After opening the document
+                vscode.window.showTextDocument(document).then( editor => {
+                    // first 2 rows are informational, task code starts at row 3(index 2)
+                    let pos = new vscode.Position(2,0)
+                    // set cursos
+                    editor.selection = new vscode.Selection(pos,pos)
+                    // set focus to opened editor
+                    editor.revealRange(new vscode.Range(pos,pos))
+                })
             })
-        })
-        } catch (error){
-            // Catch errors trying to open a document and refresh tree
-            vscode.window.showErrorMessage("Error, document might be deleted. Refreshing...")
-            this.refreshTree()
-        }
+            } catch (error){
+                // Catch errors trying to open a document and refresh tree
+                vscode.window.showErrorMessage("Error, document might be deleted. Refreshing...")
+                this.refreshTree()
+            }
         
     }
 
@@ -235,52 +241,72 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
      * @returns a vscode.TreeItem that can be shown in a treeview component
      */
     public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem|Thenable<vscode.TreeItem> {
+
         let title = item.label? item.label.toString() : ""
         let result = new vscode.TreeItem(title, item.collapsibleState)
-        let iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
+        let iconPath = ''
+
+        // File icon logic
         if (item.type == 'file') {
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = item.path
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-2)
-            // task set name
+            // taskSet(demo) name
             let demo = pathSplit.at(-3)
-
+            // course with a downloadpath that includes the files path
             const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(itemPath)))
-            const taskset = course.taskSets.find(taskSet => itemPath.includes(taskSet.downloadPath ?? ""))
-
+            
             // Find the points data of this task file from ExtensionStateManager
-            if (id && demo && taskset) {
-                const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
-                if (timData) {
-                    // Task Max points (max_points: number in .timData, maxPoints: string also exists in Tim and may be used in the future to describe how to gain maximum points from a task!)
-                    let taskMaxPoints = timData.max_points
-                    if (taskMaxPoints == null) {
-                        taskMaxPoints = 0
-                    }
-                    if (taskMaxPoints == 0) {
-                        iconPath = ""
-                    } else {
-                        // Current task points
-                        const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-                        if (taskMaxPoints && currentPoints && currentPoints.current_points) {
-                            // Maximum points received from the task
-                            if (currentPoints?.current_points == taskMaxPoints) {
-                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
-                                // Some points received from the task
-                            } else if (currentPoints?.current_points > 0) {
-                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
-                                // Zero points received from the task
-                            } else {
-                                iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
-                            }
+            if (id && demo && course) {
+
+                // Identify the Task Set from course data using the files path
+                const taskset = course.taskSets.find(taskSet => {
+                    if (taskSet.downloadPath) {
+                        if (itemPath.includes(taskSet.downloadPath)) {
+                            return taskSet
                         }
                     }
+                })
+
+                if (taskset) {
+
+                    const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
+                    
+                    if (timData) {
+                        // Task Max points (max_points: number in .timData, maxPoints: string also exists in Tim and may be used in the future to describe how to gain maximum points from a task!)
+                        let taskMaxPoints = timData.max_points
+                        if (taskMaxPoints == null) {
+                            taskMaxPoints = 0
+                        }
+                        if (taskMaxPoints == 0) {
+                            iconPath = ""
+                        } else {
+                            // Current task points
+                            const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
+                            if (taskMaxPoints && currentPoints && currentPoints.current_points) {
+                                // Maximum points received from the task
+                                if (currentPoints?.current_points == taskMaxPoints) {
+                                    iconPath = this.iconGreenStatus
+                                    // Some points received from the task
+                                } else if (currentPoints?.current_points > 0) {
+                                    iconPath = this.iconYellowStatus
+                                    // Zero points received from the task
+                                } else {
+                                    iconPath = this.iconRedStatus
+                                }
+                            }
+                        }
+                    } else {
+                        // Add a description for files that aren't a part of a Tide-Course
+                        result.description = "Not a Tide-Course file!"
+                        iconPath = this.iconWarningStatus
+                    }                
                 } else {
                     // Add a description for files that aren't a part of a Tide-Course
                     result.description = "Not a Tide-Course file!"
-                    iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
+                    iconPath = this.iconWarningStatus
                 }
             } else {
                 vscode.window.showErrorMessage("Error parsing task path!")
@@ -301,21 +327,21 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
                 if (taskMaxPointsForDir > 0) {
                     if (taskMaxPointsForDir == currentPointsForDir) {
-                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
+                        iconPath = this.iconGreenStatus
                     } else if (currentPointsForDir > 0) {
-                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
+                        iconPath = this.iconYellowStatus
                     } else {
-                        iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
+                        iconPath = this.iconRedStatus
                     }
                 } else {
                     iconPath = ""
                 }
             } else {
                 // No icon and a warning for directories that aren't a part of a Tide-Course
-                iconPath = iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
+                iconPath = this.iconWarningStatus
                 result.description = "Not a Tide-Course directory!"
             }
-            // Calculate taskMaxPoints sum for tasks in this directory
+            /* // Calculate taskMaxPoints sum for tasks in this directory
             let taskMaxPointsForDir = this.calculateTaskMaxPoints(item, 0)
 
             // Calculate currentPoints sum for tasks in this directory
@@ -329,7 +355,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 } else {
                     iconPath = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg') 
                 }
-            }
+            } */
         }
         result.command = {
             command : 'tide.itemClicked',
@@ -475,8 +501,10 @@ class CourseTaskTreeItem extends vscode.TreeItem {
     // and is passed to the base class
     // path = path to file or dir
     // type = type of item (file or dir)
+    // TODO: label: vscode.TreeItemLabel
     constructor(label: string, itemPath: string, type: "file" | "dir") {
         super(label)
+        this.label
         this.path = itemPath
         this.type = type
         if (this.type === "file") {
