@@ -8,7 +8,7 @@
 
   let { taskset, isLoggedIn }: Props = $props();
 
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
     const date = new Date(dateString);
 
     const options = {
@@ -25,8 +25,6 @@ function formatDate(dateString) {
     const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(date);
 
     return formattedDate.replace(/(\d{2})\.(\d{2})\.(\d{4}),/, "$1/$2/$3,"); 
-
-
 }
 
 </script>

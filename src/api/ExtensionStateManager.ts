@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints, TimData, UserData } from '../common/types'
+import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
 
@@ -386,6 +386,20 @@ export default class ExtensionStateManager {
     const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
     if (!course) {
       throw new Error(`Course not found for task download path: ${downloadPath}`)
+    }
+    return course;
+  }
+
+  /**
+   * Retrieves a course by its path.
+   * @param downloadPath The download path of the task set.
+   * @returns The course associated with the task set path.
+   */
+  public static getCourseByCoursePath(coursePath: string): Course {
+    const courses = this.getCourses()
+    const course: Course | undefined = courses.find((course) => course.path === coursePath)
+    if (!course) {
+      throw new Error(`Course with path: ${coursePath} not found`)
     }
     return course;
   }
