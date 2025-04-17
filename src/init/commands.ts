@@ -199,4 +199,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup')
     }),
   )
+
+  ctx.subscriptions.push(
+    vscode.commands.registerCommand('tide.timIcon', () => {
+      vscode.commands.executeCommand('workbench.action.quickOpen', '>TIDE: ')
+    })
+  )
 }
