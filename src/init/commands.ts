@@ -99,7 +99,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return;
       }
       const taskPath = editor.document.uri.fsPath;
-      const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
+      const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM');
       
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
