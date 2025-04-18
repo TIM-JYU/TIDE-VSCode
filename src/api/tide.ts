@@ -169,7 +169,7 @@ export default class Tide {
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     this.runAndHandle(['submit', taskPath], (data: string) => {
-      Logger.debug(data)
+      Logger.info(data)
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
       const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
       const currentDir = path.dirname(taskPath)
