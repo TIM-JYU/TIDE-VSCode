@@ -50,12 +50,17 @@
 					"command": "tide.refreshTree",
 					"when": "view == tide-tasks-treeview",
 					"group": "navigation@0"
+				},
+				{
+					"command": "tide.treeviewShowCourses",
+					"when": "view == tide-tasks-treeview",
+					"group": "navigation@0"
 				}
 			],
 			"view/item/context": [
 				{
 					"command": "tide.treeviewMenuOpenTasks",
-					"when": "view == tide-tasks-treeview",
+					"when": "view == tide-tasks-treeview && viewItem == folder",
 					"group": "tide@0"
 				}
 			]
@@ -139,6 +144,11 @@
 				"icon": "$(refresh)"
 			},
 			{
+				"command": "tide.treeviewShowCourses",
+				"title": "Show Courses",
+				"icon": "$(tasklist)"
+			},
+			{
 				"command": "tide.treeviewMenuOpenTasks",
 				"title": "Open all tasks in this directory"
 			},
@@ -198,7 +208,7 @@
 				},
 				{
 					"id": "tide-tasks-treeview",
-					"name": "Courses"
+					"name": "Course Explorer"
 				}
 			]
 		},
