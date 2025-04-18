@@ -99,6 +99,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return;
       }
       const taskPath = editor.document.uri.fsPath;
+      const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
       
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
@@ -115,13 +116,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
           messageOpts,
           ...modalOpts
         )
-        
+        // Cancel
         if (!selection) {
           return
         }
 
         if (selection === 'Submit without Saving') {
-          const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
           Tide.submitTask(taskPath, callback) 
         }
         else {
@@ -131,15 +131,13 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
               vscode.window.showErrorMessage('Save failed - Current task has not been submitted!')
               return
             }
-            const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
             Tide.submitTask(taskPath, callback)
           } catch (error) {
-            vscode.window.showErrorMessage('Error occurred during the submission: ${error}')
+            vscode.window.showErrorMessage('Error occurred during the submit: ${error}')
           }
         }
       }
       else {
-        const callback = () => vscode.window.showInformationMessage('Task submitted successfully');
         Tide.submitTask(taskPath, callback)
       }
     }),
