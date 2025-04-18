@@ -137,7 +137,7 @@ export default class Tide {
   }
 
   /**
-   * Overwrites one exercise
+   * Overwrites one exercise. Used in task restore commad
    * @param taskSetPath - tide task set for the exercise that is going to be overwritten
    * @param ideTaskId - id/directory for the task that is going to be overwritten
    * @param fileLocation - path to the directory where user has loaded the task set
