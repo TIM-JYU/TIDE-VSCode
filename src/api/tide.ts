@@ -168,7 +168,6 @@ export default class Tide {
    * @param {string} taskPath - path of the task
    */
   public static async submitTask(taskPath: string, callback: () => any) {
-    vscode.commands.executeCommand('tide.setPointsUpdating')
     this.runAndHandle(['submit', taskPath], (data: string) => {
       Logger.info(data)
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
@@ -195,6 +194,7 @@ export default class Tide {
 
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
     try {
+      vscode.commands.executeCommand('tide.setPointsUpdating')
       await this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
         Logger.debug(data)
         const points: TaskPoints = JSON.parse(data)
