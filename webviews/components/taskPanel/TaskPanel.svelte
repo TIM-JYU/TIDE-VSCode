@@ -16,6 +16,7 @@
     type WebviewMessage,
   } from '../../../src/common/types'
   import PointsDisplay from './PointsDisplay.svelte'
+  import LoaderButton from '../common/LoaderButton.svelte'
 
   let timData: TimData = $state({
     doc_id: 0,
@@ -35,6 +36,7 @@
   let isLoggedIn = $state(false)
   let taskPoints: TaskPoints = $state({ current_points: null })
   let customUrl: string = $state('')
+  let pointsUpdating: boolean = $state(false)
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -53,6 +55,7 @@
         }
         case 'TaskPoints': {
           taskPoints = message.value
+          pointsUpdating = false
           break
         }
         case 'SubmitResult': {
@@ -62,6 +65,10 @@
         }
         case 'CustomUrl': {
           customUrl = ensureTrailingSlash(message.value)
+          break
+        }
+        case 'SetPointsUpdating': {
+          pointsUpdating = message.value
           break
         }
       }
@@ -78,6 +85,7 @@
   }
 
   function updateTaskPoints() {
+    pointsUpdating = true
     tsvscode.postMessage({
       type: 'UpdateTaskPoints',
       value: {
@@ -128,8 +136,13 @@ This component manages the display of task information and interaction with task
       <p>This task does not reward points.</p>
       {:else}
       <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
-      
-      <button onclick={updateTaskPoints}>Update points</button>
+      <LoaderButton
+        class="loader-button-blue"
+        text="Update points"
+        textWhileLoading="Updating"
+        loading={pointsUpdating}
+        onClick={updateTaskPoints}
+      />
       {/if}
     </div>
 
@@ -159,23 +172,6 @@ This component manages the display of task information and interaction with task
   .task-panel a {
     margin: 0.5em 0 0.5em 0;
     font-size: small;
-  }
-
-  button {
-    background-color: #007ACC;
-    font-size: small;
-    color: white;
-    border: none;
-    padding: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-    border-radius: 3px;
-    width: 100%;
-    margin: 5px 0 5px 0;
-  }
-
-  button:hover {
-    background-color: #005F9E;
   }
 
   .task-panel hr {

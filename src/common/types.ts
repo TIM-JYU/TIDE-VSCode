@@ -178,3 +178,4 @@ export type MessageType =
   | 'TaskPoints'
   | 'UpdateTaskPoints'
   | 'UpdateTimData'
+  | 'SetPointsUpdating'
