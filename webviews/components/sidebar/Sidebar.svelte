@@ -79,7 +79,7 @@ It listens for messages from the extension to handle login and logout functional
         </button>
       </li>
       <li>
-        <button onclick={handleLogout} title="Logout (tasks remain on local filesystem)">Logout</button>
+        <button onclick={handleLogout} title="Logout and sever access to your TIM account">Logout</button>
       </li>
     {/if}
     <li>
