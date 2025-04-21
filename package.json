@@ -26,14 +26,22 @@
 			"editor/title": [
 				{
 					"command": "tide.resetExercise",
-					"group": "navigation@2"
+					"when": "editorFocus",
+					"group": "navigation@3"
 				},
 				{
 					"command": "tide.restoreSubmission",
-					"group": "navigation@1"
+					"when": "editorFocus",
+					"group": "navigation@2"
 				},
 				{
 					"command": "tide.submitTask",
+					"when": "editorFocus",
+					"group": "navigation@1"
+				},
+				{
+					"command": "tide.timIcon",
+					"when": "editorFocus",
 					"group": "navigation@0"
 				}
 			],
@@ -42,12 +50,17 @@
 					"command": "tide.refreshTree",
 					"when": "view == tide-tasks-treeview",
 					"group": "navigation@0"
+				},
+				{
+					"command": "tide.treeviewShowCourses",
+					"when": "view == tide-tasks-treeview",
+					"group": "navigation@0"
 				}
 			],
 			"view/item/context": [
 				{
 					"command": "tide.treeviewMenuOpenTasks",
-					"when": "view == tide-tasks-treeview",
+					"when": "view == tide-tasks-treeview && viewItem == folder",
 					"group": "tide@0"
 				}
 			]
@@ -111,9 +124,10 @@
 			},
 			{
 				"command": "tide.submitTask",
-				"title": "Submit",
+				"title": "Submit task to TIM",
 				"category": "TIM-IDE",
-				"description": "Submit exercise of active editor to TIM"
+				"description": "Submit exercise from the active editor to TIM",
+				"icon": "media/submit-arrow_dark4.svg"
 			},
 			{
 				"command": "tide.clearLocalExtensionData",
@@ -130,6 +144,11 @@
 				"icon": "$(refresh)"
 			},
 			{
+				"command": "tide.treeviewShowCourses",
+				"title": "Show Courses",
+				"icon": "$(tasklist)"
+			},
+			{
 				"command": "tide.treeviewMenuOpenTasks",
 				"title": "Open all tasks in this directory"
 			},
@@ -144,15 +163,24 @@
 			},
 			{
 				"command": "tide.resetExercise",
-				"title": "Reset",
+				"title": "Reset the current task to its initial state",
 				"category": "TIM-IDE",
-				"description": "Resets exercise of active editor to initial state"
+				"description": "Resets exercise of active editor to initial state",
+				"icon": "media/reset_dark3.svg"
 			},
 			{
 				"command": "tide.restoreSubmission",
-				"title": "Restore",
+				"title": "Restore task to the last submission in TIM",
 				"category": "TIM-IDE",
-				"description": "Restore last submission of active editor"
+				"description": "Restore last submission of active editor",
+				"icon": "media/restore-arrow_dark2.svg"
+			},
+			{
+				"command": "tide.timIcon",
+				"title": "Show all TIM-IDE related commands",
+				"category": "TIM-IDE",
+				"description": "Open selection for the TIM-IDE extension commands",
+				"icon": "media/tim-logo.svg"
 			}
 		],
 		"viewsContainers": {
@@ -180,7 +208,7 @@
 				},
 				{
 					"id": "tide-tasks-treeview",
-					"name": "Courses"
+					"name": "Course Explorer"
 				}
 			]
 		},

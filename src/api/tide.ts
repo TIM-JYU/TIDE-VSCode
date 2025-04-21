@@ -223,12 +223,13 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
       this.runAndHandle(['submit', taskPath], (data: string) => {
-        Logger.debug(data)
+        Logger.info(data)
         const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
         const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
         const currentDir = path.dirname(taskPath)
         // Find the names of the tasks ide_task_id and the task set from the files path
         let itemPath = currentDir
+        // console.log(path)
         let pathSplit = itemPath.split(path.sep)
         // ide_task_id
         let id = pathSplit.at(-1)
@@ -243,12 +244,10 @@ export default class Tide {
           }
         }
       })
-    }
-    catch (error) {
+    }catch (error) {
       Logger.error('Error while submitting task: ' + error)
       UiController.showError('Failed to submit task.')
     }
-
   }
 
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
