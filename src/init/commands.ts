@@ -80,11 +80,16 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
         if (timData) {
           Tide.overwriteTask(timData.path, timData.ide_task_id, tasksetDir);
-        } else {
-          vscode.window.showErrorMessage('TimData is undefined or invalid.');
-        }
+        Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
+          if (points !== undefined && points !== null) {
+            ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points);
+          } else {
+            vscode.window.showErrorMessage('TimData is undefined or invalid.');
+          }
+        });
       }
-    }),
+    }
+  }),
   )
   
 
