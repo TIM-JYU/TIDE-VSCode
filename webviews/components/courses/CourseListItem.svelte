@@ -88,11 +88,12 @@ This component creates displays for individual courses.
           {/snippet}
     </Menu>
   </header>
-    <a class="link" href={ customUrl + 'view/' + course.path}>Open material page</a>
+    <a class="link" href={ customUrl + 'view/' + course.path} title="Open the course in TIM">Open material page</a>
   <button
     class="expand-collapse-button"
     aria-expanded={isExpanded}
     onclick={() => toggleExpanded()}
+    title={isExpanded ? 'Hide task sets' : 'Show task sets'}
   >
     <span class="arrow {isExpanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
   </button>
@@ -109,7 +110,8 @@ This component creates displays for individual courses.
                 loading={downloadingTasks} 
                 text="Download all tasks" 
                 textWhileLoading="Downloading..." 
-                onClick={downloadAllCourseTasks} 
+                onClick={downloadAllCourseTasks}
+                title="Download all tasksets for this course"
               />
             </th>
           </tr>

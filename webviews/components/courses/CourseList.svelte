@@ -38,7 +38,7 @@ expand or collapse course details, and perform actions like downloading task set
 or opening workspaces.
 -->
 
-<button class="button-header" onclick={toggleExpandedState}>
+<button class="button-header" onclick={toggleExpandedState} title={isExpanded ? `Hide ${statusOfCourses} Courses` : `Show ${statusOfCourses} Courses`}>
   {#if statusOfCourses === 'active'}
   <span class="button-header-span">My Courses</span>
   {/if}

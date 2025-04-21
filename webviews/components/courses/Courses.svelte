@@ -96,6 +96,7 @@ updates the courses' status, and handles downloading task sets and opening works
         textWhileLoading="Refreshing"
         loading={coursesRefreshing}
         onClick={refreshCourses}
+        title="Refresh the list of courses from TIM"
         />
     </div>
   </div>

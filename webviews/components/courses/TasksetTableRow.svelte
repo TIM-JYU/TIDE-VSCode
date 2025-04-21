@@ -72,6 +72,7 @@ Enables downloading task set.
         text="Download taskset" 
         textWhileLoading="Downloading..." 
         onClick={downloadTaskSet} 
+        title="Download {taskset.name} tasks"
       />
     </td>
   {:else}

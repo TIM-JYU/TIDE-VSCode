@@ -5,6 +5,7 @@
     onClick: () => void;
     loading: boolean;
     text: string;
+    title?: string;
     textWhileLoading: any;
     class?: string; // Accept class as a prop
   }
@@ -14,11 +15,12 @@
     loading,
     text,
     textWhileLoading,
-    class: className = ""
+    class: className = "",
+    title = ""
   }: Props = $props();
 </script>
 
-<button class="loader-button {className}" onclick={onClick}>
+<button class="loader-button {className}" onclick={onClick} title={title}>
   {#if loading}
     {textWhileLoading ?? text}
     <Spinner/>

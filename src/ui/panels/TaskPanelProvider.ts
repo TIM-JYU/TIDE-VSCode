@@ -53,6 +53,10 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(this.handleWebviewMessage.bind(this))
         this.sendLoginData();
         this.sendCustomUrl();
+
+        vscode.commands.registerCommand('tide.setPointsUpdating', () => {
+            this.setPointsUpdating();
+        });
     }
 
     /**
@@ -91,6 +95,10 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         if (timData?.path && timData?.ide_task_id) {
             this.sendTaskPoints(ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id))
         }
+    }
+
+    private async setPointsUpdating(){
+        await this._view?.webview.postMessage({ type: 'SetPointsUpdating', value: true })
     }
 
     /**
