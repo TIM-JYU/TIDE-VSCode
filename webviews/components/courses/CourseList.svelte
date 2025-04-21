@@ -40,7 +40,7 @@ or opening workspaces.
 
 <button class="button-header" onclick={toggleExpandedState}>
   {#if statusOfCourses === 'active'}
-  <h2 class="button-header-big">My Courses</h2>
+  <span class="button-header-span">My Courses</span>
   {/if}
   {#if statusOfCourses === 'hidden'}
   <span class="button-header-span">{statusOfCourses} Courses</span>
@@ -66,14 +66,14 @@ or opening workspaces.
     cursor: pointer;
     border: none;
     background: none;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: bold;
-    margin-top: 1.5rem;
+    margin-top: 1.8rem;
     padding: 0;
     color: rgb(197, 197, 197);
   }
 
-  .button-header-span::first-letter, .button-header-big::first-letter {
+  .button-header-span::first-letter{
     text-transform: capitalize;
   }
 

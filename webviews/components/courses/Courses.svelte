@@ -149,7 +149,7 @@ updates the courses' status, and handles downloading task sets and opening works
 
   .refresh-button {
     position: absolute;
-    top: 50px;
+    top: 1.8rem;
     right: 16%;
   }
 </style>
