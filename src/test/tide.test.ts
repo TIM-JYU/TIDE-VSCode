@@ -22,7 +22,7 @@ describe('Tide', () =>
         ({
             get: sinon.stub().returns('testPath')
         })     
-        // Mocking runAndHandle to return a resolved promise with "mock data"
+        // Arrange: Mocking runAndHandle to return a resolved promise with "mock data"
         const runStub = sinon.stub(Tide as any, "runAndHandle").returns(new Promise((resolve) => resolve("mock data")))
         // Act
         await Tide.downloadTaskSet("Ohjelmointi", "test/path")
@@ -30,4 +30,20 @@ describe('Tide', () =>
         assert.strictEqual(runStub.calledOnce, true, "runAndHandle should be called once")
         sinon.assert.calledWith(runStub, sinon.match.array.startsWith(['task', 'create', 'test/path', '-a', '-d']))
     })  
+    test("login should call runAndHandle and login successfully", async () => 
+    {
+        // Arrange: Mock runAndHandle to simulate a successful login response
+        const runStub = sinon.stub(Tide as any, "runAndHandle").callsFake(async (...args: unknown[]): Promise<void> => 
+        {
+            const callback = args[1] as (data: string) => void;
+            callback(JSON.stringify({ login_success: true }));
+        })
+        // Act: 
+        const result = await Tide.login();
+
+        // Assert: 
+        assert.strictEqual(runStub.calledOnce, true, "runAndHandle should be called once");
+        sinon.assert.calledWith(runStub, sinon.match.array.startsWith(['login', '--json']));
+        assert.deepStrictEqual(result, { isLogged: true }, "The login result should match the expected response");
+    });
 })
