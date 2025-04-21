@@ -142,11 +142,6 @@ updates the courses' status, and handles downloading task sets and opening works
     margin-bottom: 2.5rem;
   }
 
-  h1 {
-    margin-bottom: 2rem;
-    font-size: 2rem;
-  }
-
   .refresh-button {
     position: absolute;
     top: 1.8rem;
