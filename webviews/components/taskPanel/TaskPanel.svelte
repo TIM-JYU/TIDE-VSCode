@@ -126,7 +126,7 @@ This component manages the display of task information and interaction with task
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-        <a href={ customUrl + "view/" + timData.path}>Open exercise in TIM</a>
+        <a href={ customUrl + "view/" + timData.path} title="Open the exercise in TIM">Open exercise in TIM</a>
     </div>
 
     <hr />
@@ -142,6 +142,7 @@ This component manages the display of task information and interaction with task
         textWhileLoading="Updating"
         loading={pointsUpdating}
         onClick={updateTaskPoints}
+        title="Click to fetch the latest points from TIM"
       />
       {/if}
     </div>
