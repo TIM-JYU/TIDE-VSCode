@@ -53,6 +53,10 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(this.handleWebviewMessage.bind(this))
         this.sendLoginData();
         this.sendCustomUrl();
+
+        vscode.commands.registerCommand('tide.setPointsUpdating', () => {
+            this.setPointsUpdating();
+        });
     }
 
     /**
@@ -93,6 +97,10 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         }
     }
 
+    private async setPointsUpdating(){
+        await this._view?.webview.postMessage({ type: 'SetPointsUpdating', value: true })
+    }
+
     /**
      * Sends task points to the webview.
      */
@@ -110,7 +118,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             customUrl = "https://tim.jyu.fi/";
         }
         this._view?.webview.postMessage({ type: "CustomUrl", value: customUrl})
-        console.log(customUrl)
     }
 
     /**
@@ -126,7 +133,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             const currentDir = path.dirname(doc.fileName)
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = currentDir
-            // console.log(path)
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-1)

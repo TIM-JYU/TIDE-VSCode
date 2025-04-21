@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints, TimData, UserData } from '../common/types'
+import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
 
@@ -132,20 +132,19 @@ export default class ExtensionStateManager {
 
   static getTaskPoints(taskSetPath: string, ideTaskId: string): TaskPoints | undefined {
     // const taskPoints = this.readFromGlobalState('taskPoints')
-    const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
-    if (taskPoints === undefined) {
-      return undefined
-    }
-    try {
-      console.log("reading points")
-      let pointsData = taskPoints[taskSetPath][ideTaskId]
-      console.log(pointsData)
-      return pointsData
+    try  {
+      const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
+      if (taskPoints === undefined) {
+        return undefined
+      }
+      if(taskPoints[taskSetPath][ideTaskId]){
+        return taskPoints[taskSetPath][ideTaskId]
+      }else{
+        return {current_points : 0}
+      }
     } catch (error) {
-      console.log(error)
-      return {current_points : 0}
-    }
-    
+      Logger.error(String(error))
+    } 
   }
 
   // This is for learning purposes only
@@ -184,9 +183,7 @@ export default class ExtensionStateManager {
         // Read the timdata object from the file
         const timDataRaw = fs.readFileSync(filePath)
         const timData = JSON.parse(timDataRaw.toString())
-        
-        //console.log(timData)
-
+      
         // course_parts includes all task sets (demos)
         let courseParts = Object.keys(timData.course_parts)
         courseParts.forEach(demo => {
@@ -199,7 +196,7 @@ export default class ExtensionStateManager {
           })
         })          
     } catch (err) {
-        console.log(err)
+        Logger.error(String(err))
     }
   }
 
@@ -387,7 +384,21 @@ export default class ExtensionStateManager {
     const courses = this.getCourses()
     const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
     if (!course) {
-      throw new Error(`Course not found for task download path: ${downloadPath}`)
+      throw new Error(`No course found for the task with download path: ${downloadPath}`)
+    }
+    return course;
+  }
+
+  /**
+   * Retrieves a course by its path.
+   * @param downloadPath The download path of the task set.
+   * @returns The course associated with the task set path.
+   */
+  public static getCourseByCoursePath(coursePath: string): Course {
+    const courses = this.getCourses()
+    const course: Course | undefined = courses.find((course) => course.path === coursePath)
+    if (!course) {
+      throw new Error(`Course with path: ${coursePath} not found`)
     }
     return course;
   }

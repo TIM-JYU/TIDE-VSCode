@@ -64,7 +64,7 @@ It listens for messages from the extension to handle login and logout functional
 <nav>
   <ul class="nav-list">
     {#if !isLoggedIn}
-      <li><button onclick={handleLogin}>Login</button></li>
+      <li><button onclick={handleLogin} title="Log in using TIM to access TIDE tasks">Login</button></li>
     {:else}
       <li>
         <button
@@ -73,22 +73,25 @@ It listens for messages from the extension to handle login and logout functional
               type: 'ShowCourses',
               value: '',
             })
-          }}>My Courses</button
-        >
+          }}
+            title="View and download tasks from your TIDE courses">
+          My Courses
+        </button>
       </li>
       <li>
-        <button onclick={handleLogout}>Logout</button>
+        <button onclick={handleLogout} title="Logout and sever access to your TIM account">Logout</button>
       </li>
     {/if}
     <li>
       <button
         onclick={() => {
           tsvscode.postMessage({
-            type: 'OpenSettings',
-            value: '',
+        type: 'OpenSettings',
+        value: '',
           })
-        }}>Settings</button
-      >
+        }} title="Open extension settings">
+        Settings
+      </button>
     </li>
   </ul>
 </nav>

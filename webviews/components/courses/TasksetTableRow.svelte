@@ -11,7 +11,6 @@
 
   let { taskset, isLoggedIn }: Props = $props();
   let showDetails: boolean = $state(false);
-
   let downloadingTasks: boolean = $state(false)
   
   /* 
@@ -73,6 +72,7 @@ Enables downloading task set.
         text="Download taskset" 
         textWhileLoading="Downloading..." 
         onClick={downloadTaskSet} 
+        title="Download {taskset.name} tasks"
       />
     </td>
   {:else}
