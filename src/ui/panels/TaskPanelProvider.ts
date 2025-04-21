@@ -118,7 +118,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             customUrl = "https://tim.jyu.fi/";
         }
         this._view?.webview.postMessage({ type: "CustomUrl", value: customUrl})
-        console.log(customUrl)
     }
 
     /**
@@ -134,7 +133,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             const currentDir = path.dirname(doc.fileName)
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = currentDir
-            // console.log(path)
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-1)
