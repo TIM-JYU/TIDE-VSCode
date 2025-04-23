@@ -386,7 +386,7 @@ export default class ExtensionStateManager {
     if (!course) {
       throw new Error(`No course found for the task with download path: ${downloadPath}`)
     }
-    return course;
+    return course
   }
 
   /**
