@@ -6,7 +6,7 @@ on:
     branches:
       -**
 jobs:
-  integration-tests:
+  run-all-tests:
     name: Run integration tests
     runs-on: ubuntu-latest
 
