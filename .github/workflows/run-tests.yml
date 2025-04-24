@@ -4,9 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
-      - staging
-
+      -**
 jobs:
   integration-tests:
     name: Run integration tests
