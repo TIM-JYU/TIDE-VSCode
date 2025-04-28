@@ -95,6 +95,27 @@
     })
   }
 
+  // This function is used to format the date string received from TIM
+  // to a more readable format for the user.
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+
+    const options = {
+        timeZone: "Europe/Helsinki",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false // Use 24-hour format
+    };
+
+    const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(date);
+
+    return formattedDate.replace(/(\d{2})\.(\d{2})\.(\d{4}),/, "$1/$2/$3,"); 
+  }
+
   run(() => {
     isLoggedIn = loginData?.isLogged ?? false
   });
@@ -150,6 +171,9 @@ This component manages the display of task information and interaction with task
     <div>
       {#if timData.answer_limit !== null}
       <p>For this task, you can only get points from the first {timData.answer_limit} submissions.</p>
+      {/if}
+      {#if timData.deadline !== null}
+      <p>The deadline for this task is {formatDate(timData.deadline)}.</p>
       {/if}
     </div>
   </div>
