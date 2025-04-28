@@ -111,7 +111,7 @@ This component creates displays for individual courses.
                 text="Download all tasks" 
                 textWhileLoading="Downloading..." 
                 onClick={downloadAllCourseTasks}
-                title="Download all tasksets for this course"
+                title="Download all tasks for this course"
               />
             </th>
           </tr>
