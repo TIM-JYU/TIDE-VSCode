@@ -281,7 +281,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                             downloadedTaskSetsAmount++
                         }
                     })
-                    result.description = downloadedTaskSetsAmount + "/" + taskSetAmount + " TaskSets Downloaded"
+                    result.description = downloadedTaskSetsAmount + "/" + taskSetAmount + " task sets Downloaded"
                 }
             } else {
                 iconPath = this.iconWarningStatus
