@@ -264,7 +264,7 @@ export default class ExtensionStateManager {
       // task set name
       let demo = pathSplit.at(-2)
       if (demo && id && taskset) {
-        timData = this.getTaskTimData(taskPath, demo, id)
+        timData = this.getTaskTimData(taskset.path, demo, id)
       }
     }
     return timData
