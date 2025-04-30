@@ -253,7 +253,7 @@ export default class ExtensionStateManager {
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
     if (!timData) {
-      const course: Course =  this.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
+      const course: Course =  this.getCourseByDownloadPath(taskPath)
       const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
       const currentDir = path.dirname(taskPath)
       // Find the names of the tasks ide_task_id and the task set from the files path
@@ -408,9 +408,24 @@ export default class ExtensionStateManager {
    */
   public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
+    let course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
     if (!course) {
-      // TODO: Etsi kurssi, jolla taskset jolla task jolla  taskfile jonka task_directory + taskfile on osa downloadpathia
+      for (const course of courses) {
+        for (const taskSet of course.taskSets) {
+          for (const task of taskSet.tasks) {
+            for (const taskFile of task.task_files ?? []) {
+              if (taskFile.task_directory && taskFile.file_name) {
+              const fullPath = path.join(taskFile.task_directory, taskFile.file_name);
+                if (downloadPath.includes(fullPath)) {
+                  return course;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (!course) {
       throw new Error(`No course found for the task with download path: ${downloadPath}`)
     }
     return course

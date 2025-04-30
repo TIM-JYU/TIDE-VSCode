@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { Course, TimData } from '../../common/types'
+import Logger from '../../utilities/logger'
 
 
 // Class for handling TreeView data
@@ -435,18 +436,11 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 }
             })
             if (readyCheck) {
-                let pathSplit = item.path.split(path.sep)
-                let demo = pathSplit.at(-2)
-                let taskId = pathSplit.at(-1)
-                const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(item.path))
-                const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(item.path))
-                if (demo && taskId && taskset) {
-                    let timData = ExtensionStateManager.getTaskTimData(taskset.path, demo, taskId)
-                    if (timData && timData.max_points) {
-                        pointsSum += timData?.max_points
-                        return pointsSum
-                    }
-                }
+                let timData = ExtensionStateManager.getTimDataByFilepath(item.path)
+                if (timData && timData.max_points) {
+                    pointsSum += timData?.max_points
+                    return pointsSum
+                } 
             }
         }
         return pointsSum
@@ -558,47 +552,16 @@ class CourseTaskTreeItem extends vscode.TreeItem {
         let result = false
         if (this.type === "file") {
             try {
-                // TODO: muutettava käyttämään haussa koko tiedoston polkua. getCourseByDownloadPath(this.path)
-                const itemCourse: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(this.path)))
-                if (!itemCourse) {
-                    result = false
-                    return result
-                }
-                const itemTaskSet = itemCourse.taskSets.find(taskSet => {
-                    if (taskSet.downloadPath) {
-                        if (this.path.includes(taskSet.downloadPath)) {
-                            return taskSet
-                        }
-                    }
-                })
-                if (!itemTaskSet) {
-                    result = false
-                    return result
-                }
-                const itemTask = itemTaskSet?.tasks.find(task => {
-                    const itemPathSplit = this.path.split(path.sep)
-                    if (itemPathSplit.includes(task.ide_task_id)) {
-                        return task
-                    }
-                })
-
-                if (!itemTask) {
-                    result = false
-                    return result
-                }
-
-                if (itemTask && itemTask.path && itemTask.ide_task_id) {
-                    const itemTimData = ExtensionStateManager.getTaskTimData(itemTask.path, "", itemTask.ide_task_id)
-                    if (itemTimData) {
-                        itemTimData.task_files.forEach(taskFile => {
-                            if (taskFile.file_name == this.label) {
-                                result = true
-                            }                        
-                        })
-                    }
-                }                    
+                const itemTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
+                if (itemTimData) {
+                    itemTimData.task_files.forEach(taskFile => {
+                        if (this.label && taskFile.file_name.includes(this.label.toString())) {
+                            result = true
+                        }                        
+                    })
+                }                  
             } catch (error) {
-                console.log(error)
+                Logger.debug(error)
                 return result
             }
         } else if (this.type == 'dir') {
