@@ -91,6 +91,7 @@ export interface Task {
   path: string
   deadline: string | null
   answer_limit: number | null
+  task_files: TaskFile[] | null
 }
 
 /**

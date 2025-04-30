@@ -410,6 +410,7 @@ export default class ExtensionStateManager {
     const courses = this.getCourses()
     const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
     if (!course) {
+      // TODO: Etsi kurssi, jolla taskset jolla task jolla  taskfile jonka task_directory + taskfile on osa downloadpathia
       throw new Error(`No course found for the task with download path: ${downloadPath}`)
     }
     return course

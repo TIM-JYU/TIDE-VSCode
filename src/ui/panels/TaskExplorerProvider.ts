@@ -558,6 +558,7 @@ class CourseTaskTreeItem extends vscode.TreeItem {
         let result = false
         if (this.type === "file") {
             try {
+                // TODO: muutettava käyttämään haussa koko tiedoston polkua. getCourseByDownloadPath(this.path)
                 const itemCourse: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(this.path)))
                 if (!itemCourse) {
                     result = false
