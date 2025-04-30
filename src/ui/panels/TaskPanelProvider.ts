@@ -125,22 +125,9 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
      */
     private async getTimData(): Promise<TimData | undefined> {
         if (!TaskPanelProvider.activeTextEditor) return undefined;
-
         try {
             const doc = TaskPanelProvider.activeTextEditor.document
-            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(doc.fileName)))
-            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(doc.fileName)))
-            const currentDir = path.dirname(doc.fileName)
-            // Find the names of the tasks ide_task_id and the task set from the files path
-            let itemPath = currentDir
-            let pathSplit = itemPath.split(path.sep)
-            // ide_task_id
-            let id = pathSplit.at(-1)
-            // task set name
-            let demo = pathSplit.at(-2)
-            if (demo && id && taskset) {
-                return(ExtensionStateManager.getTaskTimData(taskset.path, demo, id))
-            }
+            return(ExtensionStateManager.getTaskTimData(doc.fileName))
         } catch {
             return undefined
         }
