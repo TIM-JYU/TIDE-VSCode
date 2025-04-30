@@ -309,7 +309,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                     // taskSet(demo) name
                     let demo = pathSplit.at(-3)
                     // course with a downloadpath that includes the files path
-                    const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(itemPath)))
+                    const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(itemPath)
                     
                     // Find the points data of this task file from ExtensionStateManager
                     if (id && demo && course) {
