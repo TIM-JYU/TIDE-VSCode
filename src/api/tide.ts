@@ -236,7 +236,7 @@ export default class Tide {
         // task set name
         let demo = pathSplit.at(-2)
         if (demo && id && taskset) {
-          const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
+          const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
           if (timData) {
             this.getTaskPoints(timData.path, timData.ide_task_id, callback);
           } else {

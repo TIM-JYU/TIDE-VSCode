@@ -127,7 +127,7 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         if (!TaskPanelProvider.activeTextEditor) return undefined;
         try {
             const doc = TaskPanelProvider.activeTextEditor.document
-            return(ExtensionStateManager.getTaskTimData(doc.fileName))
+            return(ExtensionStateManager.getTimDataByFilepath(doc.fileName))
         } catch {
             return undefined
         }

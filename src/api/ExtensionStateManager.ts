@@ -249,11 +249,16 @@ export default class ExtensionStateManager {
    * @param taskPath Path to the task file (like 'kurssit/ties666/demot/demo-1/t1/t1.py')
    * @returns a unique TimData object with the given parameters, undefined is one is not found using the given parameters
    */
-  static getTaskTimData(taskPath: string): TimData | undefined{
+  static getTimDataByFilepath(taskPath: string): TimData | undefined{
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     const timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
+    if (!timData) {
+      const timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
+    }
     return timData
   }
+
+  
 
   static reset() {
     // let key: keyof typeof StateKey

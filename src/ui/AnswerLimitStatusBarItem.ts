@@ -56,19 +56,7 @@ export default class AnswerLimitStatusBarItem {
 
         try {
             const doc = AnswerLimitStatusBarItem.activeEditor.document
-            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(doc.fileName)))
-            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(doc.fileName)))
-            const currentDir = path.dirname(doc.fileName)
-            // Find the names of the tasks ide_task_id and the task set from the files path
-            let itemPath = currentDir
-            let pathSplit = itemPath.split(path.sep)
-            // ide_task_id
-            let id = pathSplit.at(-1)
-            // task set name
-            let demo = pathSplit.at(-2)
-            if (demo && id && taskset) {
-                return(ExtensionStateManager.getTaskTimData(taskset.path, demo, id))
-            }
+            return(ExtensionStateManager.getTimDataByFilepath(doc.fileName))
         } catch {
             return undefined
         }
