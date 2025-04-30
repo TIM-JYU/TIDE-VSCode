@@ -253,7 +253,19 @@ export default class ExtensionStateManager {
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     const timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
     if (!timData) {
-      const timData = this.getTaskTimData(taskPath, '', '')
+      const course: Course =  this.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
+      const currentDir = path.dirname(taskPath)
+      // Find the names of the tasks ide_task_id and the task set from the files path
+      let itemPath = currentDir
+      let pathSplit = itemPath.split(path.sep)
+      // ide_task_id
+      let id = pathSplit.at(-1)
+      // task set name
+      let demo = pathSplit.at(-2)
+      if (demo && id && taskset) {
+        const timData = this.getTaskTimData(taskPath, '', '')
+      }
     }
     return timData
   }
