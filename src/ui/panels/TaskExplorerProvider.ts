@@ -436,11 +436,15 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 }
             })
             if (readyCheck) {
-                let timData = ExtensionStateManager.getTimDataByFilepath(item.path)
-                if (timData && timData.max_points) {
-                    pointsSum += timData?.max_points
-                    return pointsSum
-                } 
+                try {
+                    let timData = ExtensionStateManager.getTimDataByFilepath(item.path)
+                    if (timData && timData.max_points) {
+                        pointsSum += timData?.max_points
+                        return pointsSum
+                    }
+                } catch (error) {           
+
+                }
             }
         }
         return pointsSum
@@ -468,20 +472,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 }
             })
             if (readyCheck) {
-                let pathSplit = item.path.split(path.sep)
-                let demo = pathSplit.at(-2)
-                let taskId = pathSplit.at(-1)
-                const course: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(item.path))
-                const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(item.path))
-                if (demo && taskId && taskset) {
-                    let timData = ExtensionStateManager.getTaskTimData(taskset.path, demo, taskId)
-                    if (timData) {
-                        let pointsData = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-                        if (pointsData && pointsData.current_points) {
-                            pointsSum += pointsData.current_points
-                            return pointsSum
-                        }                        
+                try {
+                    let timData = ExtensionStateManager.getTimDataByFilepath(item.path)
+                    if (timData && timData.max_points) {
+                        pointsSum += timData?.max_points
+                        return pointsSum
                     }
+                } catch (error) {           
+
                 }
             }
         }
