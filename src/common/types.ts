@@ -116,7 +116,6 @@ export interface TaskFile {
   task_id_ext: string
   user_args: string
   user_input: string
-  task_directory: string
 }
 
 /**
