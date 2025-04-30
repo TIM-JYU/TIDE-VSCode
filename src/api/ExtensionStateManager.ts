@@ -251,7 +251,7 @@ export default class ExtensionStateManager {
    */
   static getTimDataByFilepath(taskPath: string): TimData | undefined{
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
-    const timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
+    let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
     if (!timData) {
       const course: Course =  this.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
       const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
@@ -264,7 +264,7 @@ export default class ExtensionStateManager {
       // task set name
       let demo = pathSplit.at(-2)
       if (demo && id && taskset) {
-        const timData = this.getTaskTimData(taskPath, '', '')
+        timData = this.getTaskTimData(taskPath, demo, id)
       }
     }
     return timData
