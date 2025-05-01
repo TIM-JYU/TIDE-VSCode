@@ -194,7 +194,7 @@ export default class CoursePanel {
               // eslint-disable-next-line eqeqeq
               } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
                 // Set the current points of pointsless tasks to 0 in order to avoid errors
-                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0});
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
               }
             }))
 
