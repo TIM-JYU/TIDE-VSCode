@@ -24,6 +24,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     private iconGreenStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
     private iconYellowStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
     private iconRedStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
+    private iconGreyStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-grey.svg')
     private iconWarningStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
     private iconTimCourse = path.join(__filename, '..', '..', '..', '..', 'media', 'timlogovscode.png')
 
@@ -307,23 +308,20 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                         // Task Max points (max_points: number in .timData, maxPoints: string also exists in Tim and may be used in the future to describe how to gain maximum points from a task!)
                         let taskMaxPoints = timData.max_points
                         if (taskMaxPoints == null) {
-                            taskMaxPoints = 0
-                        }
-                        if (taskMaxPoints == 0) {
-                            iconPath = ""
+                            iconPath = this.iconGreyStatus
                         } else {
                             // Current task points
                             const currentPoints = ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id)
-                            if (taskMaxPoints && currentPoints && currentPoints.current_points) {
+                            if (taskMaxPoints) {
                                 // Maximum points received from the task
                                 if (currentPoints?.current_points == taskMaxPoints) {
                                     iconPath = this.iconGreenStatus
                                     // Some points received from the task
-                                } else if (currentPoints?.current_points > 0) {
-                                    iconPath = this.iconYellowStatus
+                                } else if (!currentPoints?.current_points || currentPoints?.current_points == 0) {
+                                    iconPath = this.iconRedStatus
                                     // Zero points received from the task
                                 } else {
-                                    iconPath = this.iconRedStatus
+                                    iconPath = this.iconYellowStatus
                                 }
                             }
                         }
@@ -331,8 +329,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 }
                 else {
                     // Add a description for files that aren't a part of a Tide-Course
-                    result.description = "Not a Tide-Course file!"
-                    iconPath = this.iconWarningStatus
+                    result.description = "Not a Tide-Task file!"
+                    //iconPath = this.iconWarningStatus
                 }
 
             } else {
@@ -402,7 +400,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             })
             if (readyCheck) {
                 try {
-                    let timData = ExtensionStateManager.getTimDataByFilepath(item.path)
+                    let timData = ExtensionStateManager.getTimDataByFileDir(item.path)
                     if (timData && timData.max_points) {
                         pointsSum += timData?.max_points
                         return pointsSum

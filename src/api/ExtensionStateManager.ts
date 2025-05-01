@@ -16,6 +16,7 @@ import Logger from '../utilities/logger'
 import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
+import { get } from 'http'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -268,6 +269,23 @@ export default class ExtensionStateManager {
       }
     }
     return timData
+  }
+
+  static getTimDataByFileDir(taskPath: string): TimData | undefined {
+    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData);
+  
+    for (const timData of allTimData) {
+      for (const taskFile of timData.task_files ?? []) {
+        if (taskFile.task_directory && taskFile.file_name) {
+          const fullDir = path.dirname(path.join(taskFile.task_directory, taskFile.file_name));
+          if (taskPath.includes(fullDir)) {
+            return timData;
+          }
+        }
+      }
+    }
+  
+    return this.getTimDataByFilepath(taskPath);
   }
 
   /**
