@@ -386,7 +386,7 @@ export default class ExtensionStateManager {
     if (!course) {
       throw new Error(`This file doesn't seem to be part of the TIDE task: ${downloadPath}`)
     }
-    return course;
+    return course
   }
 
   /**

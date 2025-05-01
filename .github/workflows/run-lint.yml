@@ -1,0 +1,53 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: [ "**" ]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js 23.7.0
+        uses: actions/setup-node@v3
+        with:
+          node-version: '23.7.0'
+          cache: 'npm'
+
+      - name: Upgrade to npm 11.1.0
+        run: npm install -g npm@11.1.0
+
+      - name: Confirm versions
+        run: |
+          node -v
+          npm -v
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint and output JSON report
+        run: |
+          npm run lint -- --format json --output-file eslint_report.json || echo "ESLint completed with warnings/errors"
+      
+      - name: Print ESLint report for debugging
+        run: cat eslint_report.json
+
+      - name: Annotate ESLint issues
+        uses: DerLev/eslint-annotations@v2
+        with:
+          eslint-report: eslint_report.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          only-changed-in-pr: true
+          fail-in-pr: false
+          create-status-check: true
+          status-check-name: ESLint Annotations
+          add-notice-with-url: true
