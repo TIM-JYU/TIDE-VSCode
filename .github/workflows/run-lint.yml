@@ -34,7 +34,6 @@ jobs:
       - name: Run ESLint with reviewdog
         uses: reviewdog/action-eslint@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
+          reporter: github-check
+          fail_level: warning
           eslint_flags: "src --ext ts"
-          fail_level: error
