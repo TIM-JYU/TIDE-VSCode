@@ -330,7 +330,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                 else {
                     // Add a description for files that aren't a part of a Tide-Course
                     result.description = "Not a Tide-Task file!"
-                    //iconPath = this.iconWarningStatus
+                    iconPath = this.iconWarningStatus
                 }
 
             } else {
