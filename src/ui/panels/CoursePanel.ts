@@ -87,12 +87,12 @@ export default class CoursePanel {
    * @param customUrl 
    */
   private sendCustomUrl() {
-    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl')
     if (!customUrl) {
-      customUrl = "https://tim.jyu.fi/";
+      customUrl = 'https://tim.jyu.fi/'
     }
     const msg: WebviewMessage = {
-      type: "CustomUrl",
+      type: 'CustomUrl',
       value: customUrl,
     }
     this.panel.webview.postMessage(msg)
@@ -154,7 +154,7 @@ export default class CoursePanel {
           })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
-           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '');
+           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '')
             if (previousPath) {
               newPath = [vscode.Uri.file(previousPath)]
             }
@@ -188,8 +188,10 @@ export default class CoursePanel {
             // Fetch Task Points for the newly downloaded tasks from TIM
             await Promise.all(dataPromise.map(async (dataObject) => {
               // Only fetch points for new tasks
+              // eslint-disable-next-line eqeqeq
               if (dataObject.path == taskSetPath && dataObject.max_points) {
                 await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, null)
+              // eslint-disable-next-line eqeqeq
               } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
                 // Set the current points of pointsless tasks to 0 in order to avoid errors
                 ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
@@ -232,6 +234,7 @@ export default class CoursePanel {
                 await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
                   console.log(data)
                 })
+              // eslint-disable-next-line eqeqeq
               } else if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points == null) {
                 // Set the current points of pointsless tasks to 0 in order to avoid errors
                 ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
