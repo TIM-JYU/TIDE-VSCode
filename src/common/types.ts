@@ -118,6 +118,13 @@ export interface TaskFile {
   user_input: string
 }
 
+export interface FileStatus {
+  file_name: string
+  path: string
+  relative_path: string
+  status: string
+}
+
 /**
  * Data associated with logged in user
  */

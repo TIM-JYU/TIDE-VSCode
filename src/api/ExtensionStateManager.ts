@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
+import { Course, CourseStatus, FileStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
 
@@ -85,13 +85,36 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-  static setTaskSetDownloadPath(taskSetPath: string, tasks: Array<object>) {
+  static setTaskSetDownloadPath(taskSetPath: string, tasks: Array<Array<FileStatus>>) {
     const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
-    const course: Course = this.getCourseByTasksetPath(taskSetPath)
-    const taskSet: TaskSet | undefined = course.taskSets.find((taskSet) => taskSet.path === taskSetPath)
-
+    courses.forEach((course) => {
+      course.taskSets.forEach((taskSet) => {
+        if (taskSet.path === taskSetPath) {
+          taskSet.downloadPath = this.getCommonPath(tasks)
+        }
+      })
+    })
     this.writeToGlobalState(StateKey.Courses, courses)
   }
+
+  static getCommonPath(data: Array<Array<FileStatus>>): string {
+    const allPaths = data.flat().map(file => file.path);
+    if (allPaths.length === 0) return "";
+  
+    const splitPaths = allPaths.map(p => p.split(path.sep));
+    const commonParts = [];
+  
+    for (let i = 0; i < splitPaths[0].length; i++) {
+      const part = splitPaths[0][i];
+      if (splitPaths.every(parts => parts[i] === part)) {
+        commonParts.push(part);
+      } else {
+        break;
+      }
+    } 
+    return commonParts.join(path.sep);
+  }
+  
 
   /**
    * Retrieves the download path for a specific task set path from the Global State.
