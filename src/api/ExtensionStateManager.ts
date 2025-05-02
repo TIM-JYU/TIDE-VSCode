@@ -85,15 +85,11 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-  static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
+  static setTaskSetDownloadPath(taskSetPath: string, tasks: Array<object>) {
     const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
-    courses.forEach((course) => {
-      course.taskSets.forEach((taskSet) => {
-        if (taskSet.path === taskSetPath) {
-          taskSet.downloadPath = downloadPath
-        }
-      })
-    })
+    const course: Course = this.getCourseByTasksetPath(taskSetPath)
+    const taskSet: TaskSet | undefined = course.taskSets.find((taskSet) => taskSet.path === taskSetPath)
+
     this.writeToGlobalState(StateKey.Courses, courses)
   }
 
