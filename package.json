@@ -252,7 +252,6 @@
 		"@rollup/plugin-node-resolve": "^16.0.1",
 		"@rollup/plugin-terser": "^0.4.4",
 		"@rollup/plugin-typescript": "^12.1.2",
-		"@rollup/rollup-linux-x64-gnu": "^4.40.1",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^22.15.3",
