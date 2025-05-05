@@ -176,7 +176,7 @@ This component creates displays for individual courses.
     display: flex;
     justify-content: center;
     align-items: center;
-    color: rgb(155, 155, 155);
+    color: rgb(197, 197, 197);
     background-color: transparent;
     border: none;
     width: 36px;
