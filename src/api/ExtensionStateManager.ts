@@ -384,7 +384,7 @@ export default class ExtensionStateManager {
     const courses = this.getCourses()
     const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
     if (!course) {
-      throw new Error(`No course found for the task with download path: ${downloadPath}`)
+      throw new Error(`This file doesn't seem to be part of the TIDE task: ${downloadPath}`)
     }
     return course
   }

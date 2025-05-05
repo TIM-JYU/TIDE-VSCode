@@ -46,8 +46,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to reset.')
         return
       }
-      const doc = editor.document;
-      Tide.resetTask(doc.fileName)
+      const doc = editor.document
+      const currentDir = path.dirname(doc.fileName)
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
+      if (course){
+        Tide.resetTask(doc.fileName)
+      }
     }),
   )
 
@@ -100,6 +104,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       if (!editor) {
         vscode.window.showErrorMessage('No active file to submit.');
         return;
+      }
+      const doc = editor.document
+      const currentDir = path.dirname(doc.fileName)
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
+      if (!course){
+        return
       }
       const taskPath = editor.document.uri.fsPath;
       const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM');
