@@ -77,7 +77,7 @@ This component creates displays for individual courses.
     <p class="course-title">{course.name}</p>
     <Menu>
       {#snippet toggle()}
-            <span >&#8942;</span>
+            <span class="menu-toggle">&#8942;</span>
           {/snippet}
       {#snippet menucontent()}
             <MenuItem >
@@ -145,6 +145,10 @@ This component creates displays for individual courses.
   .course-title {
     margin-left: 1.5rem;
     margin-top: 1.5rem;
+  }
+
+  .menu-toggle{
+    padding-right: 5px;
   }
 
   .link {
