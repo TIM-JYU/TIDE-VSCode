@@ -14,6 +14,7 @@
 
   let isLoggedIn = $state(false)
   let isLoggingIn: boolean = $state(false)
+  let isLoggingOut: boolean = $state(false)
   let loginData: LoginData = $state({
     isLogged: false
   })
@@ -27,6 +28,7 @@
       const message = event.data
       if (message && message.type === 'LoginData') {
         isLoggingIn = false
+        isLoggingOut = false
         loginData = message.value
       }
     })
@@ -49,6 +51,7 @@
    * Posts message for extension for logging user out.
    */
   function handleLogout() {
+    isLoggingOut = true
     tsvscode.postMessage({
       type: 'Logout',
       value: '',
@@ -73,7 +76,7 @@ It listens for messages from the extension to handle login and logout functional
         <LoaderButton
         class="loader-button-plain"
         text="Login"
-        textWhileLoading="Logging in..."
+        textWhileLoading="Login"
         loading={isLoggingIn}
         onClick={handleLogin}
         title="Log in using TIM to access TIDE tasks"
@@ -93,7 +96,14 @@ It listens for messages from the extension to handle login and logout functional
         </button>
       </li>
       <li>
-        <button onclick={handleLogout} title="Logout and sever access to your TIM account">Logout</button>
+        <LoaderButton
+          class="loader-button-plain"
+          text="Logout"
+          textWhileLoading="Logout"
+          loading={isLoggingOut}
+          onClick={handleLogout}
+          title="Logout and sever access to your TIM account"
+        />
       </li>
     {/if}
     <li>
