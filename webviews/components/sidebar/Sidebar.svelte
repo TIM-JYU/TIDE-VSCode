@@ -102,6 +102,7 @@ It listens for messages from the extension to handle login and logout functional
     border: none;
     cursor: pointer;
     text-align: left;
+    color: rgb(197, 197, 197);
   }
 
   .nav-list {
