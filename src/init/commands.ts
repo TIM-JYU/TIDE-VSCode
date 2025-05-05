@@ -56,10 +56,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * Restore last submission of active task file.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.restoreSubmission', async () => {
+    vscode.commands.registerCommand('tide.synchronizeSubmission', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showErrorMessage('No active file to restore.')
+        vscode.window.showErrorMessage('No active file to synchronize.')
         return
       }
       const doc = editor.document;
