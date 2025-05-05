@@ -10,7 +10,10 @@
 
   import { onMount } from 'svelte'
   import { type LoginData } from '../../../src/common/types'
+  import LoaderButton from '../common/LoaderButton.svelte'
+
   let isLoggedIn = $state(false)
+  let isLoggingIn: boolean = $state(false)
   let loginData: LoginData = $state({
     isLogged: false
   })
@@ -23,6 +26,7 @@
     window.addEventListener('message', (event) => {
       const message = event.data
       if (message && message.type === 'LoginData') {
+        isLoggingIn = false
         loginData = message.value
       }
     })
@@ -34,6 +38,7 @@
    * Posts message for the extension for logging user in.
    */
   function handleLogin() {
+    isLoggingIn = true
     tsvscode.postMessage({
       type: 'Login',
       value: '',
@@ -64,7 +69,16 @@ It listens for messages from the extension to handle login and logout functional
 <nav>
   <ul class="nav-list">
     {#if !isLoggedIn}
-      <li><button onclick={handleLogin} title="Log in using TIM to access TIDE tasks">Login</button></li>
+      <li>
+        <LoaderButton
+        class="loader-button-plain"
+        text="Login"
+        textWhileLoading="Logging in..."
+        loading={isLoggingIn}
+        onClick={handleLogin}
+        title="Log in using TIM to access TIDE tasks"
+        />
+      </li>
     {:else}
       <li>
         <button
