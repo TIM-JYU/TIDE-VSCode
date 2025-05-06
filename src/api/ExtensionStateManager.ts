@@ -13,7 +13,7 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
+import { Course, CourseStatus, FileStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
 import { get } from 'http'
@@ -86,12 +86,21 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-  static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
+  static setTaskSetPaths(localCoursePath:string, taskSetPath: string, tasks: Array<Array<FileStatus>>) {
     const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
-          taskSet.downloadPath = downloadPath
+          taskSet.downloadPath = localCoursePath
+          for (const group of tasks) {
+            for (const file of group) {
+              const task = taskSet.tasks.find((task) => task.task_files.some((taskFile) => taskFile.file_name === file.file_name));
+              if (task) {
+                task.download_path = file.path;
+              }
+            }
+          }
+          return
         }
       })
     })
@@ -168,7 +177,7 @@ export default class ExtensionStateManager {
         if (!taskset.downloadPath) {
             throw new Error('Download path is undefined for the task set.');
         }else {
-          const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
+          const pathToTimDataFile = path.join(taskset.downloadPath, '.timdata')
           ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
         }
         
@@ -247,9 +256,12 @@ export default class ExtensionStateManager {
 
   /**
    * Get a TimData object
-   * @param taskPath Path to the task file (like 'kurssit/ties666/demot/demo-1/t1/t1.py')
+   * @param taskPath Path to the task file (like 'kurssit/ties666/demot/demo-1')
+   * @param demoName Name of the Demo that the TimData task is a part of
+   * @param taskId Task id of the TimData task
    * @returns a unique TimData object with the given parameters, undefined is one is not found using the given parameters
    */
+
   static getTimDataByFilepath(taskPath: string): TimData | undefined{
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
