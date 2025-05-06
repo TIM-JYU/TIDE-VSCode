@@ -94,7 +94,7 @@ export default class ExtensionStateManager {
           taskSet.downloadPath = localCoursePath
           for (const group of tasks) {
             for (const file of group) {
-              const task = taskSet.tasks.find((task) => task.task_files.some((taskFile) => taskFile.file_name === file.file_name));
+              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.file_name === file.file_name));
               if (task) {
                 task.download_path = file.path;
               }

@@ -120,6 +120,7 @@ export interface TaskFile {
   user_args: string
   user_input: string
   path: string
+  task_directory: string
 }
 
 export interface FileStatus {
