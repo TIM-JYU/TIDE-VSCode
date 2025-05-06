@@ -85,36 +85,26 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-  static setTaskSetDownloadPath(taskSetPath: string, tasks: Array<Array<FileStatus>>) {
+  static setTaskSetPaths(localCoursePath:string, taskSetPath: string, tasks: Array<Array<FileStatus>>) {
     const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
-          taskSet.downloadPath = this.getCommonPath(tasks)
+          taskSet.downloadPath = localCoursePath
+          for (const group of tasks) {
+            for (const file of group) {
+              const task = taskSet.tasks.find((task) => task.task_files.some((taskFile) => taskFile.file_name === file.file_name));
+              if (task) {
+                task.download_path = file.path;
+              }
+            }
+          }
+          return
         }
       })
     })
     this.writeToGlobalState(StateKey.Courses, courses)
   }
-
-  static getCommonPath(data: Array<Array<FileStatus>>): string {
-    const allPaths = data.flat().map(file => file.path);
-    if (allPaths.length === 0) return "";
-  
-    const splitPaths = allPaths.map(p => p.split(path.sep));
-    const commonParts = [];
-  
-    for (let i = 0; i < splitPaths[0].length; i++) {
-      const part = splitPaths[0][i];
-      if (splitPaths.every(parts => parts[i] === part)) {
-        commonParts.push(part);
-      } else {
-        break;
-      }
-    } 
-    return commonParts.join(path.sep);
-  }
-  
 
   /**
    * Retrieves the download path for a specific task set path from the Global State.
@@ -186,7 +176,7 @@ export default class ExtensionStateManager {
         if (!taskset.downloadPath) {
             throw new Error('Download path is undefined for the task set.');
         }else {
-          const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
+          const pathToTimDataFile = path.join(taskset.downloadPath, '.timdata')
           ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
         }
         

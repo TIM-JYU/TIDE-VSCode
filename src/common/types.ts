@@ -75,6 +75,7 @@ export interface TaskSet extends TaskSetBase {
    * Download path of the taskset
    */
   downloadPath: string | undefined
+  timdataPath: string | undefined
 
   /**
    * Tasks of the taskset
@@ -91,6 +92,8 @@ export interface Task {
   path: string
   deadline: string | null
   answer_limit: number | null
+  task_files: TaskFile[]
+  download_path: string | undefined
 }
 
 /**
@@ -116,6 +119,7 @@ export interface TaskFile {
   task_id_ext: string
   user_args: string
   user_input: string
+  path: string
 }
 
 export interface FileStatus {

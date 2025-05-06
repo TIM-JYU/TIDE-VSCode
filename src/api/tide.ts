@@ -143,7 +143,7 @@ export default class Tide {
       await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath, '-j'], (data: string) => {
         Logger.debug(data)
         const tasks = JSON.parse(data);
-        ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, tasks)
+        ExtensionStateManager.setTaskSetPaths(localCoursePath, taskSetPath, tasks)
       })
     }
     catch (error) {
