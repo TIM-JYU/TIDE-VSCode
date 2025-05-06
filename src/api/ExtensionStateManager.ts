@@ -16,6 +16,7 @@ import Logger from '../utilities/logger'
 import { Course, CourseStatus, FileStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import path from 'path'
 import * as fs from 'fs'
+import { get } from 'http'
 
 export default class ExtensionStateManager {
   private static globalState: vscode.Memento & {
@@ -260,6 +261,52 @@ export default class ExtensionStateManager {
    * @param taskId Task id of the TimData task
    * @returns a unique TimData object with the given parameters, undefined is one is not found using the given parameters
    */
+
+  static getTimDataByFilepath(taskPath: string): TimData | undefined{
+    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
+    let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
+    if (!timData) {
+      const course: Course =  this.getCourseByDownloadPath(taskPath)
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
+      const currentDir = path.dirname(taskPath)
+      // Find the names of the tasks ide_task_id and the task set from the files path
+      let itemPath = currentDir
+      let pathSplit = itemPath.split(path.sep)
+      // ide_task_id
+      let id = pathSplit.at(-1)
+      // task set name
+      let demo = pathSplit.at(-2)
+      if (demo && id && taskset) {
+        timData = this.getTaskTimData(taskset.path, demo, id)
+      }
+    }
+    return timData
+  }
+
+  static getTimDataByFileDir(taskPath: string): TimData | undefined {
+    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData);
+  
+    for (const timData of allTimData) {
+      for (const taskFile of timData.task_files ?? []) {
+        if (taskFile.task_directory && taskFile.file_name) {
+          const fullDir = path.dirname(path.join(taskFile.task_directory, taskFile.file_name));
+          if (taskPath.includes(fullDir)) {
+            return timData;
+          }
+        }
+      }
+    }
+  
+    return this.getTimDataByFilepath(taskPath);
+  }
+
+  /**
+   * Get a TimData object
+   * @param taskPath Path to the task file (like 'kurssit/ties666/demot/demo-1')
+   * @param demoName Name of the Demo that the TimData task is a part of
+   * @param taskId Task id of the TimData task
+   * @returns a unique TimData object with the given parameters, undefined is one is not found using the given parameters
+   */
   static getTaskTimData(taskPath: string, demoName: string, taskId: string): TimData | undefined{
     const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     const timData = allTimData.find((timData) => timData.path.includes(taskPath) && timData.ide_task_id === taskId)
@@ -391,7 +438,23 @@ export default class ExtensionStateManager {
    */
   public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
+    let course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
+    if (!course) {
+      for (const course of courses) {
+        for (const taskSet of course.taskSets) {
+          for (const task of taskSet.tasks) {
+            for (const taskFile of task.task_files ?? []) {
+              if (taskFile.task_directory && taskFile.file_name) {
+              const fullPath = path.join(taskFile.task_directory, taskFile.file_name);
+                if (downloadPath.includes(fullPath)) {
+                  return course;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     if (!course) {
       throw new Error(`No course found for the task with download path: ${downloadPath}`)
     }
