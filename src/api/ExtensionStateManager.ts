@@ -382,11 +382,11 @@ export default class ExtensionStateManager {
    * @param downloadPath The download path of the task set.
    * @returns The course associated with the task set path.
    */
-  public static getCourseByDownloadPath(normDownloadPath: string): Course {
+  public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && normDownloadPath.includes(taskSet.downloadPath)))
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && Formatting.normalizePath(downloadPath) === taskSet.downloadPath))
     if (!course) {
-      throw new Error(`This file doesn't seem to be part of the TIDE task: ${normDownloadPath}`)
+      throw new Error(`This file doesn't seem to be part of the TIDE task: ${downloadPath}`)
     }
     return course
   }
