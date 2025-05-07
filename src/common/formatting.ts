@@ -10,6 +10,10 @@
     //expand relative path
     const resolved = path.resolve(expanded);
     //replace separators with '/'
-    return resolved.split(path.sep).join(path.posix.sep);
+    const posixPath = resolved.split(path.sep).join(path.posix.sep);
+    //consistent drive letter casing
+    return process.platform === 'win32' && /^[A-Z]:/i.test(posixPath)
+    ? posixPath.charAt(0).toLowerCase() + posixPath.slice(1)
+    : posixPath;
   }
 }
