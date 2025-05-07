@@ -478,7 +478,20 @@ class CourseTaskTreeItem extends vscode.TreeItem {
                             result = true
                         }                        
                     })
-                }                  
+                    if (result == false) {
+                        itemTimData.supplementary_files.forEach(supFile => {
+                            if (this.label && supFile.file_name.includes(this.label.toString())) {
+                                result = true
+                            }
+                        })
+                    }
+
+                }
+                // Java tehtävä tiedostojen tunnistus!
+                // C# tehtävien csproj tiedostojen tunnistus!
+                if (result == false) {
+
+                }
             } catch (error) {
                 Logger.debug(error)
                 return result
@@ -490,8 +503,15 @@ class CourseTaskTreeItem extends vscode.TreeItem {
             if (!labelString) {
                 return result
             }
-            timData.forEach(element => {
+            timData.some(element => {
+                if (result == true) return
                 if (element.ide_task_id === labelString) {
+                    result = true
+                }
+                if (element.task_directory === labelString) {
+                    result = true
+                }
+                if (element.task_files.some(taskFile => taskFile.file_name.includes(labelString))) {
                     result = true
                 }
                 const pathParts = element.path.split(path.posix.sep)
@@ -499,12 +519,23 @@ class CourseTaskTreeItem extends vscode.TreeItem {
                     result = true
                 }
             })
-            const courseData = ExtensionStateManager.getCourses()
-            courseData.forEach(element => {
-                if (element.name.toLocaleLowerCase() === labelString) {
-                    result = true
-                }
-            })
+            if (result == false) {
+                const courseData = ExtensionStateManager.getCourses()
+                courseData.forEach(element => {
+                    if (element.name.toLocaleLowerCase() === labelString) {
+                        result = true
+                    }
+                })
+            }
+            // C# tehtävien kansioiden tunnistus?
+            if (result == false) {
+                timData.some(data => {
+                    if (result = true) return
+                    if (data.supplementary_files.some(file => file.file_name.includes(labelString))) {
+                        result = true
+                    }
+                })
+            }
         }
         return result
     }

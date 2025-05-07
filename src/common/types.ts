@@ -100,6 +100,8 @@ export interface Task {
  * Data included in .timdata
  */
 export interface TimData {
+  supplementary_files: SupplementaryFile[]
+  task_directory: string | null
   doc_id: number
   header: string | undefined
   ide_task_id: string
@@ -121,6 +123,13 @@ export interface TaskFile {
   user_input: string
   path: string
   task_directory: string
+}
+
+export interface SupplementaryFile {
+  file_name: string,
+  content : string | null,
+  source : string | null,
+  task_directory : string | null
 }
 
 export interface FileStatus {

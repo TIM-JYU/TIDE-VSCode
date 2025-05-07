@@ -51,13 +51,16 @@ suite('ExtensionStateManager Test Suite', () =>
                 tasks: [
                     {
                         doc_id: 101, ide_task_id: 'task1', path: 'path/to/task1', deadline: '2025-10-01', answer_limit: null,
-                        task_files: null
+                        task_files: null,
+                        download_path: undefined
                     },
                     {
                         doc_id: 102, ide_task_id: 'task2', path: 'path/to/task2', deadline: '2025-10-01', answer_limit: 3,
-                        task_files: null
+                        task_files: null,
+                        download_path: undefined
                     }
-                ]
+                ],
+                timdataPath: undefined
             },
             {
                 doc_id: 2,
@@ -67,13 +70,16 @@ suite('ExtensionStateManager Test Suite', () =>
                 tasks: [
                     {
                         doc_id: 201, ide_task_id: 'task3', path: 'path/to/task3', deadline: null, answer_limit: null,
-                        task_files: null
+                        task_files: null,
+                        download_path: undefined
                     },
                     {
                         doc_id: 202, ide_task_id: 'task4', path: 'path/to/task4', deadline: null, answer_limit: null,
-                        task_files: null
+                        task_files: null,
+                        download_path: undefined
                     }
-                ]
+                ],
+                timdataPath: undefined
             }
         ]
 

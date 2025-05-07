@@ -263,10 +263,14 @@ export default class ExtensionStateManager {
    */
 
   static getTimDataByFilepath(taskPath: string): TimData | undefined{
-    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
-    let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => taskPath.includes(taskFile.task_directory+path.sep+taskFile.file_name)))
+    const allTimData: Array<TimData> = this.getTimData()
+    let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => {
+      const parsedTaskDir = taskFile.task_directory ?? ""
+      const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+      return taskPath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+    }))
     if (!timData) {
-      const course: Course =  this.getCourseByDownloadPath(taskPath)
+      /* const course: Course =  this.getCourseByDownloadPath(taskPath)
       const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
       const currentDir = path.dirname(taskPath)
       // Find the names of the tasks ide_task_id and the task set from the files path
@@ -278,7 +282,13 @@ export default class ExtensionStateManager {
       let demo = pathSplit.at(-2)
       if (demo && id && taskset) {
         timData = this.getTaskTimData(taskset.path, demo, id)
-      }
+      } */
+     // Search for supplementary files!
+     timData = allTimData.find((timData) => timData.supplementary_files.some((supFile) => {
+      const parsedSupFileTaskDir = supFile.task_directory ?? ""
+      const supFileNameToOsPath = supFile.file_name.replaceAll("/", path.sep)
+      return taskPath.includes(parsedSupFileTaskDir+path.sep+supFileNameToOsPath)
+    }))
     }
     return timData
   }
