@@ -30,6 +30,15 @@
 </button>
 
 <style>
+
+  .loader-button-plain{
+    background-color: transparent;
+    text-align: left;
+    color: rgb(197, 197, 197);
+    border: none;
+    transition: background 0.3s;
+  }
+
   .loader-button-blue {
     background-color:rgb(0, 113, 189);
     color: rgb(230, 230, 230);

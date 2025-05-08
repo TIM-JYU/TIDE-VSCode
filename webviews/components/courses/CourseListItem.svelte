@@ -77,7 +77,7 @@ This component creates displays for individual courses.
     <p class="course-title">{course.name}</p>
     <Menu>
       {#snippet toggle()}
-            <span >&#8942;</span>
+            <span class="menu-toggle">&#8942;</span>
           {/snippet}
       {#snippet menucontent()}
             <MenuItem >
@@ -147,6 +147,10 @@ This component creates displays for individual courses.
     margin-top: 1.5rem;
   }
 
+  .menu-toggle{
+    padding-right: 5px;
+  }
+
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
@@ -172,7 +176,7 @@ This component creates displays for individual courses.
     display: flex;
     justify-content: center;
     align-items: center;
-    color: rgb(155, 155, 155);
+    color: rgb(197, 197, 197);
     background-color: transparent;
     border: none;
     width: 36px;
