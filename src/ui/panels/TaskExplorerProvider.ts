@@ -3,6 +3,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { Course, TimData } from '../../common/types'
+import Formatting from '../../common/formatting'
+
 
 
 // Class for handling TreeView data
@@ -301,8 +303,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
                 if (fileCheck) {
                     // Find the names of the tasks ide_task_id and the task set from the files path
-                    let itemPath = item.path
-                    let pathSplit = itemPath.split(path.sep)
+                    let itemPath = Formatting.normalizePath(item.path)
+                    let pathSplit = itemPath.split('/')
                     // ide_task_id
                     let id = pathSplit.at(-2)
                     // taskSet(demo) name
@@ -312,7 +314,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                     
                     // Find the points data of this task file from ExtensionStateManager
                     if (id && demo && course) {
-
                         // Identify the Task Set from course data using the files path
                         const taskset = course.taskSets.find(taskSet => {
                             if (taskSet.downloadPath) {
@@ -558,14 +559,15 @@ class CourseTaskTreeItem extends vscode.TreeItem {
         let result = false
         if (this.type === "file") {
             try {
-                const itemCourse: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(this.path)))
+                const normDownloadPath = Formatting.normalizePath(path.dirname(path.dirname(this.path)))
+                const itemCourse: Course | undefined = ExtensionStateManager.getCourseByDownloadPath(normDownloadPath)
                 if (!itemCourse) {
                     result = false
                     return result
                 }
                 const itemTaskSet = itemCourse.taskSets.find(taskSet => {
                     if (taskSet.downloadPath) {
-                        if (this.path.includes(taskSet.downloadPath)) {
+                        if (Formatting.normalizePath(this.path).includes(taskSet.downloadPath)) {
                             return taskSet
                         }
                     }

@@ -14,6 +14,7 @@
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
 import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
+import Formatting from '../common/formatting'
 import path from 'path'
 import * as fs from 'fs'
 
@@ -86,11 +87,12 @@ export default class ExtensionStateManager {
    * @param downloadPath - The path where the task set will be downloaded.
    */
   static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
+    const normDownloadPath = Formatting.normalizePath(downloadPath)
     const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
-          taskSet.downloadPath = downloadPath
+          taskSet.downloadPath = normDownloadPath
         }
       })
     })
@@ -382,7 +384,7 @@ export default class ExtensionStateManager {
    */
   public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && Formatting.normalizePath(downloadPath) === taskSet.downloadPath))
     if (!course) {
       throw new Error(`This file doesn't seem to be part of the TIDE task: ${downloadPath}`)
     }
