@@ -18,6 +18,7 @@ import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
 import { Course, TimData } from '../common/types'
+import Formatting from '../common/formatting'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -46,8 +47,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to reset.')
         return
       }
-      const doc = editor.document;
-      Tide.resetTask(doc.fileName)
+      const doc = editor.document
+      const currentDir = path.dirname(doc.fileName)
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
+      if (course){
+        Tide.resetTask(doc.fileName)
+      }
     }),
   )
 
@@ -56,17 +61,17 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    * Restore last submission of active task file.
    */
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('tide.restoreSubmission', async () => {
+    vscode.commands.registerCommand('tide.synchronizeSubmission', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showErrorMessage('No active file to restore.')
+        vscode.window.showErrorMessage('No active file to synchronize.')
         return
       }
       const doc = editor.document;
       const currentDir = path.dirname(doc.fileName)
-      const tasksetDir = path.dirname(path.dirname(currentDir));
+      const tasksetDir = path.dirname(path.dirname(currentDir))
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
-      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(currentDir))
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === Formatting.normalizePath(path.dirname(currentDir)))
       // Find the names of the tasks ide_task_id and the task set from the files path
       let itemPath = currentDir
       let pathSplit = itemPath.split(path.sep)
@@ -100,6 +105,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       if (!editor) {
         vscode.window.showErrorMessage('No active file to submit.');
         return;
+      }
+      const doc = editor.document
+      const currentDir = path.dirname(doc.fileName)
+      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
+      if (!course){
+        return
       }
       const taskPath = editor.document.uri.fsPath;
       const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM');

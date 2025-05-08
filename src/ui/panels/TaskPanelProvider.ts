@@ -1,12 +1,11 @@
 import * as vscode from 'vscode'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
-import getCourseByTasksetPath from '../../api/ExtensionStateManager'
+import Formatting from '../../common/formatting'
 import { LoginData, TaskPoints, WebviewMessage, TimData, Course } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Tide from '../../api/tide'
 import path from 'path'
 import UiController from '../UiController'
-import Logger from '../../utilities/logger'
 
 /**
  * Provides the TaskPanel menu in the extension's sidebar.

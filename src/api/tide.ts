@@ -11,6 +11,7 @@ import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
 import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, TimData, UserData } from '../common/types'
+import Formatting from '../common/formatting'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -216,8 +217,9 @@ export default class Tide {
     try {
       this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
-        const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(taskPath)))
-        const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
+        const downloadPath = Formatting.normalizePath(path.dirname(path.dirname(taskPath)))
+        const course: Course =  ExtensionStateManager.getCourseByDownloadPath(downloadPath)
+        const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === downloadPath)
         const currentDir = path.dirname(taskPath)
         // Find the names of the tasks ide_task_id and the task set from the files path
         let itemPath = currentDir

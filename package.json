@@ -30,7 +30,7 @@
 					"group": "navigation@3"
 				},
 				{
-					"command": "tide.restoreSubmission",
+					"command": "tide.synchronizeSubmission",
 					"when": "editorFocus",
 					"group": "navigation@2"
 				},
@@ -169,10 +169,10 @@
 				"icon": "media/reset_dark3.svg"
 			},
 			{
-				"command": "tide.restoreSubmission",
-				"title": "Restore task to the last submission in TIM",
+				"command": "tide.synchronizeSubmission",
+				"title": "Synchronize task to the last submission in TIM",
 				"category": "TIM-IDE",
-				"description": "Restore last submission of active editor",
+				"description": "Synchronize active editor with last submission of task in TIM",
 				"icon": "media/restore-arrow_dark2.svg"
 			},
 			{
@@ -252,7 +252,6 @@
 		"@rollup/plugin-node-resolve": "^16.0.1",
 		"@rollup/plugin-terser": "^0.4.4",
 		"@rollup/plugin-typescript": "^12.1.2",
-		"@rollup/rollup-linux-x64-gnu": "^4.40.1",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^22.15.3",

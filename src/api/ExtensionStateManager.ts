@@ -13,7 +13,8 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, FileStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
+import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
+import Formatting from '../common/formatting'
 import path from 'path'
 import * as fs from 'fs'
 import { get } from 'http'
@@ -86,21 +87,13 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-  static setTaskSetPaths(localCoursePath:string, taskSetPath: string, tasks: Array<Array<FileStatus>>) {
+  static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
+    const normDownloadPath = Formatting.normalizePath(downloadPath)
     const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
-          taskSet.downloadPath = localCoursePath
-          for (const group of tasks) {
-            for (const file of group) {
-              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.file_name === file.file_name));
-              if (task) {
-                task.download_path = file.path;
-              }
-            }
-          }
-          return
+          taskSet.downloadPath = normDownloadPath
         }
       })
     })
@@ -448,25 +441,9 @@ export default class ExtensionStateManager {
    */
   public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    let course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && downloadPath.includes(taskSet.downloadPath)))
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && Formatting.normalizePath(downloadPath) === taskSet.downloadPath))
     if (!course) {
-      for (const course of courses) {
-        for (const taskSet of course.taskSets) {
-          for (const task of taskSet.tasks) {
-            for (const taskFile of task.task_files ?? []) {
-              if (taskFile.task_directory && taskFile.file_name) {
-              const fullPath = path.join(taskFile.task_directory, taskFile.file_name);
-                if (downloadPath.includes(fullPath)) {
-                  return course;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    if (!course) {
-      throw new Error(`No course found for the task with download path: ${downloadPath}`)
+      throw new Error(`This file doesn't seem to be part of the TIDE task: ${downloadPath}`)
     }
     return course
   }
