@@ -18,6 +18,7 @@ import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
 import { Course, TimData } from '../common/types'
+import Formatting from '../common/formatting'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -68,9 +69,9 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       }
       const doc = editor.document;
       const currentDir = path.dirname(doc.fileName)
-      const tasksetDir = path.dirname(path.dirname(currentDir));
+      const tasksetDir = path.dirname(path.dirname(currentDir))
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
-      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(currentDir))
+      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === Formatting.normalizePath(path.dirname(currentDir)))
       // Find the names of the tasks ide_task_id and the task set from the files path
       let itemPath = currentDir
       let pathSplit = itemPath.split(path.sep)
