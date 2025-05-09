@@ -197,18 +197,18 @@
 				{
 					"type": "webview",
 					"id": "tide-sidebar",
-					"name": "Menu",
+					"name": "TIM-IDE: Menu",
 					"icon": "./media/timlogovscode.png",
 					"contextualTitle": "TIM-IDE"
 				},
 				{
 					"type": "webview",
 					"id": "tide-taskpanel",
-					"name": "Taskpanel"
+					"name": "TIM-IDE: Taskpanel"
 				},
 				{
 					"id": "tide-tasks-treeview",
-					"name": "Course Explorer"
+					"name": "TIM-IDE: Course Explorer"
 				}
 			]
 		},

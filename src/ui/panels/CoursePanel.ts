@@ -22,7 +22,7 @@ export default class CoursePanel {
 
   private static readonly fileNamePrefix = 'courses'
   private static readonly viewType = 'Courses'
-  private static readonly panelTitle = 'My Courses'
+  private static readonly panelTitle = 'TIM-IDE: My Courses'
   private static preferredColumn = vscode.ViewColumn.One
 
   private readonly panel: vscode.WebviewPanel
