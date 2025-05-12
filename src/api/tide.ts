@@ -223,8 +223,10 @@ export default class Tide {
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
+      Logger.info("The current task is being submitted to TIM. Please wait for the TIM response.")
       this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
+        callback()
         const downloadPath = Formatting.normalizePath(path.dirname(path.dirname(taskPath)))
         const course: Course =  ExtensionStateManager.getCourseByDownloadPath(downloadPath)
         const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === downloadPath)
