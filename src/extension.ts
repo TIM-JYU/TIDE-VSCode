@@ -58,7 +58,12 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
   // Creates and registers the taskpanel menu on the left
   const taskPanelProvider = new TaskPanelProvider(ctx.extensionUri)
-  ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider))
+  const webviewViewopts = {
+    webviewOptions: {
+      retainContextWhenHidden : true
+    }
+  }
+  ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider, webviewViewopts))
 
   // Creates and registers taskbar item for displaying answer_limit warnings
   const answerLimitStatusBarItem = new AnswerLimitStatusBarItem(vscode.StatusBarAlignment.Right, 500)
