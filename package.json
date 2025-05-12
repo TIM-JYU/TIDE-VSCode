@@ -22,6 +22,15 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"icons": {
+			"tim-font-icon": {
+				"description": "TIM logo",
+				"default": {
+					"fontPath": "media/tim-font-icon.woff",
+					"fontCharacter": "\\E900"
+				}
+			}
+		},
 		"menus": {
 			"editor/title": [
 				{
