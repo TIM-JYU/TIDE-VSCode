@@ -13,13 +13,14 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
+import { Course, CourseStatus, FileStatus, LoginData, TaskPoints, TaskSet, TimData, UserData } from '../common/types'
 import Formatting from '../common/formatting'
 import path from 'path'
 import * as fs from 'fs'
 import { get } from 'http'
 
 export default class ExtensionStateManager {
+  
   private static globalState: vscode.Memento & {
     setKeysForSync(keys: readonly string[]): void
   }
@@ -87,13 +88,23 @@ export default class ExtensionStateManager {
    * @param taskSetPath - The path of the task set.
    * @param downloadPath - The path where the task set will be downloaded.
    */
-  static setTaskSetDownloadPath(taskSetPath: string, downloadPath: string) {
-    const normDownloadPath = Formatting.normalizePath(downloadPath)
-    const courses: Array<Course> = this.readFromGlobalState(StateKey.Courses)
+  static setTaskSetPaths(localCoursePath:string, taskSetPath: string, tasks: Array<Array<FileStatus>>) {
+    const courses: Array<Course> = this.getCourses()
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
-          taskSet.downloadPath = normDownloadPath
+          // localCoursePath : "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\Demo2"
+          taskSet.downloadPath = localCoursePath
+          for (const group of tasks) {
+            for (const file of group) {
+              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.file_name === file.file_name));
+              if (task) {
+                // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\src\\demo\\d2\\Tauno1a.java"
+                task.download_path = file.path;
+              }
+            }
+          }
+          return
         }
       })
     })
@@ -160,7 +171,7 @@ export default class ExtensionStateManager {
   /**
    * Updates the timdata of a course, this should be called after downloading a new task set from tim, since it will modify the old .timdata file
    * @param taskSetPath This path and the downloadpath the user has set are used to find the new .timdata file, which is then saved
-   * @returns 
+   * @returns
    */
   static updateTimData(taskSetPath: string) {
     const course: Course = this.getCourseByTasksetPath(taskSetPath)
@@ -170,7 +181,8 @@ export default class ExtensionStateManager {
         if (!taskset.downloadPath) {
             throw new Error('Download path is undefined for the task set.');
         }else {
-          const pathToTimDataFile = path.join(taskset.downloadPath, '.timdata')
+          const dir = path.dirname(taskset.downloadPath)
+          const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
           ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
         }
         
@@ -259,23 +271,23 @@ export default class ExtensionStateManager {
     const allTimData: Array<TimData> = this.getTimData()
     let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => {
       const parsedTaskDir = taskFile.task_directory ?? ""
-      const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
-      return taskPath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+      if (parsedTaskDir.length > 0) {
+        const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+        return taskPath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+      } else {
+        const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+        const pathParts = timData.path.split("/")
+        const demo = pathParts.at(-1)
+        if (demo) {
+          return taskPath.includes(path.join(demo, timData.ide_task_id, fileNameToOsPath))
+        } else {
+          // This should never be reached
+          return taskPath.includes(path.join(timData.ide_task_id, fileNameToOsPath))
+        }
+        
+      }
     }))
     if (!timData) {
-      /* const course: Course =  this.getCourseByDownloadPath(taskPath)
-      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(taskPath)))
-      const currentDir = path.dirname(taskPath)
-      // Find the names of the tasks ide_task_id and the task set from the files path
-      let itemPath = currentDir
-      let pathSplit = itemPath.split(path.sep)
-      // ide_task_id
-      let id = pathSplit.at(-1)
-      // task set name
-      let demo = pathSplit.at(-2)
-      if (demo && id && taskset) {
-        timData = this.getTaskTimData(taskset.path, demo, id)
-      } */
      // Search for supplementary files!
      timData = allTimData.find((timData) => timData.supplementary_files.some((supFile) => {
       const parsedSupFileTaskDir = supFile.task_directory ?? ""
@@ -286,22 +298,6 @@ export default class ExtensionStateManager {
     return timData
   }
 
-  static getTimDataByFileDir(taskPath: string): TimData | undefined {
-    const allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData);
-  
-    for (const timData of allTimData) {
-      for (const taskFile of timData.task_files ?? []) {
-        if (taskFile.task_directory && taskFile.file_name) {
-          const fullDir = path.dirname(path.join(taskFile.task_directory, taskFile.file_name));
-          if (taskPath.includes(fullDir)) {
-            return timData;
-          }
-        }
-      }
-    }
-  
-    return this.getTimDataByFilepath(taskPath);
-  }
 
   /**
    * Get a TimData object
@@ -431,7 +427,7 @@ export default class ExtensionStateManager {
     if (!course) {
       throw new Error(`Course not found for task set path: ${taskSetPath}`)
     }
-    return course;
+    return course
   }
 
   /**
@@ -441,9 +437,29 @@ export default class ExtensionStateManager {
    */
   public static getCourseByDownloadPath(downloadPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.downloadPath && Formatting.normalizePath(downloadPath) === taskSet.downloadPath))
+    const course = courses.find((course) => course.taskSets.some((taskSet) => {
+      const formattedParamPath = Formatting.normalizePath(downloadPath)
+      const formattedTaskSetDownloadPath = Formatting.normalizePath(taskSet.downloadPath ?? "")
+      return (formattedParamPath === formattedTaskSetDownloadPath)
+    }))
     if (!course) {
       throw new Error(`This file doesn't seem to be part of the TIDE task: ${downloadPath}`)
+    }
+    return course
+  }
+
+  /**
+   * Find a course that includes a taskset that includes a task with the given path as its download_path
+   * @param filePath used to find a task inside a taskset inside a course
+   * @returns a course that contains a task with the given path as one of its tasks download_path
+   */
+  public static getCourseByFilePath(filePath: string): Course {
+    const courses = this.getCourses()
+    const course = courses.find((course) => course.taskSets.some((taskSet) => {
+      taskSet.tasks.some((task) => task.download_path === filePath) 
+    }))
+    if (!course) {
+      throw new Error(`This file doesn't seem to be part of the TIDE task: ${filePath}`)
     }
     return course
   }

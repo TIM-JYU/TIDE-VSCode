@@ -49,6 +49,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       }
       const doc = editor.document
       const currentDir = path.dirname(doc.fileName)
+      // Need to format here?
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
       if (course){
         Tide.resetTask(doc.fileName)
@@ -70,8 +71,13 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const doc = editor.document;
       const currentDir = path.dirname(doc.fileName)
       const tasksetDir = path.dirname(path.dirname(currentDir))
+      // TODO: need to format here?
       const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
-      const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === Formatting.normalizePath(path.dirname(currentDir)))
+      const taskset = course.taskSets.find((taskSet) => {
+        const formattedCurrentDirPath = Formatting.normalizePath(path.dirname(currentDir))
+        const formattedTaskSetDownloadPath = Formatting.normalizePath(taskSet.downloadPath ?? "")
+        return formattedCurrentDirPath === formattedTaskSetDownloadPath
+      })
       // Find the names of the tasks ide_task_id and the task set from the files path
       let itemPath = currentDir
       let pathSplit = itemPath.split(path.sep)
@@ -83,7 +89,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(doc.fileName)
         if (timData) {
           Tide.overwriteTask(timData.path, timData.ide_task_id, tasksetDir);
-        Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
+          Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
           if (points !== undefined && points !== null) {
             ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points);
           } else {
@@ -108,9 +114,14 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       }
       const doc = editor.document
       const currentDir = path.dirname(doc.fileName)
-      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
+      // TODO: Need to format here?
+      let course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
       if (!course){
-        return
+        const filePath = editor.document.uri.fsPath
+        course = ExtensionStateManager.getCourseByFilePath(filePath)
+        if (!course) {
+          return
+        }
       }
       const taskPath = editor.document.uri.fsPath;
       const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM');

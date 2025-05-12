@@ -130,7 +130,7 @@ export default class Tide {
    * Downloads task set from TIM; creates files for each task
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
-  public static async downloadTaskSet(courseName:string, taskSetPath: string) {
+  public static async downloadTaskSet(courseName: string, courseDir: string, taskSetPath: string) {
     try {
       const downloadPathBase: string | undefined = vscode.workspace
         .getConfiguration()
@@ -140,11 +140,22 @@ export default class Tide {
         return
       }
 
+      // Java kursseille!?
+      // "Demo2"
+      const taskName = path.basename(taskSetPath)
+      // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025"
       const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
+      // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\Demo2"
+      let localTaskPath = ""
+      if (courseDir.length > 0) {
+        localTaskPath = path.join(localCoursePath, courseDir)
+      } else {
+        localTaskPath = path.join(localCoursePath, taskName)
+      }
       await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath, '-j'], (data: string) => {
         Logger.debug(data)
-        const tasks = JSON.parse(data);
-        ExtensionStateManager.setTaskSetPaths(localCoursePath, taskSetPath, tasks)
+        const tasks = JSON.parse(data)
+        ExtensionStateManager.setTaskSetPaths(localTaskPath, taskSetPath, tasks)
       })
     }
     catch (error) {

@@ -176,8 +176,16 @@ export default class CoursePanel {
             const taskSetPath = msg.value
             const course: Course =  ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
 
+            // taskSet = Demo
+            const taskSet = course.taskSets.find((taskSet) => {
+              let taskPath = taskSet.path
+              if (taskPath === taskSetPath) {
+                return true
+              }
+          })
+            const taskDir = taskSet?.tasks.at(0)?.task_directory ?? ""
             // Download a new Task Set
-            await Tide.downloadTaskSet(course.name.toLowerCase(), taskSetPath)
+            await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskSetPath)
 
             // Update TimData with the newly written data
             ExtensionStateManager.updateTimData(taskSetPath)
@@ -216,8 +224,9 @@ export default class CoursePanel {
             const course: Course = ExtensionStateManager.getCourseByCoursePath(coursePath)
 
             // Download all tasks and update TimData
-            for (const taskset of course.taskSets) {              
-              await Tide.downloadTaskSet(course.name.toLowerCase(), taskset.path)
+            for (let taskset of course.taskSets) {
+              const taskDir = taskset?.tasks.at(0)?.task_directory ?? ""
+              await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskset.path)
               ExtensionStateManager.updateTimData(taskset.path)
             }
 

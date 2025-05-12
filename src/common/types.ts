@@ -94,6 +94,7 @@ export interface Task {
   answer_limit: number | null
   download_path: string | undefined
   task_files: TaskFile[] | null
+  task_directory: string | null
 }
 
 /**

@@ -331,78 +331,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         return result
     }
 
-    /**
-     * Calculates a sum of taskMaxPoints for tasks within the items children
-     * @param item the treeview item for which the sum is calculated
-     * @param sum current sum
-     * @returns calculated max points
-     */
-    public calculateTaskMaxPoints(item: CourseTaskTreeItem, sum: number): number {
-        let children = item.children
-        let pointsSum = sum
-        let readyCheck = false
-        if (children.length > 0) {
-            children.forEach(child => {
-                if (child.type === 'dir') {
-                    pointsSum += this.calculateTaskMaxPoints(child, sum)
-                } else {
-                    // type === 'file' -> ready to find max points, if the found file is a course task file
-                    if (child.isCourseDirOfFile()) {
-                        readyCheck = true
-                    }
-                }
-            })
-            if (readyCheck) {
-                try {
-                    let timData = ExtensionStateManager.getTimDataByFileDir(item.path)
-                    if (timData && timData.max_points) {
-                        pointsSum += timData?.max_points
-                        return pointsSum
-                    }
-                } catch (error) {           
-
-                }
-            }
-        }
-        return pointsSum
-    }
-
-    /**
-     * Calculates the current points sum of the tasks within the items children
-     * @param item the treeview item for which the sum is calculated
-     * @param sum current sum
-     * @returns calculated current points sum
-     */
-    public calculateCurrentPoints(item: CourseTaskTreeItem, sum: number): number {
-        let children = item.children
-        let pointsSum = sum
-        let readyCheck = false
-        if (children.length > 0) {
-            children.forEach(child => {
-                if (child.type === 'dir') {
-                    pointsSum += this.calculateCurrentPoints(child, sum)
-                } else {
-                    // type === 'file' -> ready to find max points
-                    if (child.isCourseDirOfFile()) {
-                        readyCheck = true
-                    }                    
-                }
-            })
-            if (readyCheck) {
-                try {
-                    let timData = ExtensionStateManager.getTimDataByFilepath(item.path)
-                    if (timData && timData.max_points) {
-                        pointsSum += timData?.max_points
-                        return pointsSum
-                    }
-                } catch (error) {           
-
-                }
-            }
-        }
-        return pointsSum
-    }
-
     // Returns treeview items children
     public getChildren(element : CourseTaskTreeItem | undefined): vscode.ProviderResult<CourseTaskTreeItem[]> {
         if (element === undefined) {
@@ -476,7 +404,7 @@ class CourseTaskTreeItem extends vscode.TreeItem {
                     itemTimData.task_files.forEach(taskFile => {
                         if (this.label && taskFile.file_name.includes(this.label.toString())) {
                             result = true
-                        }                        
+                        }
                     })
                     if (result == false) {
                         itemTimData.supplementary_files.forEach(supFile => {
