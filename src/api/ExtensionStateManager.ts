@@ -272,9 +272,24 @@ export default class ExtensionStateManager {
     let id: number = -1
     courses.find((course) => {
       course.taskSets.some((taskSet) => {
-        if (taskSet.downloadPath && taskfilePath.includes(taskSet.downloadPath)){
-          id = taskSet.doc_id
-        }
+        taskSet.tasks.some((task) => {
+          // Return if a taskSet(demo) was found
+          if (!task.download_path) return
+          if (id > -1) return
+          if (task.download_path && taskfilePath === task.download_path) {
+            id = taskSet.doc_id
+          } else {
+            // If it turns out there is a possibility of more than 1 task_file in a task
+            // this needs to be refactored to take that into account
+            task.supplementary_files.some((supFile) => {
+              let supPath = task.download_path?.replace(task.task_files?.at(0)?.file_name ?? "", "")
+              supPath = supPath + supFile.file_name.replaceAll("/", path.sep)
+              if (taskfilePath === supPath) {
+                id = taskSet.doc_id
+              }
+            })
+          }
+        })
       })
     })
 

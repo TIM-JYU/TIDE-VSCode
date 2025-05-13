@@ -47,13 +47,11 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         // When the treeView is in Course browsing mode
         let loginData = ExtensionStateManager.getLoginData()
 
-        // TODO: Remove after testing
-        // this.testCourseData(this.courseData)
-
         if (loginData.isLogged) {
             if (this.treeViewMode == 'Courses') {
                 this.showCourses()
             } else {
+                this.courseData[0].updatePoints()
                 this.m_onDidChangeTreeData.fire(undefined)
             }
         } else {
@@ -301,7 +299,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             }
         } else {
 
-            const fileCheck = item.isCourseDirOfFile()
+            const fileCheck = item.isCourseDirOrFile()
 
                 if (fileCheck) {
                     if (item.maxPoints === 0) {
@@ -395,7 +393,7 @@ class CourseTaskTreeItem extends vscode.TreeItem {
      * Checks if the CourseTaskTreeItem is a file or a directory that is a part of a Tide-Course
      * @returns true if the item is a part of a Tide-Course, false otherwise
      */
-    public isCourseDirOfFile() : boolean {
+    public isCourseDirOrFile() : boolean {
         let result = false
         if (this.type === "file") {
             try {

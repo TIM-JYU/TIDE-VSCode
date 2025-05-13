@@ -95,6 +95,7 @@ export interface Task {
   download_path: string | undefined
   task_files: TaskFile[] | null
   task_directory: string | null
+  supplementary_files: SupplementaryFile[]
 }
 
 /**
