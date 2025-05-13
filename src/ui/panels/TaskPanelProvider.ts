@@ -1,12 +1,11 @@
 import * as vscode from 'vscode'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
-import getCourseByTasksetPath from '../../api/ExtensionStateManager'
+import Formatting from '../../common/formatting'
 import { LoginData, TaskPoints, WebviewMessage, TimData, Course } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Tide from '../../api/tide'
 import path from 'path'
 import UiController from '../UiController'
-import Logger from '../../utilities/logger'
 
 /**
  * Provides the TaskPanel menu in the extension's sidebar.
@@ -53,6 +52,10 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(this.handleWebviewMessage.bind(this))
         this.sendLoginData();
         this.sendCustomUrl();
+
+        vscode.commands.registerCommand('tide.setPointsUpdating', () => {
+            this.setPointsUpdating();
+        });
     }
 
     /**
@@ -93,6 +96,10 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         }
     }
 
+    private async setPointsUpdating(){
+        await this._view?.webview.postMessage({ type: 'SetPointsUpdating', value: true })
+    }
+
     /**
      * Sends task points to the webview.
      */
@@ -110,7 +117,6 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
             customUrl = "https://tim.jyu.fi/";
         }
         this._view?.webview.postMessage({ type: "CustomUrl", value: customUrl})
-        console.log(customUrl)
     }
 
     /**
@@ -121,12 +127,12 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
 
         try {
             const doc = TaskPanelProvider.activeTextEditor.document
-            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(doc.fileName)))
-            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(doc.fileName)))
+            const downloadPath = Formatting.normalizePath(path.dirname(path.dirname(doc.fileName)))
+            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(downloadPath)
+            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === downloadPath)
             const currentDir = path.dirname(doc.fileName)
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = currentDir
-            // console.log(path)
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-1)

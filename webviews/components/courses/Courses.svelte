@@ -87,8 +87,6 @@ This component manages the display and interaction with a list of courses. It li
 updates the courses' status, and handles downloading task sets and opening workspaces.
 -->
 
-<h1>My Courses</h1>
-
 {#if isLoggedIn}
   <div>
     <div class="refresh-button">
@@ -98,6 +96,7 @@ updates the courses' status, and handles downloading task sets and opening works
         textWhileLoading="Refreshing"
         loading={coursesRefreshing}
         onClick={refreshCourses}
+        title="Refresh the list of courses from TIM"
         />
     </div>
   </div>
@@ -116,6 +115,7 @@ updates the courses' status, and handles downloading task sets and opening works
   {#if courses.length === 0}
     <p>No IDE courses were found.</p>
     <p>Add a course to "My courses" bookmark folder in TIM to begin.</p>
+    <p>Click 'Refresh' button to load course list. </p>
   {:else}
     <CourseList
       defaultExpandedState={true}
@@ -139,16 +139,13 @@ updates the courses' status, and handles downloading task sets and opening works
 
 <style>
   :global(body) {
+    margin-top: 1.5rem;
     margin-bottom: 2.5rem;
   }
 
-  h1 {
-    margin-bottom: 2rem;
-    font-size: 2rem;
-  }
   .refresh-button {
     position: absolute;
-    top: 10%;
+    top: 1.8rem;
     right: 16%;
   }
 </style>

@@ -5,6 +5,7 @@
     onClick: () => void;
     loading: boolean;
     text: string;
+    title?: string;
     textWhileLoading: any;
     class?: string; // Accept class as a prop
   }
@@ -14,11 +15,12 @@
     loading,
     text,
     textWhileLoading,
-    class: className = ""
+    class: className = "",
+    title = ""
   }: Props = $props();
 </script>
 
-<button class="loader-button {className}" onclick={onClick}>
+<button class="loader-button {className}" onclick={onClick} title={title}>
   {#if loading}
     {textWhileLoading ?? text}
     <Spinner/>
@@ -28,6 +30,15 @@
 </button>
 
 <style>
+
+  .loader-button-plain{
+    background-color: transparent;
+    text-align: left;
+    color: rgb(197, 197, 197);
+    border: none;
+    transition: background 0.3s;
+  }
+
   .loader-button-blue {
     background-color:rgb(0, 113, 189);
     color: rgb(230, 230, 230);

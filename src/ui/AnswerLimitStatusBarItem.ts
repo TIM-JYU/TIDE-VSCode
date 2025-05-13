@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import { Course, TimData } from '../common/types'
 import path from 'path'
 import ExtensionStateManager from '../api/ExtensionStateManager'
+import Formatting from '../common/formatting'
 
 /**
  * Class for Status Bar item displaying answer limit related information
@@ -56,12 +57,12 @@ export default class AnswerLimitStatusBarItem {
 
         try {
             const doc = AnswerLimitStatusBarItem.activeEditor.document
-            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(path.dirname(doc.fileName)))
-            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === path.dirname(path.dirname(doc.fileName)))
+            const downloadPath = Formatting.normalizePath(path.dirname(path.dirname(doc.fileName)))
+            const course: Course =  ExtensionStateManager.getCourseByDownloadPath(downloadPath)
+            const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === downloadPath)
             const currentDir = path.dirname(doc.fileName)
             // Find the names of the tasks ide_task_id and the task set from the files path
             let itemPath = currentDir
-            // console.log(path)
             let pathSplit = itemPath.split(path.sep)
             // ide_task_id
             let id = pathSplit.at(-1)

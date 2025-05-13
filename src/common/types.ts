@@ -156,6 +156,8 @@ export type MessageType =
   | 'CustomUrl'
   | 'DownloadTaskSet'
   | 'DownloadTaskSetComplete'
+  | 'DownloadCourseTasks'
+  | 'DownloadCourseTasksComplete'
   | 'Login'
   | 'LoginData'
   | 'Logout'
@@ -176,3 +178,4 @@ export type MessageType =
   | 'TaskPoints'
   | 'UpdateTaskPoints'
   | 'UpdateTimData'
+  | 'SetPointsUpdating'

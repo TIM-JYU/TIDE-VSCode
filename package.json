@@ -12,7 +12,7 @@
 	],
 	"version": "0.0.1",
 	"engines": {
-		"vscode": "^1.86.0"
+		"vscode": "^1.99.0"
 	},
 	"categories": [
 		"Other"
@@ -26,14 +26,22 @@
 			"editor/title": [
 				{
 					"command": "tide.resetExercise",
+					"when": "editorFocus",
+					"group": "navigation@3"
+				},
+				{
+					"command": "tide.synchronizeSubmission",
+					"when": "editorFocus",
 					"group": "navigation@2"
 				},
 				{
-					"command": "tide.restoreSubmission",
+					"command": "tide.submitTask",
+					"when": "editorFocus",
 					"group": "navigation@1"
 				},
 				{
-					"command": "tide.submitTask",
+					"command": "tide.timIcon",
+					"when": "editorFocus",
 					"group": "navigation@0"
 				}
 			],
@@ -42,12 +50,17 @@
 					"command": "tide.refreshTree",
 					"when": "view == tide-tasks-treeview",
 					"group": "navigation@0"
+				},
+				{
+					"command": "tide.treeviewShowCourses",
+					"when": "view == tide-tasks-treeview",
+					"group": "navigation@0"
 				}
 			],
 			"view/item/context": [
 				{
 					"command": "tide.treeviewMenuOpenTasks",
-					"when": "view == tide-tasks-treeview",
+					"when": "view == tide-tasks-treeview && viewItem == folder",
 					"group": "tide@0"
 				}
 			]
@@ -111,9 +124,10 @@
 			},
 			{
 				"command": "tide.submitTask",
-				"title": "Submit",
+				"title": "Submit task to TIM",
 				"category": "TIM-IDE",
-				"description": "Submit exercise of active editor to TIM"
+				"description": "Submit exercise from the active editor to TIM",
+				"icon": "media/submit-arrow_dark4.svg"
 			},
 			{
 				"command": "tide.clearLocalExtensionData",
@@ -130,6 +144,11 @@
 				"icon": "$(refresh)"
 			},
 			{
+				"command": "tide.treeviewShowCourses",
+				"title": "Show Courses",
+				"icon": "$(tasklist)"
+			},
+			{
 				"command": "tide.treeviewMenuOpenTasks",
 				"title": "Open all tasks in this directory"
 			},
@@ -144,15 +163,24 @@
 			},
 			{
 				"command": "tide.resetExercise",
-				"title": "Reset",
+				"title": "Reset the current task to its initial state",
 				"category": "TIM-IDE",
-				"description": "Resets exercise of active editor to initial state"
+				"description": "Resets exercise of active editor to initial state",
+				"icon": "media/reset_dark3.svg"
 			},
 			{
-				"command": "tide.restoreSubmission",
-				"title": "Restore",
+				"command": "tide.synchronizeSubmission",
+				"title": "Synchronize task to the last submission in TIM",
 				"category": "TIM-IDE",
-				"description": "Restore last submission of active editor"
+				"description": "Synchronize active editor with last submission of task in TIM",
+				"icon": "media/restore-arrow_dark2.svg"
+			},
+			{
+				"command": "tide.timIcon",
+				"title": "Show all TIM-IDE related commands",
+				"category": "TIM-IDE",
+				"description": "Open selection for the TIM-IDE extension commands",
+				"icon": "media/tim-logo.svg"
 			}
 		],
 		"viewsContainers": {
@@ -180,7 +208,7 @@
 				},
 				{
 					"id": "tide-tasks-treeview",
-					"name": "Courses"
+					"name": "Course Explorer"
 				}
 			]
 		},
@@ -215,32 +243,32 @@
 		"watch": "tsc -watch -p .",
 		"svelte-watch": "rollup -c -w --bundleConfigAsCjs",
 		"svelte-compile": "rollup -c --bundleConfigAsCjs",
-		"pretest": "npm run compile && npm run lint",
+		"_pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "vscode-test"
+		"test": "npm run compile && vscode-test"
 	},
 	"devDependencies": {
-		"@rollup/plugin-commonjs": "^28.0.2",
-		"@rollup/plugin-node-resolve": "^16.0.0",
+		"@rollup/plugin-commonjs": "^28.0.3",
+		"@rollup/plugin-node-resolve": "^16.0.1",
 		"@rollup/plugin-terser": "^0.4.4",
 		"@rollup/plugin-typescript": "^12.1.2",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "22.x",
-		"@types/vscode": "^1.97.0",
-		"@typescript-eslint/eslint-plugin": "^8.23.0",
-		"@typescript-eslint/parser": "^8.23.0",
+		"@types/node": "^22.15.3",
+		"@types/sinon": "^17.0.4",
+		"@types/vscode": "^1.99.1",
+		"@typescript-eslint/eslint-plugin": "^8.31.1",
+		"@typescript-eslint/parser": "^8.31.1",
 		"@vscode/test-cli": "^0.0.10",
-		"@vscode/test-electron": "^2.4.1",
-		"eslint": "^9.19.0",
-		"prettier": "^3.4.2",
-		"prettier-plugin-svelte": "^3.3.3",
-		"rollup": "^4.34.5",
+		"@vscode/test-electron": "^2.5.2",
+		"eslint": "^9.25.1",
+		"rollup": "^4.40.1",
 		"rollup-plugin-postcss": "^4.0.2",
 		"rollup-plugin-svelte": "^7.2.2",
-		"svelte": "^5.19.9",
+		"sinon": "^20.0.0",
+		"svelte": "^5.28.2",
 		"svelte-preprocess": "^6.0.3",
-		"typescript": "^5.7.3",
-		"tslib": "^2.5.0"
+		"tslib": "^2.8.1",
+		"typescript": "^5.8.3"
 	}
 }
