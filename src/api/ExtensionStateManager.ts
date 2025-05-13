@@ -280,10 +280,22 @@ export default class ExtensionStateManager {
 
     if (id !== -1) {
       const allTimData: Array<TimData> = this.getTimData()
-      let timData = allTimData.find((timData) => timData.doc_id === id &&timData.task_files.some((taskFile) => {
+      let timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some((taskFile) => {
         const parsedTaskDir = taskFile.task_directory ?? ""
-        const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
-        return taskfilePath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+        if (parsedTaskDir.length > 0) {
+          const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+          return taskfilePath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+        } else {
+          const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+          const pathParts = timData.path.split("/")
+          const demo = pathParts.at(-1)
+          if (demo) {
+            return taskfilePath.includes(path.join(demo, timData.ide_task_id, fileNameToOsPath))
+          } else {
+            // This should never be reached
+            return taskfilePath.includes(path.join(timData.ide_task_id, fileNameToOsPath))
+          }
+        }
       }))
       if (!timData) {
       // Search for supplementary files!
