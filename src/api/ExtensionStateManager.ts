@@ -267,35 +267,35 @@ export default class ExtensionStateManager {
    * @returns a unique TimData object with the given parameters, undefined is one is not found using the given parameters
    */
 
-  static getTimDataByFilepath(taskPath: string): TimData | undefined{
-    const allTimData: Array<TimData> = this.getTimData()
-    let timData = allTimData.find((timData) => timData.task_files.some((taskFile) => {
-      const parsedTaskDir = taskFile.task_directory ?? ""
-      if (parsedTaskDir.length > 0) {
-        const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
-        return taskPath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
-      } else {
-        const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
-        const pathParts = timData.path.split("/")
-        const demo = pathParts.at(-1)
-        if (demo) {
-          return taskPath.includes(path.join(demo, timData.ide_task_id, fileNameToOsPath))
-        } else {
-          // This should never be reached
-          return taskPath.includes(path.join(timData.ide_task_id, fileNameToOsPath))
+  static getTimDataByFilepath(taskfilePath: string): TimData | undefined{
+    const courses: Array<Course> = this.getCourses()
+    let id: number = -1
+    courses.find((course) => {
+      course.taskSets.some((taskSet) => {
+        if (taskSet.downloadPath && taskfilePath.includes(taskSet.downloadPath)){
+          id = taskSet.doc_id
         }
-        
+      })
+    })
+
+    if (id !== -1) {
+      const allTimData: Array<TimData> = this.getTimData()
+      let timData = allTimData.find((timData) => timData.doc_id === id &&timData.task_files.some((taskFile) => {
+        const parsedTaskDir = taskFile.task_directory ?? ""
+        const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+        return taskfilePath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+      }))
+      if (!timData) {
+      // Search for supplementary files!
+      timData = allTimData.find((timData) => timData.supplementary_files.some((supFile) => {
+        const parsedSupFileTaskDir = supFile.task_directory ?? ""
+        const supFileNameToOsPath = supFile.file_name.replaceAll("/", path.sep)
+        return taskfilePath.includes(parsedSupFileTaskDir+path.sep+supFileNameToOsPath)
+      }))
       }
-    }))
-    if (!timData) {
-     // Search for supplementary files!
-     timData = allTimData.find((timData) => timData.supplementary_files.some((supFile) => {
-      const parsedSupFileTaskDir = supFile.task_directory ?? ""
-      const supFileNameToOsPath = supFile.file_name.replaceAll("/", path.sep)
-      return taskPath.includes(parsedSupFileTaskDir+path.sep+supFileNameToOsPath)
-    }))
+      return timData
     }
-    return timData
+    return undefined
   }
 
 
