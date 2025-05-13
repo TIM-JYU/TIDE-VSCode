@@ -467,9 +467,7 @@ export default class ExtensionStateManager {
    */
   public static getCourseByFilePath(filePath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => {
-      taskSet.tasks.some((task) => task.download_path === filePath) 
-    }))
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.tasks.some((task) => task.download_path === filePath)))
     if (!course) {
       throw new Error(`This file doesn't seem to be part of the TIDE task: ${filePath}`)
     }

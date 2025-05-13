@@ -115,14 +115,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const doc = editor.document
       const currentDir = path.dirname(doc.fileName)
       // TODO: Need to format here?
-      let course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
-      if (!course){
-        const filePath = editor.document.uri.fsPath
-        course = ExtensionStateManager.getCourseByFilePath(filePath)
-        if (!course) {
-          return
-        }
+      const filePath = editor.document.uri.fsPath
+      const course = ExtensionStateManager.getCourseByFilePath(filePath)
+      if (!course) {
+        return
       }
+      
       const taskPath = editor.document.uri.fsPath;
       const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM');
       
