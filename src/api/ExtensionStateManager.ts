@@ -97,7 +97,7 @@ export default class ExtensionStateManager {
           taskSet.downloadPath = localCoursePath
           for (const group of tasks) {
             for (const file of group) {
-              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.file_name === file.file_name));
+              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.task_id_ext === file.task_id_ext && taskFile.file_name === file.file_name));
               if (task) {
                 // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\src\\demo\\d2\\Tauno1a.java"
                 task.download_path = file.path;

@@ -138,6 +138,7 @@ export interface FileStatus {
   path: string
   relative_path: string
   status: string
+  task_id_ext: string | null
 }
 
 /**
