@@ -205,7 +205,7 @@ export default class CoursePanel {
             }))
 
             // Refresh TreeView with the new data
-            vscode.commands.executeCommand('tide.treeviewShowCourses')
+            vscode.commands.executeCommand('tide.refreshTree')
             this.panel.webview.postMessage({
               type: 'DownloadTaskSetComplete',
               value: taskSetPath,
@@ -248,7 +248,7 @@ export default class CoursePanel {
             }))
 
             // Refresh TreeView with the new data
-            vscode.commands.executeCommand('tide.refreshTree')
+            vscode.commands.executeCommand('tide.treeviewShowCourses')
             this.panel.webview.postMessage({
               type: 'DownloadCourseTasksComplete',
               value: coursePath,

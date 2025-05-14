@@ -47,12 +47,11 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to reset.')
         return
       }
-      const doc = editor.document
-      const currentDir = path.dirname(doc.fileName)
+      const filePath = editor.document.uri.fsPath
       // Need to format here?
-      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
-      if (course){
-        Tide.resetTask(doc.fileName)
+      const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
+      if (timData) {
+        Tide.resetTask(filePath)
       }
     }),
   )
@@ -68,35 +67,23 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to synchronize.')
         return
       }
-      const doc = editor.document;
-      const currentDir = path.dirname(doc.fileName)
-      const tasksetDir = path.dirname(path.dirname(currentDir))
       // TODO: need to format here?
-      const course: Course =  ExtensionStateManager.getCourseByDownloadPath(path.dirname(currentDir))
-      const taskset = course.taskSets.find((taskSet) => {
-        const formattedCurrentDirPath = Formatting.normalizePath(path.dirname(currentDir))
-        const formattedTaskSetDownloadPath = Formatting.normalizePath(taskSet.downloadPath ?? "")
-        return formattedCurrentDirPath === formattedTaskSetDownloadPath
-      })
-      // Find the names of the tasks ide_task_id and the task set from the files path
-      let itemPath = currentDir
-      let pathSplit = itemPath.split(path.sep)
-      // ide_task_id
-      let id = pathSplit.at(-1)
-      // task set name
-      let demo = pathSplit.at(-2)
-      if (demo && id && taskset) {
-        const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(doc.fileName)
-        if (timData) {
-          Tide.overwriteTask(timData.path, timData.ide_task_id, tasksetDir);
-          Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
-          if (points !== undefined && points !== null) {
-            ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points);
-          } else {
-            vscode.window.showErrorMessage('TimData is undefined or invalid.');
-          }
-        });
+      const filePath = editor.document.uri.fsPath
+      const course = ExtensionStateManager.getCourseByFilePath(filePath)
+      if (!course) {
+        return
       }
+      const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
+      if (timData) {
+        const pathToTimData = path.join(vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? "", course.name)
+        Tide.overwriteTask(timData.path, timData.ide_task_id, pathToTimData)
+        Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
+        if (points !== undefined && points !== null) {
+          ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points)
+        } else {
+          vscode.window.showErrorMessage('TimData is undefined or invalid.')
+        }
+      })
     }
   }),
   )
@@ -112,8 +99,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to submit.');
         return;
       }
-      const doc = editor.document
-      const currentDir = path.dirname(doc.fileName)
       // TODO: Need to format here?
       const filePath = editor.document.uri.fsPath
       const course = ExtensionStateManager.getCourseByFilePath(filePath)

@@ -40,7 +40,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
         // Context menu commands (right-click menu)
         vscode.commands.registerCommand('tide.treeviewMenuOpenTasks', item => this.openTasksInThisDir(item))
-
     }
 
     // Refresh the current treeview items
@@ -52,7 +51,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             if (this.treeViewMode == 'Courses') {
                 this.showCourses()
             } else {
-                this.courseData[0].updatePoints()
+                const treeRootItem = this.courseData.at(0)
+                if (treeRootItem) {
+                    treeRootItem.children = []
+                    this.readCourseDirectory(treeRootItem.path, this.courseData.at(0))
+                    treeRootItem.updatePoints()
+                }
                 this.m_onDidChangeTreeData.fire(undefined)
             }
         } else {
@@ -231,7 +235,12 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             this.courseData = []
             let newLabel = item.label?.toString().replace("Course: ", "") ?? ""
             let newPath = item.path
-            this.courseData.push(new CourseTaskTreeItem(newLabel, newPath, "dir")) 
+            this.courseData.push(new CourseTaskTreeItem(newLabel, newPath, "dir"))
+            let rootItem = this.courseData.at(0)
+            if (rootItem) {
+                // Automaticly expand the root folder when opening a course from the treeView
+                rootItem.collapsibleState = vscode.TreeItemCollapsibleState.Expanded
+            }            
             this.readCourseDirectory(item.path, this.courseData.at(0))
             const treeRootItem = this.courseData.at(0)
             if (treeRootItem) {
@@ -308,11 +317,11 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
                         const taskTimData = ExtensionStateManager.getTimDataByFilepath(item.path)
                         if (taskTimData) {
                             // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
-                            let taskFileName = taskTimData.task_files.at(0)?.file_name ?? ""
+                            let taskFiles = taskTimData.task_files
                             let labelString = item.label?.toString() ?? ""
         
                             // Only give points icons to the task_file files!
-                            if (taskFileName.includes(labelString)) {
+                            if (taskFiles.some(taskFile => taskFile.file_name.includes(labelString))) {
                                 if (item.maxPoints === 0) {
                                     iconPath = this.iconGreyStatus
                                 } else if (item.currentPoints === 0) {
@@ -404,7 +413,7 @@ class CourseTaskTreeItem extends vscode.TreeItem {
             this.collapsibleState = vscode.TreeItemCollapsibleState.None
             this.contextValue = ""
         } else {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.Expanded
+            this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
             this.contextValue = "folder"
         }
     }
@@ -483,7 +492,7 @@ class CourseTaskTreeItem extends vscode.TreeItem {
             // C# tehtävien kansioiden tunnistus?
             if (result == false) {
                 timData.some(data => {
-                    if (result = true) return
+                    if (result == true) return
                     if (data.supplementary_files.some(file => file.file_name.includes(labelString))) {
                         result = true
                     }
@@ -512,11 +521,11 @@ class CourseTaskTreeItem extends vscode.TreeItem {
                 const taskTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
                 if (taskTimData) {
                     // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
-                    let taskFileName = taskTimData.task_files.at(0)?.file_name ?? ""
+                    let taskFiles = taskTimData.task_files
                     let labelString = this.label?.toString() ?? ""
 
                     // Only give points to the task_file file!
-                    if (taskFileName.includes(labelString)) {
+                    if (taskFiles.some(taskFile => taskFile.file_name.includes(labelString))) {
                         if (taskTimData.max_points) {
                             maxPointsSum = taskTimData.max_points
                         }
