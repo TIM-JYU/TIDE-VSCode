@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte';
 import LoaderButton from '../LoaderButton.svelte';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
 describe('LoaderButton', () => {
@@ -16,4 +16,30 @@ describe('LoaderButton', () => {
         expect(button).toBeInTheDocument();
         expect(button).toHaveTextContent('Click Me');     
   });
+    it('shows textWhileLoading and Spinner when loading is true', () => 
+    {
+        const { getByText } = render(LoaderButton as any, {
+            props: {
+            loading: true,
+            text: 'Click Me',
+            textWhileLoading: 'Loading...',
+            },
+        });
+        expect(getByText('Loading...')).toBeInTheDocument();
+    });
+    it('calls onClick when clicked', async () => 
+    {
+        const handleClick = vi.fn();
+
+        const { getByText } = render(LoaderButton as any, {
+            props: {
+            loading: false,
+            text: 'Click Me',
+            onClick: handleClick,
+            },
+        });
+        const button = getByText('Click Me');
+        button.click();
+        expect(handleClick).toHaveBeenCalled();
+    }); 
 });
