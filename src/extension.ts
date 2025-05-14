@@ -71,7 +71,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
 
   vscode.window.onDidChangeActiveTextEditor(editor => {
-    const fileName = editor?.document?.fileName || ""
+    const fileName = editor?.document?.fileName || ''
     const TimData = ExtensionStateManager.getTimDataByFilepath(fileName)
     if (TimData) {
       // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!

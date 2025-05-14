@@ -97,10 +97,10 @@ export default class ExtensionStateManager {
           taskSet.downloadPath = localCoursePath
           for (const group of tasks) {
             for (const file of group) {
-              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.task_id_ext === file.task_id_ext && taskFile.file_name === file.file_name));
+              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.task_id_ext === file.task_id_ext && taskFile.file_name === file.file_name))
               if (task) {
                 // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\src\\demo\\d2\\Tauno1a.java"
-                task.download_path = file.path;
+                task.download_path = file.path
               }
             }
           }
@@ -179,7 +179,7 @@ export default class ExtensionStateManager {
     if (taskset) {
         // Find the path to the new .timdata file
         if (!taskset.downloadPath) {
-            throw new Error('Download path is undefined for the task set.');
+            throw new Error('Download path is undefined for the task set.')
         }else {
           const dir = path.dirname(taskset.downloadPath)
           const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
@@ -274,16 +274,16 @@ export default class ExtensionStateManager {
       course.taskSets.some((taskSet) => {
         taskSet.tasks.some((task) => {
           // Return if a taskSet(demo) was found
-          if (!task.download_path) return
-          if (id > -1) return
+          if (!task.download_path) {return}
+          if (id > -1) {return}
           if (task.download_path && taskfilePath === task.download_path) {
             id = taskSet.doc_id
           } else {
             // If it turns out there is a possibility of more than 1 task_file in a task
             // this needs to be refactored to take that into account
             task.supplementary_files.some((supFile) => {
-              let supPath = task.download_path?.replace(task.task_files?.at(0)?.file_name ?? "", "")
-              supPath = supPath + supFile.file_name.replaceAll("/", path.sep)
+              let supPath = task.download_path?.replace(task.task_files?.at(0)?.file_name ?? '', '')
+              supPath = supPath + supFile.file_name.replaceAll('/', path.sep)
               if (taskfilePath === supPath) {
                 id = taskSet.doc_id
               }
@@ -296,13 +296,13 @@ export default class ExtensionStateManager {
     if (id !== -1) {
       const allTimData: Array<TimData> = this.getTimData()
       let timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some((taskFile) => {
-        const parsedTaskDir = taskFile.task_directory ?? ""
+        const parsedTaskDir = taskFile.task_directory ?? ''
         if (parsedTaskDir.length > 0) {
-          const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
+          const fileNameToOsPath = taskFile.file_name.replaceAll('/', path.sep)
           return taskfilePath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
         } else {
-          const fileNameToOsPath = taskFile.file_name.replaceAll("/", path.sep)
-          const pathParts = timData.path.split("/")
+          const fileNameToOsPath = taskFile.file_name.replaceAll('/', path.sep)
+          const pathParts = timData.path.split('/')
           const demo = pathParts.at(-1)
           if (demo) {
             return taskfilePath.includes(path.join(demo, timData.ide_task_id, fileNameToOsPath))
@@ -320,8 +320,8 @@ export default class ExtensionStateManager {
       if (!timData) {
         // Search for supplementary files!
         timData = allTimData.find((timData) => timData.doc_id === id && timData.supplementary_files.some((supFile) => {
-        const parsedSupFileTaskDir = supFile.task_directory ?? ""
-        const supFileNameToOsPath = supFile.file_name.replaceAll("/", path.sep)
+        const parsedSupFileTaskDir = supFile.task_directory ?? ''
+        const supFileNameToOsPath = supFile.file_name.replaceAll('/', path.sep)
         return taskfilePath.includes(parsedSupFileTaskDir+path.sep+supFileNameToOsPath)
         }))
       }
@@ -470,7 +470,7 @@ export default class ExtensionStateManager {
     const courses = this.getCourses()
     const course = courses.find((course) => course.taskSets.some((taskSet) => {
       const formattedParamPath = Formatting.normalizePath(downloadPath)
-      const formattedTaskSetDownloadPath = Formatting.normalizePath(taskSet.downloadPath ?? "")
+      const formattedTaskSetDownloadPath = Formatting.normalizePath(taskSet.downloadPath ?? '')
       return (formattedParamPath === formattedTaskSetDownloadPath)
     }))
     if (!course) {
@@ -504,7 +504,7 @@ export default class ExtensionStateManager {
     if (!course) {
       throw new Error(`Course with path: ${coursePath} not found`)
     }
-    return course;
+    return course
   }
 }
 

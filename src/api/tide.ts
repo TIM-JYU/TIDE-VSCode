@@ -146,7 +146,7 @@ export default class Tide {
       // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025"
       const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
       // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\Demo2"
-      let localTaskPath = ""
+      let localTaskPath = ''
       if (courseDir.length > 0) {
         localTaskPath = path.join(localCoursePath, courseDir)
       } else {
@@ -226,15 +226,15 @@ export default class Tide {
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
-      Logger.info("The current task is being submitted to TIM. Please wait for the TIM response.")
+      Logger.info('The current task is being submitted to TIM. Please wait for the TIM response.')
       this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
         callback()
         const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
           if (timData) {
-            this.getTaskPoints(timData.path, timData.ide_task_id, callback);
+            this.getTaskPoints(timData.path, timData.ide_task_id, callback)
           } else {
-            vscode.window.showErrorMessage('TimData is undefined or invalid.');
+            vscode.window.showErrorMessage('TimData is undefined or invalid.')
           }
       })
     }catch (error) {
@@ -296,14 +296,14 @@ export default class Tide {
     // Use a copy of process.env to pass custom url to the child process 
     const env_modified = {...process.env}
     
-    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string
-    if (customUrl && customUrl.trim() !== "") {
+    let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl') as string
+    if (customUrl && customUrl.trim() !== '') {
       // Ensure that the custom url ends with a slash
-      const formattedUrl = customUrl.trim().endsWith("/") ? customUrl.trim() : customUrl.trim() + "/"
+      const formattedUrl = customUrl.trim().endsWith('/') ? customUrl.trim() : customUrl.trim() + '/'
       env_modified.URL = formattedUrl
     }
     else {
-      env_modified.URL = "https://tim.jyu.fi/"
+      env_modified.URL = 'https://tim.jyu.fi/'
     }
 
     // To run an uncompiled version of the CLI tool:
@@ -315,7 +315,7 @@ export default class Tide {
     const childProcess = cp.spawn(
       vscode.workspace.getConfiguration().get('TIM-IDE.cliPath') as string,
       args,
-      {"env" : env_modified}
+      {'env' : env_modified}
     )
 
     childProcess.stdout.on('data', (data) => {

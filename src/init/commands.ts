@@ -42,7 +42,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.resetExercise', async () => {
-      const editor = vscode.window.activeTextEditor;
+      const editor = vscode.window.activeTextEditor
       if (!editor) {
         vscode.window.showErrorMessage('No active file to reset.')
         return
@@ -62,7 +62,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.synchronizeSubmission', async () => {
-      const editor = vscode.window.activeTextEditor;
+      const editor = vscode.window.activeTextEditor
       if (!editor) {
         vscode.window.showErrorMessage('No active file to synchronize.')
         return
@@ -75,7 +75,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       }
       const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
       if (timData) {
-        const pathToTimData = path.join(vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? "", course.name)
+        const pathToTimData = path.join(vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? '', course.name)
         Tide.overwriteTask(timData.path, timData.ide_task_id, pathToTimData)
         Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
         if (points !== undefined && points !== null) {
@@ -94,10 +94,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.submitTask', async () => {
-      const editor = vscode.window.activeTextEditor;
+      const editor = vscode.window.activeTextEditor
       if (!editor) {
-        vscode.window.showErrorMessage('No active file to submit.');
-        return;
+        vscode.window.showErrorMessage('No active file to submit.')
+        return
       }
       // TODO: Need to format here?
       const filePath = editor.document.uri.fsPath
@@ -106,14 +106,14 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         return
       }
       
-      const taskPath = editor.document.uri.fsPath;
-      const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM');
+      const taskPath = editor.document.uri.fsPath
+      const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM')
       
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
         const messageOpts: vscode.MessageOptions = {
-          "detail": "Do you wish to save the changes before submitting the task to TIM?",
-          "modal": true
+          'detail': 'Do you wish to save the changes before submitting the task to TIM?',
+          'modal': true
         }
         const modalOpts: string[] = [
           'Save and Submit',

@@ -87,12 +87,12 @@ export default class CoursePanel {
    * @param customUrl 
    */
   private sendCustomUrl() {
-    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl")
+    let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl')
     if (!customUrl) {
-      customUrl = "https://tim.jyu.fi/";
+      customUrl = 'https://tim.jyu.fi/'
     }
     const msg: WebviewMessage = {
-      type: "CustomUrl",
+      type: 'CustomUrl',
       value: customUrl,
     }
     this.panel.webview.postMessage(msg)
@@ -154,7 +154,7 @@ export default class CoursePanel {
           })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
-           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '');
+           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '')
             if (previousPath) {
               newPath = [vscode.Uri.file(previousPath)]
             }
@@ -183,7 +183,7 @@ export default class CoursePanel {
                 return true
               }
           })
-            const taskDir = taskSet?.tasks.at(0)?.task_directory ?? ""
+            const taskDir = taskSet?.tasks.at(0)?.task_directory ?? ''
             // Download a new Task Set
             await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskSetPath)
 
@@ -225,7 +225,7 @@ export default class CoursePanel {
 
             // Download all tasks and update TimData
             for (let taskset of course.taskSets) {
-              const taskDir = taskset?.tasks.at(0)?.task_directory ?? ""
+              const taskDir = taskset?.tasks.at(0)?.task_directory ?? ''
               await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskset.path)
               ExtensionStateManager.updateTimData(taskset.path)
             }
