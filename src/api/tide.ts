@@ -226,9 +226,10 @@ export default class Tide {
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
+      Logger.info("The current task is being submitted to TIM. Please wait for the TIM response.")
       this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
-
+        callback()
         const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
           if (timData) {
             this.getTaskPoints(timData.path, timData.ide_task_id, callback);

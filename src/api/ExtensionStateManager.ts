@@ -391,7 +391,6 @@ export default class ExtensionStateManager {
   private static readFromGlobalState(key: StateKey): any {
     const prefixedKey = this.prefixedKey(key)
     const value: any = this.globalState.get(prefixedKey)
-    Logger.debug(`Found the following value from key "${prefixedKey}"`, value)
     return value
   }
 

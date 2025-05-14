@@ -53,9 +53,19 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         this.sendLoginData();
         this.sendCustomUrl();
 
-        vscode.commands.registerCommand('tide.setPointsUpdating', () => {
-            this.setPointsUpdating();
-        });
+        // Check if the command has already been registered
+        vscode.commands.getCommands(true).then(
+            (registeredCommands: string[]) => {
+                if (!registeredCommands.includes('tide.setPointsUpdating')) {
+                    vscode.commands.registerCommand('tide.setPointsUpdating', () => {
+                        this.setPointsUpdating();
+                    });
+                }
+            },
+            (err) => {
+                vscode.window.showErrorMessage('Could not get registered command:', err)
+            }
+        )
     }
 
     /**
