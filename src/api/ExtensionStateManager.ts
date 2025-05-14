@@ -313,12 +313,12 @@ export default class ExtensionStateManager {
         }
       }))
       if (!timData) {
-      // Search for supplementary files!
-      timData = allTimData.find((timData) => timData.doc_id === id && timData.supplementary_files.some((supFile) => {
+        // Search for supplementary files!
+        timData = allTimData.find((timData) => timData.doc_id === id && timData.supplementary_files.some((supFile) => {
         const parsedSupFileTaskDir = supFile.task_directory ?? ""
         const supFileNameToOsPath = supFile.file_name.replaceAll("/", path.sep)
         return taskfilePath.includes(parsedSupFileTaskDir+path.sep+supFileNameToOsPath)
-      }))
+        }))
       }
       return timData
     }

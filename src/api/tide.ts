@@ -228,26 +228,13 @@ export default class Tide {
     try {
       this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
-        const downloadPath = Formatting.normalizePath(path.dirname(path.dirname(taskPath)))
-        const course: Course =  ExtensionStateManager.getCourseByDownloadPath(downloadPath)
-        const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === downloadPath)
-        const currentDir = path.dirname(taskPath)
-        // Find the names of the tasks ide_task_id and the task set from the files path
-        let itemPath = currentDir
-        // console.log(path)
-        let pathSplit = itemPath.split(path.sep)
-        // ide_task_id
-        let id = pathSplit.at(-1)
-        // task set name
-        let demo = pathSplit.at(-2)
-        if (demo && id && taskset) {
-          const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
+
+        const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
           if (timData) {
             this.getTaskPoints(timData.path, timData.ide_task_id, callback);
           } else {
             vscode.window.showErrorMessage('TimData is undefined or invalid.');
           }
-        }
       })
     }catch (error) {
       Logger.error('Error while submitting task: ' + error)

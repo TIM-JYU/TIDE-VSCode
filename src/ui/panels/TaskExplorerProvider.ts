@@ -27,6 +27,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     private iconGreyStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-grey.svg')
     private iconWarningStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
     private iconTimCourse = path.join(__filename, '..', '..', '..', '..', 'media', 'timlogovscode.png')
+    private iconSupplementaryStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-sup-file.svg')
 
     // Register commands required to handle the treeview
     constructor() {
@@ -302,20 +303,46 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             const fileCheck = item.isCourseDirOrFile()
 
                 if (fileCheck) {
-                    if (item.maxPoints === 0) {
-                        iconPath = this.iconGreyStatus
-                    } else if (item.currentPoints === 0) {
-                        iconPath = this.iconRedStatus
-                    } else if (item.currentPoints === item.maxPoints) {
-                        iconPath = this.iconGreenStatus
+
+                    if (item.type == 'file') {
+                        const taskTimData = ExtensionStateManager.getTimDataByFilepath(item.path)
+                        if (taskTimData) {
+                            // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
+                            let taskFileName = taskTimData.task_files.at(0)?.file_name ?? ""
+                            let labelString = item.label?.toString() ?? ""
+        
+                            // Only give points icons to the task_file files!
+                            if (taskFileName.includes(labelString)) {
+                                if (item.maxPoints === 0) {
+                                    iconPath = this.iconGreyStatus
+                                } else if (item.currentPoints === 0) {
+                                    iconPath = this.iconRedStatus
+                                } else if (item.currentPoints === item.maxPoints) {
+                                    iconPath = this.iconGreenStatus
+                                } else {
+                                    iconPath = this.iconYellowStatus
+                                }
+                            } else {
+                                // Give supplementary file icon to supplementary files
+                                iconPath = this.iconSupplementaryStatus
+                            }
+                        }
                     } else {
-                        iconPath = this.iconYellowStatus
+                        if (item.maxPoints === 0) {
+                            iconPath = this.iconGreyStatus
+                        } else if (item.currentPoints === 0) {
+                            iconPath = this.iconRedStatus
+                        } else if (item.currentPoints === item.maxPoints) {
+                            iconPath = this.iconGreenStatus
+                        } else {
+                            iconPath = this.iconYellowStatus
+                        }
                     }
-            } else {
-                // No icon and a warning for directories that aren't a part of a Tide-Course
-                iconPath = this.iconWarningStatus
-                result.description = "Not a Tide-Course directory!"
-            }
+                } else {
+                    // No icon and a warning for directories that aren't a part of a Tide-Course
+                    iconPath = this.iconWarningStatus
+                    result.description = "Not a Tide-Course directory!"
+                }
         }
 
         
@@ -484,17 +511,28 @@ class CourseTaskTreeItem extends vscode.TreeItem {
             if (this.type == 'file') {
                 const taskTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
                 if (taskTimData) {
-                    if (taskTimData.max_points) {
-                        maxPointsSum = taskTimData.max_points
+                    // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
+                    let taskFileName = taskTimData.task_files.at(0)?.file_name ?? ""
+                    let labelString = this.label?.toString() ?? ""
+
+                    // Only give points to the task_file file!
+                    if (taskFileName.includes(labelString)) {
+                        if (taskTimData.max_points) {
+                            maxPointsSum = taskTimData.max_points
+                        }
+                        
+                        const savedPoints = ExtensionStateManager.getTaskPoints(taskTimData.path, taskTimData.ide_task_id)
+                        const parsedPoints = savedPoints?.current_points
+                        if (parsedPoints == null || parsedPoints == undefined) {
+                            currentPointsSum = 0
+                        } else {
+                            currentPointsSum = parsedPoints
+                        }
+                    } else {
+                        currentPointsSum = 0
+                        maxPointsSum = 0
                     }
                     
-                    const savedPoints = ExtensionStateManager.getTaskPoints(taskTimData.path, taskTimData.ide_task_id)
-                    const parsedPoints = savedPoints?.current_points
-                    if (parsedPoints == null || parsedPoints == undefined) {
-                        currentPointsSum = 0
-                    } else {
-                        currentPointsSum = parsedPoints
-                    }
                 }                
             } else {
                 currentPointsSum = 0
