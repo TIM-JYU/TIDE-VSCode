@@ -76,7 +76,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
       if (timData) {
         const pathToTimData = path.join(vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? '', course.name)
-        Tide.overwriteTask(timData.path, timData.ide_task_id, pathToTimData)
+        Tide.overwriteTask(timData.path, timData.ide_task_id, pathToTimData.toLowerCase())
         Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
         if (points !== undefined && points !== null) {
           ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points)
