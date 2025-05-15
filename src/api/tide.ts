@@ -171,7 +171,7 @@ export default class Tide {
    */
   public static async overwriteSetTasks(taskSetPath: string) {
     try {
-      this.runAndHandle(['task', 'create', '-a', '-f', taskSetPath], (data: string) => {
+      await this.runAndHandle(['task', 'create', '-a', '-f', taskSetPath], (data: string) => {
         Logger.debug(data)
       })
     }
@@ -189,7 +189,7 @@ export default class Tide {
    */
   public static async overwriteTask(taskSetPath: string, ideTaskId: string, fileLocation: string) {
     try {
-      this.runAndHandle(
+      await this.runAndHandle(
         ['task', 'create', taskSetPath, ideTaskId, '-f', '-d', fileLocation],
         (data: string) => {
           Logger.debug(data)
@@ -209,7 +209,7 @@ export default class Tide {
   public static async resetTask(filePath: string) {
     try {
       vscode.commands.executeCommand('workbench.action.files.save')
-      this.runAndHandle(['task', 'reset', filePath], (data: string) => {
+      await this.runAndHandle(['task', 'reset', filePath], (data: string) => {
         Logger.debug(data)
       })
     }
@@ -227,7 +227,7 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
       Logger.info('The current task is being submitted to TIM. Please wait for the TIM response.')
-      this.runAndHandle(['submit', taskPath], (data: string) => {
+      await this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
         callback()
         const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
