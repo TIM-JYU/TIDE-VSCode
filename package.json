@@ -254,7 +254,7 @@
 		"svelte-compile": "rollup -c --bundleConfigAsCjs",
 		"_pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "npm run compile && vscode-test",
+		"test": "npm run _pretest && vscode-test",
 		"test:svelte": "npm run svelte-compile && vitest --config vitest.config.mjs --environment jsdom --run"
 	},
 	"devDependencies": {
