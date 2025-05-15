@@ -2,7 +2,6 @@
 	"name": "tim-ide",
 	"displayName": "TIM-IDE",
 	"description": "",
-	"type": "module",
 	"authors": [
 		{
 			"name": "Hannes Koivusipilä"
@@ -256,7 +255,7 @@
 		"_pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
 		"test": "npm run compile && vscode-test",
-		"test:svelte": "npm run svelte-compile && vitest --environment jsdom --run"
+		"test:svelte": "npm run svelte-compile && vitest --config vitest.config.mjs --environment jsdom --run"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^28.0.3",
