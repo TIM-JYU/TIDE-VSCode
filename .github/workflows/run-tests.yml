@@ -32,3 +32,6 @@ jobs:
 
       - name: Run tests
         run: xvfb-run -a npm run test
+      
+      - name: Run svelte file tests
+        run: xvfb-run -a npm run test:svelte
