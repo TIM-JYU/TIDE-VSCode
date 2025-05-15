@@ -1,5 +1,5 @@
 import { render } from '@testing-library/svelte';
-import LoaderButton from '../LoaderButton.svelte';
+import LoaderButton from '../components/common/LoaderButton.svelte';
 import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
