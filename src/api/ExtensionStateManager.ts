@@ -269,6 +269,7 @@ export default class ExtensionStateManager {
 
   static getTimDataByFilepath(taskfilePath: string): TimData | undefined{
     const courses: Array<Course> = this.getCourses()
+    const normalizedPath = Formatting.normalizePath(taskfilePath)
     let id: number = -1
     courses.find((course) => {
       course.taskSets.some((taskSet) => {
@@ -276,7 +277,7 @@ export default class ExtensionStateManager {
           // Return if a taskSet(demo) was found
           if (!task.download_path) {return}
           if (id > -1) {return}
-          if (task.download_path && taskfilePath === task.download_path) {
+          if (task.download_path && normalizedPath === task.download_path) {
             id = taskSet.doc_id
           } else {
             // If it turns out there is a possibility of more than 1 task_file in a task
@@ -284,7 +285,7 @@ export default class ExtensionStateManager {
             task.supplementary_files.some((supFile) => {
               let supPath = task.download_path?.replace(task.task_files?.at(0)?.file_name ?? '', '')
               supPath = supPath + supFile.file_name.replaceAll('/', path.sep)
-              if (taskfilePath === supPath) {
+              if (normalizedPath === supPath) {
                 id = taskSet.doc_id
               }
             })
