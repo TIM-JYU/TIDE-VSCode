@@ -300,10 +300,10 @@ export default class Tide {
     if (customUrl && customUrl.trim() !== '') {
       // Ensure that the custom url ends with a slash
       const formattedUrl = customUrl.trim().endsWith('/') ? customUrl.trim() : customUrl.trim() + '/'
-      env_modified.URL = formattedUrl
+      env_modified.TIM_URL = formattedUrl
     }
     else {
-      env_modified.URL = 'https://tim.jyu.fi/'
+      env_modified.TIM_URL = 'https://tim.jyu.fi/'
     }
 
     // To run an uncompiled version of the CLI tool:
