@@ -283,8 +283,7 @@ export default class ExtensionStateManager {
             // If it turns out there is a possibility of more than 1 task_file in a task
             // this needs to be refactored to take that into account
             task.supplementary_files.some((supFile) => {
-              let supPath = task.download_path?.replace(task.task_files?.at(0)?.file_name ?? '', '')
-              supPath = supPath + supFile.file_name.replaceAll('/', path.sep)
+              const supPath = Formatting.normalizePath(task.download_path + supFile.file_name)
               if (normalizedPath === supPath) {
                 id = taskSet.doc_id
               }
@@ -299,10 +298,10 @@ export default class ExtensionStateManager {
       let timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some((taskFile) => {
         const parsedTaskDir = taskFile.task_directory ?? ''
         if (parsedTaskDir.length > 0) {
-          const fileNameToOsPath = taskFile.file_name.replaceAll('/', path.sep)
+          const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
           return taskfilePath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
         } else {
-          const fileNameToOsPath = taskFile.file_name.replaceAll('/', path.sep)
+          const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
           const pathParts = timData.path.split('/')
           const demo = pathParts.at(-1)
           if (demo) {
@@ -322,7 +321,7 @@ export default class ExtensionStateManager {
         // Search for supplementary files!
         timData = allTimData.find((timData) => timData.doc_id === id && timData.supplementary_files.some((supFile) => {
         const parsedSupFileTaskDir = supFile.task_directory ?? ''
-        const supFileNameToOsPath = supFile.file_name.replaceAll('/', path.sep)
+        const supFileNameToOsPath = Formatting.normalizePath(supFile.file_name)
         return taskfilePath.includes(parsedSupFileTaskDir+path.sep+supFileNameToOsPath)
         }))
       }
