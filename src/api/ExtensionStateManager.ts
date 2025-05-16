@@ -314,7 +314,6 @@ export default class ExtensionStateManager {
       }))
       // Added for Java course additional extra files
       if (!timData) {
-        const extraFilePath = 
         timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some(taskFile => taskfilePath.includes(taskFile.file_name)))
       }
       if (!timData) {
