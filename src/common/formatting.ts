@@ -16,4 +16,11 @@
     ? posixPath.charAt(0).toLowerCase() + posixPath.slice(1)
     : posixPath
   }
+
+  public static normalizeSeparator(pathString: string): string {
+    if (!pathString) {return pathString}
+    //replace separators with '/'
+    const posixPath = pathString.split(path.sep).join(path.posix.sep)
+    return posixPath
+  }
 }

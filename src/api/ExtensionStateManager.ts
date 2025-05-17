@@ -100,7 +100,7 @@ export default class ExtensionStateManager {
               const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.task_id_ext === file.task_id_ext && taskFile.file_name === file.file_name))
               if (task) {
                 // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\src\\demo\\d2\\Tauno1a.java"
-                task.download_path = file.path
+                task.download_path = Formatting.normalizePath(file.path)
               }
             }
           }
@@ -277,7 +277,7 @@ export default class ExtensionStateManager {
           // Return if a taskSet(demo) was found
           if (!task.download_path) {return}
           if (id > -1) {return}
-          if (task.download_path && normalizedPath === task.download_path) {
+          if (task.download_path && normalizedPath === Formatting.normalizePath(task.download_path)) {
             id = taskSet.doc_id
           } else {
             // If it turns out there is a possibility of more than 1 task_file in a task
@@ -299,17 +299,16 @@ export default class ExtensionStateManager {
       let timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some((taskFile) => {
         const parsedTaskDir = taskFile.task_directory ?? ''
         if (parsedTaskDir.length > 0) {
-          const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
-          return normalizedPath.includes(parsedTaskDir+path.sep+fileNameToOsPath)
+          return normalizedPath.includes(Formatting.normalizeSeparator(parsedTaskDir+path.sep+taskFile.file_name))
         } else {
           const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
           const pathParts = timData.path.split('/')
           const demo = pathParts.at(-1)
           if (demo) {
-            return normalizedPath.includes(path.join(demo, timData.ide_task_id, fileNameToOsPath))
+            return normalizedPath.includes(Formatting.normalizeSeparator(path.join(demo, timData.ide_task_id, taskFile.file_name)))
           } else {
             // This should never be reached
-            return normalizedPath.includes(path.join(timData.ide_task_id, fileNameToOsPath))
+            return normalizedPath.includes(Formatting.normalizeSeparator(path.join(timData.ide_task_id, taskFile.file_name)))
           }
         }
       }))
@@ -322,7 +321,7 @@ export default class ExtensionStateManager {
         timData = allTimData.find((timData) => timData.doc_id === id && timData.supplementary_files.some((supFile) => {
         const parsedSupFileTaskDir = supFile.task_directory ?? ''
         const supFileNameToOsPath = supFile.file_name
-        return normalizedPath.includes(Formatting.normalizePath(parsedSupFileTaskDir+path.sep+supFileNameToOsPath))
+        return normalizedPath.includes(Formatting.normalizeSeparator(parsedSupFileTaskDir+path.sep+supFileNameToOsPath))
         }))
       }
       return timData
@@ -486,7 +485,8 @@ export default class ExtensionStateManager {
    */
   public static getCourseByFilePath(filePath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.tasks.some((task) => task.download_path === filePath)))
+    const normPath = Formatting.normalizePath(filePath)
+    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.tasks.some((task) => task.download_path === normPath)))
     if (!course) {
       throw new Error(`This file doesn't seem to be part of the TIDE task: ${filePath}`)
     }
