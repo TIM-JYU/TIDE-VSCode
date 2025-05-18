@@ -227,6 +227,8 @@ export default class CoursePanel {
             for (let taskset of course.taskSets) {
               const taskDir = taskset?.tasks.at(0)?.task_directory ?? ''
               await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskset.path)
+              // TODO: The entire .timData file is stored on update, so this propably could be only called once after downloading everything
+              // Unfortunately there is no time to confirm this
               ExtensionStateManager.updateTimData(taskset.path)
             }
 

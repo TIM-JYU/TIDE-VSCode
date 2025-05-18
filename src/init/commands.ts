@@ -17,7 +17,7 @@ import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
 import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
-import { Course, TimData } from '../common/types'
+import { TimData } from '../common/types'
 import Formatting from '../common/formatting'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
@@ -47,6 +47,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to reset.')
         return
       }
+      // TODO: This might cause issues with c | C drive letter in windows paths
       const filePath = editor.document.uri.fsPath
       // Need to format here?
       const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)

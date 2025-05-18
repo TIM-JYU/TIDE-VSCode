@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
-import { Course, TimData } from '../../common/types'
+import { Course } from '../../common/types'
 import Logger from '../../utilities/logger'
 
 
@@ -378,6 +378,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         let result = undefined
         const courseData = ExtensionStateManager.getCourses()
         courseData.forEach(element => {
+            // Are course directories always lowercase only?
             if (element.name.toLocaleLowerCase() === dirName) {
                 result = element
             }
