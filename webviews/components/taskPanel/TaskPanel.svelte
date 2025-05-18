@@ -28,7 +28,9 @@
     task_files: [],
     type: '',
     deadline: null,
-    answer_limit: null
+    answer_limit: null,
+    supplementary_files: [],
+    task_directory: null
   })
   let loginData: LoginData = $state({
     isLogged: false
@@ -100,7 +102,7 @@
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
 
-    const options = {
+    const options: Intl.DateTimeFormatOptions = {
         timeZone: "Europe/Helsinki",
         day: "2-digit",
         month: "2-digit",
