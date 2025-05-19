@@ -148,13 +148,9 @@ export default class Tide {
         UiController.showError('Download path not set!')
         return
       }
-
-      // Java kursseille!?
-      // "Demo2"
+      
       const taskSetName = path.basename(taskSetPath)
-      // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025"
       const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
-      // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\Demo2"
       let localTaskPath = ''
       if (courseDir.length > 0) {
         localTaskPath = path.join(localCoursePath, courseDir)
@@ -314,10 +310,10 @@ export default class Tide {
     if (customUrl && customUrl.trim() !== '') {
       // Ensure that the custom url ends with a slash
       const formattedUrl = customUrl.trim().endsWith('/') ? customUrl.trim() : customUrl.trim() + '/'
-      env_modified.URL = formattedUrl
+      env_modified.TIM_URL = formattedUrl
     }
     else {
-      env_modified.URL = 'https://tim.jyu.fi/'
+      env_modified.TIM_URL = 'https://tim.jyu.fi/'
     }
 
     // To run an uncompiled version of the CLI tool:
