@@ -159,7 +159,12 @@ export default class Tide {
       }
       await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath, '-j'], (data: string) => {
         Logger.debug(data)
-        const tasks = JSON.parse(data)
+        let cleanData = data.trimStart()
+        if (cleanData.startsWith('Task metadata updated')) {
+          Logger.info('Task metadata has been updated.')
+          cleanData = cleanData.substring(cleanData.indexOf('['))
+        }
+        const tasks = JSON.parse(cleanData)
         ExtensionStateManager.setTaskSetPaths(localTaskPath, taskSetPath, tasks)
       })
     }
