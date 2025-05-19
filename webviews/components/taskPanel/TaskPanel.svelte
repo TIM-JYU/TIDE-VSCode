@@ -156,7 +156,7 @@ This component manages the display of task information and interaction with task
 
     <div class="points-section">
       {#if timData.max_points == undefined && taskPoints.current_points == 0}
-      <p>This task does not reward points.</p>
+      <p>Points data was not found for this task. Check TIM for more information. </p>
       {:else if timData.max_points}
         <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
         <LoaderButton
@@ -182,7 +182,8 @@ This component manages the display of task information and interaction with task
 
     <div>
       {#if timData.answer_limit !== null}
-      <p>For this task, you can only get points from the first {timData.answer_limit} submissions.</p>
+      <p>This task has an <strong>answer limit</strong> of {timData.answer_limit} {timData.answer_limit > 1 ? 'submissions' : 'submission'}. Any submissions made after the limit will be saved
+        in TIM, but won't be considered for points or grading.</p>
       {/if}
       {#if timData.deadline !== null}
       <p>The deadline for this task is {formatDate(timData.deadline)}.</p>
