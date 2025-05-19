@@ -148,13 +148,9 @@ export default class Tide {
         UiController.showError('Download path not set!')
         return
       }
-
-      // Java kursseille!?
-      // "Demo2"
+      
       const taskSetName = path.basename(taskSetPath)
-      // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025"
       const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
-      // "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\Demo2"
       let localTaskPath = ''
       if (courseDir.length > 0) {
         localTaskPath = path.join(localCoursePath, courseDir)

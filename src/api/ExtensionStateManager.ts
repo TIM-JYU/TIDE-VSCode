@@ -82,14 +82,13 @@ export default class ExtensionStateManager {
    * Set the downloadpath for Tasks inside TaskSets inside Courses. Currently saves a normalized path (tide.ts) 
    * @param localCoursePath Local path to course folder. This is set as the downloadPath of the course
    * @param taskSetPath TIM path for the course
-   * @param tasks Data of the tasks for which the download_paths are set 
+   * @param tasks Data of the tasks for which the download_paths are set
    */
   static setTaskSetPaths(localCoursePath:string, taskSetPath: string, tasks: Array<Array<FileStatus>>) {
     const courses: Array<Course> = this.getCourses()
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
         if (taskSet.path === taskSetPath) {
-          // localCoursePath : "c:\\Users\\patu_\\Ohjelmistoprojekti\\tim_beta_kurssit\\ohjelmointi 2, kevät 2025\\Demo2"
           taskSet.downloadPath = localCoursePath
           for (const group of tasks) {
             for (const file of group) {
