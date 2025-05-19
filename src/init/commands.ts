@@ -68,11 +68,14 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
         vscode.window.showErrorMessage('No active file to synchronize.')
         return
       }
+
+      Logger.info('Synchronizing the current task to the last submission in TIM...')
       // TODO: need to format here?
       const filePath = editor.document.uri.fsPath
       const course = ExtensionStateManager.getCourseByFilePath(filePath)
       if (!course) {
         return
+
       }
       const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
       if (timData) {
@@ -88,7 +91,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
     }
   }),
   )
-  
 
   /**
    * Submits current task file to TIM.
