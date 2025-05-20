@@ -106,21 +106,24 @@
        rx="3.6891994"
        ry="3.688159" />
     <path
-       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:1.00594583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:1.21761;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path67"
        sodipodi:type="arc"
-       sodipodi:cx="4.2285953"
-       sodipodi:cy="4.2456408"
+       sodipodi:cx="5.8339925"
+       sodipodi:cy="1.3512448"
        sodipodi:rx="2.5539851"
        sodipodi:ry="2.6069419"
        sodipodi:start="2.6168991"
        sodipodi:end="1.4158603"
        sodipodi:arc-type="arc"
-       d="M 2.0181786,5.5515826 A 2.5539851,2.6069419 0 0 1 2.3526522,2.4765926 2.5539851,2.6069419 0 0 1 5.3293229,1.8932422 2.5539851,2.6069419 0 0 1 6.755659,4.6231591 2.5539851,2.6069419 0 0 1 4.6227183,6.8213552"
-       sodipodi:open="true" />
+       d="M 3.6235758,2.6571867 A 2.5539851,2.6069419 0 0 1 3.9580494,-0.41780332 2.5539851,2.6069419 0 0 1 6.9347201,-1.0011537 2.5539851,2.6069419 0 0 1 8.3610563,1.7287631 2.5539851,2.6069419 0 0 1 6.2281155,3.9269592"
+       sodipodi:open="true"
+       inkscape:transform-center-x="0.061909596"
+       inkscape:transform-center-y="0.26144969"
+       transform="rotate(32.198764)" />
     <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#eb541c;stroke-width:0.502708;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#RoundedArrow)"
-       d="m 4.7166432,6.6223582 0.1150027,0.00269"
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#eb541c;stroke-width:0.582083;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#RoundedArrow)"
+       d="m 4.5280126,6.6395064 0.1150027,0.00269"
        id="path1"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0" />
