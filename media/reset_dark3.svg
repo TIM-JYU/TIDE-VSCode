@@ -7,7 +7,7 @@
    viewBox="0 0 8.4666666 8.4666666"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   inkscape:version="1.4.2 (2aeb623e1d, 2025-05-12)"
    sodipodi:docname="reset_dark3.svg"
    inkscape:export-filename="submit-arrow.png"
    inkscape:export-xdpi="96"
@@ -29,11 +29,11 @@
      showgrid="true"
      inkscape:zoom="15.429185"
      inkscape:cx="2.6897078"
-     inkscape:cy="18.050208"
+     inkscape:cy="18.017802"
      inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-height="945"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -78,7 +78,7 @@
          x="0.13011816"
          y="-2.1166666" /></text>
     <circle
-       style="fill:#363636;fill-opacity:0;stroke:#363636;stroke-width:0.674878;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0;paint-order:normal"
+       style="fill:#363636;fill-opacity:1;stroke:#363636;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path64"
        transform="rotate(-90)"
        cx="-4.1493692"

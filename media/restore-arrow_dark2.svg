@@ -7,7 +7,7 @@
    viewBox="0 0 8.4666666 8.4666666"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   inkscape:version="1.4.2 (2aeb623e1d, 2025-05-12)"
    sodipodi:docname="restore-arrow_dark2.svg"
    inkscape:export-filename="submit-arrow.png"
    inkscape:export-xdpi="96"
@@ -27,13 +27,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="21.820163"
-     inkscape:cx="12.075987"
-     inkscape:cy="19.546142"
+     inkscape:zoom="10.910082"
+     inkscape:cx="9.3949802"
+     inkscape:cy="17.69006"
      inkscape:window-width="1920"
-     inkscape:window-height="1009"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-height="945"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -97,7 +97,7 @@
          x="0.13011816"
          y="-2.1166666" /></text>
     <circle
-       style="fill:#363636;fill-opacity:0;stroke:#363636;stroke-width:0.674878;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0;paint-order:normal"
+       style="fill:#363636;fill-opacity:1;stroke:#363636;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path64"
        transform="rotate(-90)"
        cx="-4.1493692"
@@ -105,17 +105,17 @@
        r="3.4560852"
        sodipodi:insensitive="true" />
     <path
-       style="fill:#363636;fill-opacity:0;stroke:#5dc2c1;stroke-width:0.444389;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
+       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:0.444389;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
        id="path67"
        sodipodi:type="arc"
-       sodipodi:cx="4.2331305"
-       sodipodi:cy="3.74281"
+       sodipodi:cx="4.3058844"
+       sodipodi:cy="3.8398151"
        sodipodi:rx="2.2291515"
        sodipodi:ry="2.2291515"
        sodipodi:start="2.6168991"
        sodipodi:end="1.4158603"
        sodipodi:arc-type="arc"
-       d="M 2.30385,4.8594986 A 2.2291515,2.2291515 0 0 1 2.5957829,2.2301272 2.2291515,2.2291515 0 0 1 5.1938599,1.7313142 2.2291515,2.2291515 0 0 1 6.4387846,4.0656195 2.2291515,2.2291515 0 0 1 4.5771262,5.9452594"
+       d="M 2.3766039,4.9565037 A 2.2291515,2.2291515 0 0 1 2.6685368,2.3271323 2.2291515,2.2291515 0 0 1 5.2666138,1.8283194 2.2291515,2.2291515 0 0 1 6.5115386,4.1626246 2.2291515,2.2291515 0 0 1 4.6498801,6.0422645"
        sodipodi:open="true" />
   </g>
 </svg>
