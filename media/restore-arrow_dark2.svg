@@ -97,7 +97,7 @@
          x="0.13011816"
          y="-2.1166666" /></text>
     <circle
-       style="fill:#e0e0e0;fill-opacity:1;stroke:#e0e0e0;stroke-width:0.674878;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#363636;fill-opacity:0;stroke:#363636;stroke-width:0.674878;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0;paint-order:normal"
        id="path64"
        transform="rotate(-90)"
        cx="-4.1493692"
@@ -105,7 +105,7 @@
        r="3.4560852"
        sodipodi:insensitive="true" />
     <path
-       style="fill:#e0e0e0;fill-opacity:1;stroke:#000000;stroke-width:0.444389;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
+       style="fill:#363636;fill-opacity:0;stroke:#5dc2c1;stroke-width:0.444389;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
        id="path67"
        sodipodi:type="arc"
        sodipodi:cx="4.2331305"
