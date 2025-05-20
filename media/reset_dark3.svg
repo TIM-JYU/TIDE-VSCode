@@ -77,16 +77,17 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Californian FB';-inkscape-font-specification:'Californian FB';stroke-width:0.265"
          x="0.13011816"
          y="-2.1166666" /></text>
-    <circle
-       style="fill:#363636;fill-opacity:1;stroke:#363636;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+    <ellipse
+       style="fill:#363636;fill-opacity:1;stroke:#363636;stroke-width:1.06494791;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path64"
        transform="rotate(-90)"
-       cx="-4.1493692"
-       cy="4.2168312"
-       r="3.4560852" />
+       cx="-4.2351103"
+       cy="4.2339787"
+       rx="3.6636558"
+       ry="3.6979525" />
     <path
        sodipodi:type="star"
-       style="fill:#eb541c;fill-opacity:1;stroke:#eb541c;stroke-width:0.448733;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#eb541c;fill-opacity:1;stroke:#eb541c;stroke-width:0.83407144;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path81"
        inkscape:flatsided="true"
        sodipodi:sides="3"
@@ -100,10 +101,10 @@
        inkscape:randomized="0"
        d="m 2.1166666,3.7041663 2.3812498,-1.3748151 -1e-7,2.7496305 z"
        inkscape:transform-center-x="0.52594476"
-       transform="matrix(1.1670488,0,0,1.1670488,0.50448592,-0.17357378)" />
+       transform="matrix(1.1670488,0,0,1.1670488,0.84745067,-0.22501849)" />
     <path
-       style="fill:#000000;fill-opacity:1;stroke:#eb541c;stroke-width:0.375498;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="M 2.6624679,2.273588 V 6.0251505"
+       style="fill:#000000;fill-opacity:1;stroke:#eb541c;stroke-width:0.884436;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 2.3537997,2.1008686 V 6.1464251"
        id="path82" />
   </g>
 </svg>

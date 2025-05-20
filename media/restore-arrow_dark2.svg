@@ -27,9 +27,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="10.910082"
-     inkscape:cx="9.3949802"
-     inkscape:cy="17.69006"
+     inkscape:zoom="15.429186"
+     inkscape:cx="2.4304588"
+     inkscape:cy="17.175242"
      inkscape:window-width="1920"
      inkscape:window-height="945"
      inkscape:window-x="0"
@@ -96,16 +96,17 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Californian FB';-inkscape-font-specification:'Californian FB';stroke-width:0.265"
          x="0.13011816"
          y="-2.1166666" /></text>
-    <circle
-       style="fill:#363636;fill-opacity:1;stroke:#363636;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+    <ellipse
+       style="fill:#363636;fill-opacity:1;stroke:#363636;stroke-width:1.0673;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path64"
        transform="rotate(-90)"
-       cx="-4.1493692"
-       cy="4.2168312"
-       r="3.4560852"
-       sodipodi:insensitive="true" />
+       cx="-4.2342486"
+       cy="4.2299972"
+       sodipodi:insensitive="true"
+       rx="3.6891994"
+       ry="3.688159" />
     <path
-       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:0.444389;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
+       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:0.65616666;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
        id="path67"
        sodipodi:type="arc"
        sodipodi:cx="4.3058844"
