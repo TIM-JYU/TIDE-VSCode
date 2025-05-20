@@ -28,7 +28,9 @@
     task_files: [],
     type: '',
     deadline: null,
-    answer_limit: null
+    answer_limit: null,
+    supplementary_files: [],
+    task_directory: null
   })
   let loginData: LoginData = $state({
     isLogged: false
@@ -100,7 +102,7 @@
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
 
-    const options = {
+    const options: Intl.DateTimeFormatOptions = {
         timeZone: "Europe/Helsinki",
         day: "2-digit",
         month: "2-digit",
@@ -153,24 +155,35 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
-      {#if timData.max_points == undefined}
-      <p>This task does not reward points.</p>
+      {#if timData.max_points == undefined && taskPoints.current_points == 0}
+      <p>Points data was not found for this task. Check TIM for more information. </p>
+      {:else if timData.max_points}
+        <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
+        <LoaderButton
+          class="loader-button-blue"
+          text="Update points"
+          textWhileLoading="Updating"
+          loading={pointsUpdating}
+          onClick={updateTaskPoints}
+          title="Click to fetch the latest points from TIM"
+        />
       {:else}
-      <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
-      <LoaderButton
-        class="loader-button-blue"
-        text="Update points"
-        textWhileLoading="Updating"
-        loading={pointsUpdating}
-        onClick={updateTaskPoints}
-        title="Click to fetch the latest points from TIM"
-      />
+        <PointsDisplay {taskPoints} taskMaxPoints={null} />
+        <LoaderButton
+          class="loader-button-blue"
+          text="Update points"
+          textWhileLoading="Updating"
+          loading={pointsUpdating}
+          onClick={updateTaskPoints}
+          title="Click to fetch the latest points from TIM"
+        />
       {/if}
     </div>
 
     <div>
       {#if timData.answer_limit !== null}
-      <p>For this task, you can only get points from the first {timData.answer_limit} submissions.</p>
+      <p>This task has an <strong>answer limit</strong> of {timData.answer_limit} {timData.answer_limit > 1 ? 'submissions' : 'submission'}. Any submissions made after the limit will be saved
+        in TIM, but won't be considered for points or grading.</p>
       {/if}
       {#if timData.deadline !== null}
       <p>The deadline for this task is {formatDate(timData.deadline)}.</p>

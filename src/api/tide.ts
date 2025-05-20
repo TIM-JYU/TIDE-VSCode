@@ -50,6 +50,7 @@ export default class Tide {
 
   /**
    * Executes tide logout command.
+   * @returns Login data as JSON
    */
   public static async logout(): Promise<LoginData> {
     try {
@@ -130,7 +131,15 @@ export default class Tide {
    * Downloads task set from TIM; creates files for each task
    * @param {string} taskSetPath - path to task set. Path can be found by executing cli courses command
    */
-  public static async downloadTaskSet(courseName:string, taskSetPath: string) {
+
+  /**
+   * Downloads task set from TIM; TIDE-CLI creates files for each task
+   * @param courseName Name of the course to be downloaded
+   * @param courseDir Course directory set in TIM. If set as null in TIM, this should be called with an empty string ('')
+   * @param taskSetPath Course path in TIM
+   * @returns a Promise
+   */
+  public static async downloadTaskSet(courseName: string, courseDir: string, taskSetPath: string) {
     try {
       const downloadPathBase: string | undefined = vscode.workspace
         .getConfiguration()
@@ -139,20 +148,24 @@ export default class Tide {
         UiController.showError('Download path not set!')
         return
       }
-
-      const taskName = path.basename(taskSetPath)
+      
+      const taskSetName = path.basename(taskSetPath)
       const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
-      const localTaskPath = path.join(path.normalize(downloadPathBase), courseName, taskName)
-      await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath], (data: string) => {
-          ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, localTaskPath)
-        // TODO: --json flag is not yet implemented in cli tool 
-        // const taskCreationFeedback: TaskCreationFeedback = JSON.parse(data)
-        // if (taskCreationFeedback.success) {
-        //   ExtensionStateManager.setTaskSetDownloadPath(taskSetPath, downloadPath)
-        // } else {
-        //   // TODO: more specific errors from cli
-        //   UiController.showError('Error downloading tasks.')
-        // }
+      let localTaskPath = ''
+      if (courseDir.length > 0) {
+        localTaskPath = path.join(localCoursePath, courseDir)
+      } else {
+        localTaskPath = path.join(localCoursePath, taskSetName)
+      }
+      await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath, '-j'], (data: string) => {
+        Logger.debug(data)
+        let cleanData = data.trimStart()
+        if (cleanData.startsWith('Task metadata updated')) {
+          Logger.info('Task metadata has been updated.')
+          cleanData = cleanData.substring(cleanData.indexOf('['))
+        }
+        const tasks = JSON.parse(cleanData)
+        ExtensionStateManager.setTaskSetPaths(localTaskPath, taskSetPath, tasks)
       })
     }
     catch (error) {
@@ -164,11 +177,11 @@ export default class Tide {
   /**
    * Overwrites a local task set
    *
-   * @param {string} taskSetPath - path of the task set
+   * @param {string} taskSetPath - TIM path of the task set
    */
   public static async overwriteSetTasks(taskSetPath: string) {
     try {
-      this.runAndHandle(['task', 'create', '-a', '-f', taskSetPath], (data: string) => {
+      await this.runAndHandle(['task', 'create', '-a', '-f', taskSetPath], (data: string) => {
         Logger.debug(data)
       })
     }
@@ -180,18 +193,19 @@ export default class Tide {
 
   /**
    * Overwrites one exercise. Used in task restore commad
-   * @param taskSetPath - tide task set for the exercise that is going to be overwritten
+   * @param taskSetPath - TIM path for the exercise that is going to be overwritten
    * @param ideTaskId - id/directory for the task that is going to be overwritten
-   * @param fileLocation - path to the directory where user has loaded the task set
+   * @param fileLocation - Local path to the .timdata file which is going to be overwritten
    */
   public static async overwriteTask(taskSetPath: string, ideTaskId: string, fileLocation: string) {
     try {
-      this.runAndHandle(
+      await this.runAndHandle(
         ['task', 'create', taskSetPath, ideTaskId, '-f', '-d', fileLocation],
         (data: string) => {
           Logger.debug(data)
         },
       )
+      Logger.info('Current task now matches to the latest submission in TIM.')
     }
     catch (error) {
       Logger.error('Error while overwriting task: ' + error)
@@ -201,13 +215,15 @@ export default class Tide {
 
   /**
    * Resets the noneditable parts of a task file to their original state.
-   * @param filePath - path of the file to reset
+   * @param filePath - Local path to the file which is going to be reset
    */
   public static async resetTask(filePath: string) {
+    Logger.info('Resetting current task...')
     try {
       vscode.commands.executeCommand('workbench.action.files.save')
-      this.runAndHandle(['task', 'reset', filePath], (data: string) => {
+      await this.runAndHandle(['task', 'reset', filePath], (data: string) => {
         Logger.debug(data)
+        Logger.info('Current task has been reset.')
       })
     }
     catch (error) {
@@ -219,32 +235,20 @@ export default class Tide {
   /**
    * Return a task to TIM
    *
-   * @param {string} taskPath - path of the task
+   * @param {string} taskPath - path to the task file to be submitted
    */
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
-      this.runAndHandle(['submit', taskPath], (data: string) => {
+      Logger.info('The current task is being submitted to TIM. Please wait for the TIM response.')
+      await this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
-        const downloadPath = Formatting.normalizePath(path.dirname(path.dirname(taskPath)))
-        const course: Course =  ExtensionStateManager.getCourseByDownloadPath(downloadPath)
-        const taskset = course.taskSets.find(taskSet => taskSet.downloadPath === downloadPath)
-        const currentDir = path.dirname(taskPath)
-        // Find the names of the tasks ide_task_id and the task set from the files path
-        let itemPath = currentDir
-        // console.log(path)
-        let pathSplit = itemPath.split(path.sep)
-        // ide_task_id
-        let id = pathSplit.at(-1)
-        // task set name
-        let demo = pathSplit.at(-2)
-        if (demo && id && taskset) {
-          const timData : TimData | undefined = ExtensionStateManager.getTaskTimData(taskset.path, demo, id)
+        callback()
+        const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
           if (timData) {
-            this.getTaskPoints(timData.path, timData.ide_task_id, callback);
+            this.getTaskPoints(timData.path, timData.ide_task_id, callback)
           } else {
-            vscode.window.showErrorMessage('TimData is undefined or invalid.');
+            vscode.window.showErrorMessage('TimData is undefined or invalid.')
           }
-        }
       })
     }catch (error) {
       Logger.error('Error while submitting task: ' + error)
@@ -252,13 +256,18 @@ export default class Tide {
     }
   }
 
+  /**
+   * Fetch current points for a task from TIM
+   * @param taskSetPath TIM path of the taskSet
+   * @param ideTaskId ide_task_id of the task that the points are fetched for
+   * @param callback unused at the moment. TODO: Remove?
+   */
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
     try {
       vscode.commands.executeCommand('tide.setPointsUpdating')
       await this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
         Logger.debug(data)
         const points: TaskPoints = JSON.parse(data)
-        // TODO: should this be called elsewhere instead?
         ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
         vscode.commands.executeCommand('tide.refreshTree')
       })
@@ -295,7 +304,7 @@ export default class Tide {
    * Executes the process defined in the extension's settings.
    *
    * @param args - arguments to be passed to the executable
-   * @returns the stdout of the executed process
+   * @returns the stdout of the executed process as a Promise
    */
   private static async spawnTideProcess(...args: Array<string>): Promise<string> {
     Logger.debug(`Running cli with args "${args}"`)
@@ -305,14 +314,14 @@ export default class Tide {
     // Use a copy of process.env to pass custom url to the child process 
     const env_modified = {...process.env}
     
-    let customUrl = vscode.workspace.getConfiguration().get("TIM-IDE.customUrl") as string
-    if (customUrl && customUrl.trim() !== "") {
+    let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl') as string
+    if (customUrl && customUrl.trim() !== '') {
       // Ensure that the custom url ends with a slash
-      const formattedUrl = customUrl.trim().endsWith("/") ? customUrl.trim() : customUrl.trim() + "/"
-      env_modified.URL = formattedUrl
+      const formattedUrl = customUrl.trim().endsWith('/') ? customUrl.trim() : customUrl.trim() + '/'
+      env_modified.TIM_URL = formattedUrl
     }
     else {
-      env_modified.URL = "https://tim.jyu.fi/"
+      env_modified.TIM_URL = 'https://tim.jyu.fi/'
     }
 
     // To run an uncompiled version of the CLI tool:
@@ -324,7 +333,7 @@ export default class Tide {
     const childProcess = cp.spawn(
       vscode.workspace.getConfiguration().get('TIM-IDE.cliPath') as string,
       args,
-      {"env" : env_modified}
+      {'env' : env_modified}
     )
 
     childProcess.stdout.on('data', (data) => {
