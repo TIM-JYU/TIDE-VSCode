@@ -199,6 +199,7 @@ This component manages the display of task information and interaction with task
   .task-panel h3 {
     margin: 0;
     font-weight: bold;
+    color:#bcbcbcbc;
   }
 
   .task-panel p {
@@ -215,7 +216,7 @@ This component manages the display of task information and interaction with task
     margin-top: 10px;
     margin-bottom: 10px;
     border: none;
-    border-top: 1px inset #ccc;
+    border-top: 1px inset #bcbcbcbc;
     width: 100%;
   }
 
