@@ -70,7 +70,7 @@ Enables downloading task set.
         <LoaderButton 
           class="loader-button-grey" 
           loading={downloadingTasks} 
-          text="Download taskset" 
+          text="Download task set" 
           textWhileLoading="Downloading..." 
           onClick={downloadTaskSet} 
           title="Download {taskset.name} tasks"
@@ -79,7 +79,7 @@ Enables downloading task set.
         <LoaderButton 
           class="reload-button" 
           loading={downloadingTasks} 
-          text="Reload taskset" 
+          text="{String.fromCharCode(0x2705)} Reload task set" 
           textWhileLoading="Downloading..." 
           onClick={downloadTaskSet} 
           title="Reload {taskset.name} tasks"
