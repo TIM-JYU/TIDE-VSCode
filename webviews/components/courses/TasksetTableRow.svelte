@@ -66,14 +66,25 @@ Enables downloading task set.
   {#if taskset.tasks.length}
     <td>{taskset.tasks.length}</td>
     <td>
-      <LoaderButton 
-        class="loader-button-grey" 
-        loading={downloadingTasks} 
-        text="Download task set" 
-        textWhileLoading="Downloading..." 
-        onClick={downloadTaskSet} 
-        title="Download {taskset.name} tasks"
-      />
+      {#if taskset.downloadPath === undefined}
+        <LoaderButton 
+          class="loader-button-grey" 
+          loading={downloadingTasks} 
+          text="Download taskset" 
+          textWhileLoading="Downloading..." 
+          onClick={downloadTaskSet} 
+          title="Download {taskset.name} tasks"
+        />
+      {:else}
+        <LoaderButton 
+          class="reload-button" 
+          loading={downloadingTasks} 
+          text="Reload taskset" 
+          textWhileLoading="Downloading..." 
+          onClick={downloadTaskSet} 
+          title="Reload {taskset.name} tasks"
+        />
+      {/if}
     </td>
   {:else}
     <td colspan="2">Unavailable</td>
