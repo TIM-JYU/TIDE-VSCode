@@ -55,11 +55,11 @@
      id="defs1">
     <marker
        style="overflow:visible"
-       id="Triangle"
+       id="RoundedArrow"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
-       inkscape:stockid="Triangle arrow"
+       inkscape:stockid="Rounded arrow"
        markerWidth="1"
        markerHeight="1"
        viewBox="0 0 1 1"
@@ -67,10 +67,10 @@
        inkscape:collect="always"
        preserveAspectRatio="xMidYMid">
       <path
-         transform="scale(0.5)"
-         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-         d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135" />
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path8" />
     </marker>
     <linearGradient
        id="swatch2"
@@ -87,7 +87,7 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Californian FB';-inkscape-font-specification:'Californian FB';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#eb541c;fill-opacity:1;stroke:#eb541c;stroke-width:0.264999;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Californian FB';-inkscape-font-specification:'Californian FB';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:none;fill:#eb541c;fill-opacity:1;stroke:#eb541c;stroke-width:0.264999;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
        x="0.13011816"
        y="-2.1166666"
        id="text3"><tspan
@@ -106,17 +106,23 @@
        rx="3.6891994"
        ry="3.688159" />
     <path
-       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:0.65616666;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle);paint-order:normal"
+       style="fill:#363636;fill-opacity:0;stroke:#eb541c;stroke-width:1.00594583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path67"
        sodipodi:type="arc"
-       sodipodi:cx="4.3058844"
-       sodipodi:cy="3.8398151"
-       sodipodi:rx="2.2291515"
-       sodipodi:ry="2.2291515"
+       sodipodi:cx="4.2285953"
+       sodipodi:cy="4.2456408"
+       sodipodi:rx="2.5539851"
+       sodipodi:ry="2.6069419"
        sodipodi:start="2.6168991"
        sodipodi:end="1.4158603"
        sodipodi:arc-type="arc"
-       d="M 2.3766039,4.9565037 A 2.2291515,2.2291515 0 0 1 2.6685368,2.3271323 2.2291515,2.2291515 0 0 1 5.2666138,1.8283194 2.2291515,2.2291515 0 0 1 6.5115386,4.1626246 2.2291515,2.2291515 0 0 1 4.6498801,6.0422645"
+       d="M 2.0181786,5.5515826 A 2.5539851,2.6069419 0 0 1 2.3526522,2.4765926 2.5539851,2.6069419 0 0 1 5.3293229,1.8932422 2.5539851,2.6069419 0 0 1 6.755659,4.6231591 2.5539851,2.6069419 0 0 1 4.6227183,6.8213552"
        sodipodi:open="true" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#eb541c;stroke-width:0.502708;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#RoundedArrow)"
+       d="m 4.7166432,6.6223582 0.1150027,0.00269"
+       id="path1"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

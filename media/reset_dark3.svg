@@ -87,7 +87,7 @@
        ry="3.6979525" />
     <path
        sodipodi:type="star"
-       style="fill:#eb541c;fill-opacity:1;stroke:#eb541c;stroke-width:0.83407144;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#eb541c;fill-opacity:1;stroke:#eb541c;stroke-width:1.44619;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="path81"
        inkscape:flatsided="true"
        sodipodi:sides="3"
@@ -100,11 +100,11 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="m 2.1166666,3.7041663 2.3812498,-1.3748151 -1e-7,2.7496305 z"
-       inkscape:transform-center-x="0.52594476"
-       transform="matrix(1.1670488,0,0,1.1670488,0.84745067,-0.22501849)" />
+       inkscape:transform-center-x="0.51254931"
+       transform="matrix(1.1373245,0,0,1.1210192,0.85784365,0.10839106)" />
     <path
-       style="fill:#000000;fill-opacity:1;stroke:#eb541c;stroke-width:0.884436;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-       d="M 2.3537997,2.1008686 V 6.1464251"
+       style="fill:#000000;fill-opacity:1;stroke:#eb541c;stroke-width:1.00118;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 2.1222985,1.6259349 V 6.8099894"
        id="path82" />
   </g>
 </svg>
