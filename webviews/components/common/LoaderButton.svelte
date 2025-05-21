@@ -61,10 +61,26 @@
     cursor: pointer;
     transition: background 0.3s;
     border-radius: 3px;
+    min-width: 10em;
   }
 
   .loader-button-grey:hover, .loader-button-grey.loading {
     background-color:rgb(44, 44, 44);
+  }
+
+  .reload-button {
+    background-color:rgb(54, 54, 54); 
+    color: rgb(230, 230, 230);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+    min-width: 10em;
+  }
+
+  .reload-button:hover, .reload-button.loading {
+    background-color: rgb(44, 44, 44);
   }
 
 
