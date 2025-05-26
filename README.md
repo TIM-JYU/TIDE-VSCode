@@ -7,6 +7,11 @@ TIM-ohjelmointitehtäviä suoraan Visual Studio Code -kehitysympäristössä.
 This extension allows you to upload and submit TIM programming tasks directly
 in the Visual Studio Code. [User guide in English](https://tim.jyu.fi/view/kurssit/tie/proj/2024/tide/dokumentit/kayttoohjeet/tim-vscode-lisaosan-kayttoohjeet/en-US).
 
+## Installation
+
+1. Download latest version of the plugin from the 'Releases' section
+2. Navigate to the download folder and run `code --install-extension tim-ide-X.X.X.vsix`. Replace X.X.X with the version number downloaded. For instance, if you downloaded version v1.0.0, run `code --install-extension tim-ide-1.0.0.vsix`
+
 ## Development
 
 ### Quick start guide
@@ -39,9 +44,6 @@ See the [helpful links](#helpful-links) section for tool documentation and exten
 The extension uses Svelte as its UI framework. The documentation for the
 framework can be found [here](https://svelte.dev/docs/svelte).
 
-The codebase uses Svelte 4, and not the latest version 5, i.e. runes syntax
-introduced in the latter one can not be used.
-
 #### Creating a new webview
 
 To create a new Svelte component run (while in the project root directory)
@@ -59,19 +61,6 @@ project directory. This launches a watcher that will, as long as it runs,
 automatically compile any components affected by changes made to the source
 files. Compiled Svelte-components are saved to `./out/compiled` from where they
 can be used inside panels.
-
-In its current state, the `svelte-watch` and `svelte-compile` run configurations cause warnings when
-ran, but they do not affect the compiling process. The warnings in question are
-about importing svelte components, e.g.
-
-```
-bundles webviews/pages/TaskPanel.ts → out/compiled/TaskPanel.js...
-(!) [plugin typescript] webviews/pages/TaskPanel.ts (1:17): @rollup/plugin-typescript TS2307: Cannot find module '../components/taskPanel/TaskPanel.svelte' or its corresponding type declarations.
-/home/hannes/work/koodi/TIDE-VSCode/webviews/pages/TaskPanel.ts:1:17
-
-1 import App from '../components/taskPanel/TaskPanel.svelte'
-```
-
 
 ### Helpful links
 
