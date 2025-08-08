@@ -1,8 +1,12 @@
 <script lang="ts">
-  import type { TaskPoints } from '../../common/types'
+  import type { TaskPoints } from '../../../src/common/types'
 
-  export let taskPoints: TaskPoints
-  export let maxPoints: number | null
+  interface Props {
+    taskPoints: TaskPoints;
+    taskMaxPoints: number | null;
+  }
+
+  let { taskPoints, taskMaxPoints }: Props = $props();
 </script>
 
 <!--
@@ -10,18 +14,25 @@
 A component for showing task points data.
 -->
 <div>
-  Task points
-  {#if taskPoints.current_points !== undefined && maxPoints !== null}
+  {#if taskPoints && taskPoints.current_points !== null && taskMaxPoints !== null}
     <div id="points">
-      {taskPoints.current_points} / {maxPoints}
+      <span>Task points</span>
+      <span>{taskPoints.current_points} / {taskMaxPoints}</span>
     </div>
-    <progress value={taskPoints.current_points} max={maxPoints} />
+    <progress value={taskPoints.current_points} max={taskMaxPoints} aria-label="Task progress"></progress>
+  {:else if taskPoints && taskPoints.current_points !== null}
+    <div id="points">
+      <span>Task points</span>
+      <span>{taskPoints.current_points}</span>
+    </div>
   {/if}
+
 </div>
 
 <style>
   #points {
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
     width: 100%;
   }
   progress {

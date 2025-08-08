@@ -5,15 +5,26 @@
    * @license MIT
    * @date 30.4.2024
    */
-  import { type Course, type CourseStatus } from '../../common/types'
+  import { type Course, type CourseStatus } from '../../../src/common/types'
   import CourseListItem from './CourseListItem.svelte'
 
-  export let statusOfCourses: CourseStatus
-  export let courses: Array<Course>
-  export let defaultExpandedState: boolean
-  export let isLoggedIn: boolean
+  interface Props {
+    statusOfCourses: CourseStatus;
+    courses: Array<Course>;
+    defaultExpandedState: boolean;
+    isLoggedIn: boolean;
+    customUrl: string;
+  }
 
-  let isExpanded = defaultExpandedState
+  let {
+    statusOfCourses,
+    courses,
+    defaultExpandedState,
+    isLoggedIn,
+    customUrl
+  }: Props = $props();
+
+  let isExpanded = $state(defaultExpandedState)
 
   function toggleExpandedState() {
     isExpanded = !isExpanded
@@ -27,16 +38,22 @@ expand or collapse course details, and perform actions like downloading task set
 or opening workspaces.
 -->
 
-<button class="button-header" on:click={toggleExpandedState}>
+<button class="button-header" onclick={toggleExpandedState} title={isExpanded ? `Hide ${statusOfCourses} Courses` : `Show ${statusOfCourses} Courses`}>
+  {#if statusOfCourses === 'active'}
+  <span class="button-header-span">My Courses</span>
+  {/if}
+  {#if statusOfCourses === 'hidden'}
   <span class="button-header-span">{statusOfCourses} Courses</span>
+  {/if}
   <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
 </button>
 
 {#if isExpanded}
   {#each courses as course}
-    <CourseListItem {course} {isLoggedIn} />
+    <CourseListItem {course} {isLoggedIn} {customUrl} />
   {/each}
 {/if}
+
 
 <style>
   :global(body) {
@@ -51,12 +68,12 @@ or opening workspaces.
     background: none;
     font-size: 1.4rem;
     font-weight: bold;
-    margin-top: 1.5rem;
+    margin-top: 1.8rem;
     padding: 0;
-    color: white;
+    color: rgb(197, 197, 197);
   }
 
-  .button-header-span::first-letter {
+  .button-header-span::first-letter{
     text-transform: capitalize;
   }
 
@@ -95,13 +112,5 @@ or opening workspaces.
   *::before,
   *::after {
     box-sizing: border-box;
-  }
-
-  .arrow {
-    transition: transform 0.5s ease;
-  }
-
-  .down-arrow {
-    transform: rotate(0deg);
   }
 </style>

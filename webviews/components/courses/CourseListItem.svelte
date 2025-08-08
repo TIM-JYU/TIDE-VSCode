@@ -1,13 +1,37 @@
 <script lang="ts">
-  import type { Course, CourseStatus } from '../../common/types'
+  import { onMount } from 'svelte'
+  import type { Course, CourseStatus, WebviewMessage} from '../../../src/common/types'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'
+  import LoaderButton from '../common/LoaderButton.svelte'
 
-  export let course: Course
-  export let isLoggedIn: boolean
+  interface Props {
+    course: Course;
+    isLoggedIn: boolean;
+    customUrl: String;
+  }
 
-  let isExpanded: boolean = false
+  let { course, isLoggedIn, customUrl }: Props = $props();
+  let isExpanded: boolean = $state(false)
+  let downloadingTasks: boolean = $state(false)
+  let oppositeStatus: CourseStatus = $derived(course.status === 'active' ? 'hidden' : 'active')
+
+   onMount(() => 
+  {
+    window.addEventListener('message', (event) => 
+    {
+      const message: WebviewMessage = event.data
+      switch (message.type) 
+      {
+        case 'DownloadCourseTasksComplete': 
+        {
+            downloadingTasks = false
+            break
+        }
+      }
+    })
+  })
 
   /**
    * Updates the status of a course to a new status.
@@ -30,31 +54,48 @@
     isExpanded = !isExpanded
   }
 
-  let oppositeStatus: CourseStatus
-  $: oppositeStatus = course.status === 'active' ? 'hidden' : 'active'
+  /**
+   * Initiates the download of a tasks identified by its path.
+   */
+  function downloadAllCourseTasks() {
+    downloadingTasks = true
+    tsvscode.postMessage({
+      type: 'DownloadCourseTasks',
+      value: course.path,
+    })
+  }
+  
 </script>
+
+<!--
+@component
+This component creates displays for individual courses.  
+-->
 
 <div class="course-box">
   <header>
-    <p class="courseTitle">{course.name}</p>
+    <p class="course-title">{course.name}</p>
     <Menu>
-      <span slot="toggle">&#8942;</span>
-      <MenuItem slot="menucontent">
-        <a href="#?" on:click={() => moveCourse(oppositeStatus)}>
-          Move to {oppositeStatus} courses
-        </a>
-      </MenuItem>
+      {#snippet toggle()}
+            <span class="menu-toggle">&#8942;</span>
+          {/snippet}
+      {#snippet menucontent()}
+            <MenuItem >
+          <a href="#?" onclick={() => moveCourse(oppositeStatus)}>
+            Move to {oppositeStatus} courses
+          </a>
+        </MenuItem>
+          {/snippet}
     </Menu>
   </header>
-  <div>
-    <a class="link" href={'https://tim.jyu.fi/view/' + course.path}>Open material page</a>
-  </div>
+    <a class="link" href={ customUrl + 'view/' + course.path} title="Open the course in TIM">Open material page</a>
   <button
     class="expand-collapse-button"
-    aria-expanded={course.expanded}
-    on:click={() => toggleExpanded()}
+    aria-expanded={isExpanded}
+    onclick={() => toggleExpanded()}
+    title={isExpanded ? 'Hide task sets' : 'Show task sets'}
   >
-    <span class="arrow {course.expanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
+    <span class="arrow {isExpanded ? 'up-arrow' : 'down-arrow'}">&#9660;</span>
   </button>
   {#if isExpanded}
     <div class="course-content">
@@ -62,17 +103,22 @@
         <thead>
           <tr>
             <th>Task set</th>
-            <th>Number of exercises</th>
-            <!-- <th>Points</th> -->
-            <th></th>
-            <th></th>
+            <th>Number of tasks</th>
+            <th>
+              <LoaderButton 
+                class="loader-button-blue" 
+                loading={downloadingTasks} 
+                text="Download all tasks" 
+                textWhileLoading="Downloading..." 
+                onClick={downloadAllCourseTasks}
+                title="Download all tasks for this course"
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
           {#each course.taskSets as taskset}
-            <tr>
-              <TasksetTableRow {taskset} {isLoggedIn} />
-            </tr>
+            <TasksetTableRow {taskset} {isLoggedIn} />
           {/each}
         </tbody>
       </table>
@@ -83,7 +129,7 @@
 <style>
   .course-box {
     position: relative;
-    background-color: #000000;
+    background-color:rgb(21, 21, 21);
     padding-bottom: 3.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -93,17 +139,22 @@
     min-width: 24em;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid rgb(21, 21, 21);
   }
 
-  .courseTitle {
+  .course-title {
     margin-left: 1.5rem;
     margin-top: 1.5rem;
+  }
+
+  .menu-toggle{
+    padding-right: 5px;
   }
 
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
-    color: #007acc;
+    color:rgb(0, 127, 211);
   }
 
   .link:hover {
@@ -125,7 +176,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: rgb(197, 197, 197);
     background-color: transparent;
     border: none;
     width: 36px;
@@ -161,9 +212,11 @@
     box-sizing: content-box;
   }
 
+
   table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     box-sizing: content-box;
   }
 
@@ -171,16 +224,9 @@
     border: none;
     text-align: center;
     padding: 8px;
-    background-color: black;
+    background-color: rgb(21, 21, 21); /*same as .course-box background */
     font-weight: normal;
     font-size: smaller;
   }
 
-  tbody tr:nth-child(odd) {
-    background-color: #222222;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #444444;
-  }
 </style>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy'
+
   /**
    * @author Hannes Koivusipilä
    * @author Stella Palenius
@@ -9,17 +11,16 @@
   import CourseList from './CourseList.svelte'
   import LoaderButton from '../common/LoaderButton.svelte'
   import { onMount } from 'svelte'
-  import { type Course, type LoginData, type WebviewMessage } from '../../common/types'
+  import { type Course, type LoginData, type WebviewMessage } from '../../../src/common/types'
 
-  let downloadPath: string = ''
-  let courses: Array<Course> = []
-  let loginData: LoginData
-  let isLoggedIn: boolean
-  let coursesRefreshing: boolean = false
-
-  $: if (downloadPath === null) {
-    directoryNotSet()
-  }
+  let downloadPath: string = $state('')
+  let customUrl: string = $state('')
+  let courses: Array<Course> = $state([])
+  let loginData: LoginData = $state({
+    isLogged: false,
+  })
+  let isLoggedIn: boolean = $derived(loginData?.isLogged ?? false)
+  let coursesRefreshing: boolean = $state(false)
 
   function refreshCourses() {
     coursesRefreshing = true
@@ -27,6 +28,11 @@
       type: 'RefreshCourseData',
       value: undefined,
     })
+  }
+
+  // Ensure that the URL has a trailing slash
+  function ensureTrailingSlash(url: string): string {
+    return url.endsWith('/') ? url : url + '/'
   }
 
   /**
@@ -49,6 +55,10 @@
           loginData = message.value
           break
         }
+        case 'CustomUrl': {
+          customUrl = ensureTrailingSlash(message.value)
+          break
+        }
       }
     })
   })
@@ -64,7 +74,11 @@
     })
   }
 
-  $: isLoggedIn = loginData?.isLogged ?? false
+  run(() => {
+    if (downloadPath === null) {
+      directoryNotSet()
+    }
+  })
 </script>
 
 <!--
@@ -73,21 +87,23 @@ This component manages the display and interaction with a list of courses. It li
 updates the courses' status, and handles downloading task sets and opening workspaces.
 -->
 
-<h1>My Courses</h1>
-
 {#if isLoggedIn}
   <div>
-    <LoaderButton
-      text="Refresh"
-      textWhileLoading="Refreshing"
-      loading={coursesRefreshing}
-      onClick={refreshCourses}
-    />
+    <div class="refresh-button">
+        <LoaderButton
+        class="loader-button-blue"
+        text="Refresh"
+        textWhileLoading="Refreshing"
+        loading={coursesRefreshing}
+        onClick={refreshCourses}
+        title="Refresh the list of courses from TIM"
+        />
+    </div>
   </div>
 
   {#if downloadPath === null}
     <button
-      on:click={() => {
+      onclick={() => {
         tsvscode.postMessage({
           type: 'SetDownloadPath',
           value: undefined,
@@ -99,11 +115,13 @@ updates the courses' status, and handles downloading task sets and opening works
   {#if courses.length === 0}
     <p>No IDE courses were found.</p>
     <p>Add a course to "My courses" bookmark folder in TIM to begin.</p>
+    <p>Click 'Refresh' button to load course list. </p>
   {:else}
     <CourseList
       defaultExpandedState={true}
       statusOfCourses={'active'}
       courses={courses.filter((c) => c.status === 'active')}
+      {customUrl}
       {isLoggedIn}
     />
 
@@ -111,6 +129,7 @@ updates the courses' status, and handles downloading task sets and opening works
       defaultExpandedState={false}
       statusOfCourses={'hidden'}
       courses={courses.filter((c) => c.status === 'hidden')}
+      {customUrl}
       {isLoggedIn}
     />
   {/if}
@@ -120,11 +139,13 @@ updates the courses' status, and handles downloading task sets and opening works
 
 <style>
   :global(body) {
+    margin-top: 1.5rem;
     margin-bottom: 2.5rem;
   }
 
-  h1 {
-    margin-bottom: 2rem;
-    font-size: 2rem;
+  .refresh-button {
+    position: absolute;
+    top: 1.8rem;
+    right: 16%;
   }
 </style>

@@ -10,9 +10,9 @@
 			"name": "Stella Palenius"
 		}
 	],
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"engines": {
-		"vscode": "^1.86.0"
+		"vscode": "^1.99.0"
 	},
 	"categories": [
 		"Other"
@@ -22,11 +22,54 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"icons": {
+			"tim-font-icon": {
+				"description": "TIM logo",
+				"default": {
+					"fontPath": "media/tim-font-icon.woff",
+					"fontCharacter": "\\E900"
+				}
+			}
+		},
 		"menus": {
 			"editor/title": [
 				{
-					"command": "tide.showTaskPanel",
-					"group": "navigation"
+					"command": "tide.resetExercise",
+					"when": "editorFocus && tide.exerciseActive",
+					"group": "navigation@3"
+				},
+				{
+					"command": "tide.synchronizeSubmission",
+					"when": "editorFocus && tide.exerciseActive",
+					"group": "navigation@2"
+				},
+				{
+					"command": "tide.submitTask",
+					"when": "editorFocus && tide.exerciseActive",
+					"group": "navigation@1"
+				},
+				{
+					"command": "tide.timIcon",
+					"group": "navigation@0"
+				}
+			],
+			"view/title": [
+				{
+					"command": "tide.refreshTree",
+					"when": "view == tide-tasks-treeview",
+					"group": "navigation@0"
+				},
+				{
+					"command": "tide.treeviewShowCourses",
+					"when": "view == tide-tasks-treeview",
+					"group": "navigation@0"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "tide.treeviewMenuOpenTasks",
+					"when": "view == tide-tasks-treeview && viewItem == folder",
+					"group": "tide@0"
 				}
 			]
 		},
@@ -79,12 +122,6 @@
 				"category": "TIM-IDE"
 			},
 			{
-				"command": "tide.showTaskPanel",
-				"title": "Show Task Panel",
-				"category": "TIM-IDE",
-				"icon": "$(mortar-board)"
-			},
-			{
 				"command": "tide.debug",
 				"title": "Magic Button"
 			},
@@ -95,14 +132,64 @@
 			},
 			{
 				"command": "tide.submitTask",
-				"title": "Submit exercise to TIM",
-				"category": "TIM-IDE"
+				"title": "Submit task to TIM",
+				"category": "TIM-IDE",
+				"description": "Submit exercise from the active editor to TIM",
+				"icon": "media/submit-arrow_dark4.svg"
 			},
-            {
+			{
 				"command": "tide.clearLocalExtensionData",
 				"title": "Clear local extension data",
 				"category": "TIM-IDE"
-            }
+			},
+			{
+				"command": "tide.itemClicked",
+				"title": "Open item"
+			},
+			{
+				"command": "tide.refreshTree",
+				"title": "Refresh treeview",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "tide.treeviewShowCourses",
+				"title": "Show Courses",
+				"icon": "$(tasklist)"
+			},
+			{
+				"command": "tide.treeviewMenuOpenTasks",
+				"title": "Open all tasks in this directory"
+			},
+			{
+				"command": "tide.wipeTreeAndEditors",
+				"title": "Empty course task treeview and close files"
+			},
+			{
+				"command": "tide.showOutput",
+				"title": "Opens TIDE Logs into Output panel.",
+				"category": "TIM-IDE"
+			},
+			{
+				"command": "tide.resetExercise",
+				"title": "Reset the current task to its initial state",
+				"category": "TIM-IDE",
+				"description": "Resets exercise of active editor to initial state",
+				"icon": "media/reset_dark3.svg"
+			},
+			{
+				"command": "tide.synchronizeSubmission",
+				"title": "Synchronize task to the last submission in TIM",
+				"category": "TIM-IDE",
+				"description": "Synchronize active editor with last submission of task in TIM",
+				"icon": "media/restore-arrow_dark2.svg"
+			},
+			{
+				"command": "tide.timIcon",
+				"title": "Show all TIM-IDE related commands",
+				"category": "TIM-IDE",
+				"description": "Open selection for the TIM-IDE extension commands",
+				"icon": "media/tim-logo.svg"
+			}
 		],
 		"viewsContainers": {
 			"activitybar": [
@@ -118,12 +205,27 @@
 				{
 					"type": "webview",
 					"id": "tide-sidebar",
-					"name": "Menu",
+					"name": "TIM-IDE: Menu",
 					"icon": "./media/timlogovscode.png",
 					"contextualTitle": "TIM-IDE"
+				},
+				{
+					"type": "webview",
+					"id": "tide-taskpanel",
+					"name": "TIM-IDE: Taskpanel"
+				},
+				{
+					"id": "tide-tasks-treeview",
+					"name": "TIM-IDE: Course Explorer"
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "tide-tasks-treeview",
+				"contents": "Active courses will show here!"
+			}
+		],
 		"configuration": {
 			"title": "TIM-IDE",
 			"properties": {
@@ -134,6 +236,11 @@
 				"TIM-IDE.cliPath": {
 					"type": "string",
 					"description": "Path to CLI tool"
+				},
+				"TIM-IDE.customUrl": {
+					"type": "string",
+					"default": "",
+					"description": "Custom URL for the tide CLI. Leave empty for the default https://tim.jyu.fi"
 				}
 			}
 		}
@@ -146,32 +253,36 @@
 		"svelte-compile": "rollup -c --bundleConfigAsCjs",
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "vscode-test"
+		"test": "vscode-test",
+		"test:svelte": "npm run svelte-compile && vitest --config vitest.config.mjs --environment jsdom --run"
 	},
 	"devDependencies": {
-		"@rollup/plugin-commonjs": "^25.0.7",
-		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-commonjs": "^28.0.3",
+		"@rollup/plugin-node-resolve": "^16.0.1",
 		"@rollup/plugin-terser": "^0.4.4",
-		"@rollup/plugin-typescript": "^11.1.6",
-		"@tsconfig/svelte": "^5.0.2",
-		"@types/mocha": "^10.0.6",
-		"@types/node": "18.x",
-		"@types/vscode": "^1.86.0",
-		"@typescript-eslint/eslint-plugin": "^7.0.2",
-		"@typescript-eslint/parser": "^7.0.2",
-		"@vscode/test-cli": "^0.0.6",
-		"@vscode/test-electron": "^2.3.9",
-		"eslint": "^8.56.0",
-		"prettier": "^3.3.2",
-		"prettier-plugin-svelte": "^3.2.4",
-		"rollup": "^4.12.1",
-		"rollup-plugin-svelte": "^7.2.0",
-		"svelte": "^4.2.12",
-		"svelte-check": "^3.6.6",
-		"svelte-preprocess": "^5.1.3",
-		"typescript": "^5.4.2"
-	},
-	"dependencies": {
-		"rollup-plugin-css-only": "^4.5.2"
+		"@rollup/plugin-typescript": "^12.1.2",
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/svelte": "^5.2.0-next.3",
+		"@tsconfig/svelte": "^5.0.4",
+		"@types/mocha": "^10.0.10",
+		"@types/node": "^22.15.3",
+		"@types/sinon": "^17.0.4",
+		"@types/vscode": "^1.99.1",
+		"@typescript-eslint/eslint-plugin": "^8.31.1",
+		"@typescript-eslint/parser": "^8.31.1",
+		"@vscode/test-cli": "^0.0.10",
+		"@vscode/test-electron": "^2.5.2",
+		"eslint": "^9.25.1",
+		"jsdom": "^26.1.0",
+		"rollup": "^4.40.1",
+		"rollup-plugin-postcss": "^4.0.2",
+		"rollup-plugin-svelte": "^7.2.2",
+		"sinon": "^20.0.0",
+		"svelte": "^5.28.2",
+		"svelte-preprocess": "^6.0.3",
+		"tslib": "^2.8.1",
+		"typescript": "^5.8.3",
+		"vitest": "^3.1.3"
 	}
 }

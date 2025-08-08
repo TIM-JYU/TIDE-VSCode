@@ -1,25 +1,89 @@
 <script lang="ts">
-  // TODO: this component needs styling
-  import Spinner from "./Spinner.svelte"
+  import Spinner from "./Spinner.svelte";
 
-  export let onClick: () => void
-  export let loading: boolean
-  export let text: string
-  export let textWhileLoading
+  interface Props {
+    onClick: () => void;
+    loading: boolean;
+    text: string;
+    title?: string;
+    textWhileLoading: any;
+    class?: string; // Accept class as a prop
+  }
+
+  let {
+    onClick,
+    loading,
+    text,
+    textWhileLoading,
+    class: className = "",
+    title = ""
+  }: Props = $props();
 </script>
 
-<!--
-@component
-A button that can be toggled to show a spinner and optionally an alternative 
-text.
--->
-
-<button on:click={onClick}>
+<button class="loader-button {className}" onclick={onClick} title={title}>
   {#if loading}
-  {textWhileLoading ?? text}
-  <Spinner/>
+    {textWhileLoading ?? text}
+    <Spinner/>
   {:else}
-  {text}
+    {text}
   {/if}
 </button>
+
+<style>
+
+  .loader-button-plain{
+    background-color: transparent;
+    text-align: left;
+    color: rgb(197, 197, 197);
+    border: none;
+    transition: background 0.3s;
+  }
+
+  .loader-button-blue {
+    background-color:rgb(0, 113, 189);
+    color: rgb(230, 230, 230);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+  }
+
+  .loader-button-blue:hover, .loader-button-blue.loading {
+    background-color: #005F9E;
+  }
+
+  .loader-button-grey {
+    background-color:rgb(54, 54, 54); 
+    color: rgb(230, 230, 230);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+    min-width: 10em;
+  }
+
+  .loader-button-grey:hover, .loader-button-grey.loading {
+    background-color:rgb(44, 44, 44);
+  }
+
+  .reload-button {
+    background-color:rgb(54, 54, 54); 
+    color: rgb(230, 230, 230);
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-radius: 3px;
+    min-width: 10em;
+  }
+
+  .reload-button:hover, .reload-button.loading {
+    background-color: rgb(44, 44, 44);
+  }
+
+
+</style>
+
 

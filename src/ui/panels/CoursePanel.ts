@@ -7,18 +7,22 @@
  * @date 22.3.2024
  */
 import * as vscode from 'vscode'
-import ExtensionStateManager from '../../api/ExtensionStateManager'
+import * as fs from 'fs'
+import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
+import Logger from '../../utilities/logger'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
 import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
 import UiController from '../UiController'
+import path from 'path'
+
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
 
   private static readonly fileNamePrefix = 'courses'
   private static readonly viewType = 'Courses'
-  private static readonly panelTitle = 'My Courses'
+  private static readonly panelTitle = 'TIM-IDE: My Courses'
   private static preferredColumn = vscode.ViewColumn.One
 
   private readonly panel: vscode.WebviewPanel
@@ -76,6 +80,24 @@ export default class CoursePanel {
     this.panel.webview.postMessage(msg)
   }
 
+  /**
+   * Sends user defined url for the tim instance address from the settings.
+   * Use default address "https://tim.jyu.fi/", if customUrl is empty
+   * The intended recepient is Courses.svelte.
+   * @param customUrl 
+   */
+  private sendCustomUrl() {
+    let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl')
+    if (!customUrl) {
+      customUrl = 'https://tim.jyu.fi/'
+    }
+    const msg: WebviewMessage = {
+      type: 'CustomUrl',
+      value: customUrl,
+    }
+    this.panel.webview.postMessage(msg)
+  }
+
   public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     CoursePanel.currentPanel = new CoursePanel(panel, extensionUri)
 
@@ -88,8 +110,8 @@ export default class CoursePanel {
 
     // subscribe to changes in login data
     this.disposables.push(
-      ExtensionStateManager.subscribe('loginData', this.sendLoginData.bind(this)),
-      ExtensionStateManager.subscribe('courses', this.sendCourseData.bind(this)),
+      ExtensionStateManager.subscribe(StateKey.LoginData, this.sendLoginData.bind(this)),
+      ExtensionStateManager.subscribe(StateKey.Courses, this.sendCourseData.bind(this)),
     )
 
     // Set the webview's initial html content
@@ -123,6 +145,7 @@ export default class CoursePanel {
           break
         }
         case 'SetDownloadPath': {
+          
           let newPath: vscode.Uri[] | undefined = await vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
@@ -131,7 +154,7 @@ export default class CoursePanel {
           })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
-            const previousPath = ExtensionStateManager.getDownloadPath()
+           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '')
             if (previousPath) {
               newPath = [vscode.Uri.file(previousPath)]
             }
@@ -149,12 +172,93 @@ export default class CoursePanel {
           break
         }
         case 'DownloadTaskSet': {
-          const taskSetPath = msg.value
-          Tide.downloadTaskSet(taskSetPath)
+          try {
+            const taskSetPath = msg.value
+            const course: Course =  ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
+
+            // taskSet = Demo
+            const taskSet = course.taskSets.find((taskSet) => {
+              let taskPath = taskSet.path
+              if (taskPath === taskSetPath) {
+                return true
+              }
+          })
+            const taskDir = taskSet?.tasks.at(0)?.task_directory ?? ''
+            // Download a new Task Set
+            await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskSetPath)
+
+            // Update TimData with the newly written data
+            ExtensionStateManager.updateTimData(taskSetPath)
+
+            // Get TimData for reading
+            const dataPromise = ExtensionStateManager.getTimData()
+
+            // Fetch Task Points for the newly downloaded tasks from TIM
+            await Promise.all(dataPromise.map(async (dataObject) => {
+              // Only fetch points for new tasks
+              if (dataObject.path == taskSetPath && dataObject.max_points) {
+                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, null)
+              } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
+                // Set the current points of pointsless tasks to 0 in order to avoid errors
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
+              }
+            }))
+
+            // Refresh TreeView with the new data
+            vscode.commands.executeCommand('tide.refreshTree')
+            this.panel.webview.postMessage({
+              type: 'DownloadTaskSetComplete',
+              value: taskSetPath,
+            })
+
+
+          } catch (error) {
+            Logger.error('Downloading a new taskset had an error: ' + error)
+          }
           break
         }
-        case 'OpenWorkspace': {
-          vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(msg.value))
+        case 'DownloadCourseTasks': {
+          try {
+            //coursePath is path to course page in TIM. Not path to course folder.
+            const coursePath = msg.value
+            const course: Course = ExtensionStateManager.getCourseByCoursePath(coursePath)
+
+            // Download all tasks and update TimData
+            for (let taskset of course.taskSets) {
+              const taskDir = taskset?.tasks.at(0)?.task_directory ?? ''
+              await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskset.path)
+              // TODO: The entire .timData file is stored on update, so this propably could be only called once after downloading everything
+              // Unfortunately there is no time to confirm this
+              ExtensionStateManager.updateTimData(taskset.path)
+            }
+
+            // Get TimData for reading
+            const dataPromise = ExtensionStateManager.getTimData()
+
+            // Fetch Task Points for the newly downloaded tasks from TIM
+            await Promise.all(dataPromise.map(async (dataObject) => {
+              // Only fetch points for new tasks
+              const baseCoursePath = path.dirname(coursePath)
+              if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points) {
+                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
+                  console.log(data)
+                })
+              } else if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points == null) {
+                // Set the current points of pointsless tasks to 0 in order to avoid errors
+                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
+              }
+            }))
+
+            // Refresh TreeView with the new data
+            vscode.commands.executeCommand('tide.treeviewShowCourses')
+            this.panel.webview.postMessage({
+              type: 'DownloadCourseTasksComplete',
+              value: coursePath,
+            })
+
+          } catch (error) {
+            console.log('Downloading a new taskset had an error: ' + error)
+          }
           break
         }
         case 'RequestLoginData': {
@@ -163,6 +267,8 @@ export default class CoursePanel {
         }
         case 'SetCourseStatus': {
           ExtensionStateManager.setCourseStatus(msg.value.id, msg.value.status)
+          // Refresh TreeView with the new data
+          vscode.commands.executeCommand('tide.treeviewShowCourses')
           break
         }
         case 'RefreshCourseData': {
@@ -203,7 +309,7 @@ export default class CoursePanel {
   private update() {
     const webview = this.panel.webview
     this.panel.webview.html = this.getHtmlForWebview(webview)
-    const path = ExtensionStateManager.getDownloadPath()
+    const path = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
     this.sendInitialPath()
     this.panel.webview.postMessage({
       type: 'SetDownloadPathResult',
@@ -213,6 +319,7 @@ export default class CoursePanel {
     this.sendLoginData(loginData)
     const courses = ExtensionStateManager.getCourses()
     this.sendCourseData(courses)
+    this.sendCustomUrl()
   }
 
   private getHtmlForWebview(webview: vscode.Webview) {

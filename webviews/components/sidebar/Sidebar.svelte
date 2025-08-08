@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   /**
    * @author Hannes Koivusipilä
    * @author Stella Palenius
@@ -7,10 +9,17 @@
    */
 
   import { onMount } from 'svelte'
-  import { type LoginData } from '../../common/types'
-  let isLoggedIn = false
-  let loginData: LoginData
+  import { type LoginData } from '../../../src/common/types'
+  import LoaderButton from '../common/LoaderButton.svelte'
 
+  let isLoggedIn = $state(false)
+  let isLoggingIn: boolean = $state(false)
+  let isLoggingOut: boolean = $state(false)
+  let loginData: LoginData = $state({
+    isLogged: false
+  })
+
+  // This might not be doing anything
   /**
    * Listens to messages from the extension.
    */
@@ -18,6 +27,8 @@
     window.addEventListener('message', (event) => {
       const message = event.data
       if (message && message.type === 'LoginData') {
+        isLoggingIn = false
+        isLoggingOut = false
         loginData = message.value
       }
     })
@@ -29,6 +40,7 @@
    * Posts message for the extension for logging user in.
    */
   function handleLogin() {
+    isLoggingIn = true
     tsvscode.postMessage({
       type: 'Login',
       value: '',
@@ -39,13 +51,16 @@
    * Posts message for extension for logging user out.
    */
   function handleLogout() {
+    isLoggingOut = true
     tsvscode.postMessage({
       type: 'Logout',
       value: '',
     })
   }
 
-  $: isLoggedIn = loginData ? loginData.isLogged : false
+  run(() => {
+    isLoggedIn = loginData ? loginData.isLogged : false
+  });
 </script>
 
 <!--
@@ -57,31 +72,50 @@ It listens for messages from the extension to handle login and logout functional
 <nav>
   <ul class="nav-list">
     {#if !isLoggedIn}
-      <li><button on:click={handleLogin}>Login</button></li>
+      <li>
+        <LoaderButton
+        class="loader-button-plain"
+        text="Login"
+        textWhileLoading="Login"
+        loading={isLoggingIn}
+        onClick={handleLogin}
+        title="Log in using TIM to access TIDE tasks"
+        />
+      </li>
     {:else}
       <li>
         <button
-          on:click={() => {
+          onclick={() => {
             tsvscode.postMessage({
               type: 'ShowCourses',
               value: '',
             })
-          }}>My Courses</button
-        >
+          }}
+            title="View and download tasks from your TIDE courses">
+          My Courses
+        </button>
       </li>
       <li>
-        <button on:click={handleLogout}>Logout</button>
+        <LoaderButton
+          class="loader-button-plain"
+          text="Logout"
+          textWhileLoading="Logout"
+          loading={isLoggingOut}
+          onClick={handleLogout}
+          title="Logout and sever access to your TIM account"
+        />
       </li>
     {/if}
     <li>
       <button
-        on:click={() => {
+        onclick={() => {
           tsvscode.postMessage({
-            type: 'OpenSettings',
-            value: '',
+        type: 'OpenSettings',
+        value: '',
           })
-        }}>Settings</button
-      >
+        }} title="Open extension settings">
+        Settings
+      </button>
     </li>
   </ul>
 </nav>
@@ -92,6 +126,7 @@ It listens for messages from the extension to handle login and logout functional
     border: none;
     cursor: pointer;
     text-align: left;
+    color: rgb(197, 197, 197);
   }
 
   .nav-list {
