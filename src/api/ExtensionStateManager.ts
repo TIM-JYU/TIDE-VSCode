@@ -320,7 +320,6 @@ export default class ExtensionStateManager {
                 Formatting.normalizeSeparator(parsedTaskDir + path.sep + taskFile.file_name),
               )
             } else {
-              const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
               const pathParts = timData.path.split('/')
               const demo = pathParts.at(-1)
               if (demo) {

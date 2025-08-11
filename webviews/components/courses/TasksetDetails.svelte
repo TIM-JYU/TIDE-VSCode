@@ -6,7 +6,7 @@
     isLoggedIn: boolean
   }
 
-  let { taskset, isLoggedIn }: Props = $props()
+  let { taskset }: Props = $props()
 
   function formatDate(dateString: string): string {
     const date = new Date(dateString)
@@ -52,14 +52,14 @@ UTC is therefore not shown.
           <tr class="details-row">
             <td>{task.ide_task_id}</td>
             <td>
-              {#if task.answer_limit != null}
+              {#if task.answer_limit !== null}
                 {task.answer_limit}
               {:else}
                 -
               {/if}
             </td>
             <td>
-              {#if task.deadline != null}
+              {#if task.deadline !== null}
                 {formatDate(task.deadline)}
               {:else}
                 -

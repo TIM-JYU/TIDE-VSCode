@@ -95,7 +95,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     let loginData = ExtensionStateManager.getLoginData()
 
     if (loginData.isLogged) {
-      if (this.treeViewMode == 'Courses') {
+      if (this.treeViewMode === 'Courses') {
         this.showCourses()
       } else {
         const treeRootItem = this.courseData.at(0)
@@ -144,7 +144,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
   private openTasksInThisDir(item: CourseTaskTreeItem) {
     let currentItem = item
     // item might be a dir or a file
-    if (currentItem.type == 'dir') {
+    if (currentItem.type === 'dir') {
       currentItem.children.forEach((child) => {
         this.openTasksInThisDir(child)
       })
@@ -220,9 +220,9 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
    * @param parent TreeItem to be given new nodes as children
    */
   private readCourseDirectory(dir: string, parent: CourseTaskTreeItem | undefined) {
-    if (dir == undefined) {
+    if (dir === undefined) {
       vscode.window.showErrorMessage('Error while reading course path!')
-    } else if (parent == undefined) {
+    } else if (parent === undefined) {
       vscode.window.showErrorMessage('Error reading course directory: Undefined parent')
     } else {
       let courseDirPath: string = dir
@@ -256,10 +256,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
   // Checks if a given path exists
   // Returns true if succeeds, false on error
-  private pathExists(p: string): boolean {
+  private pathExists(path: string): boolean {
     try {
-      fs.accessSync(p)
-    } catch (err) {
+      fs.accessSync(path)
+    } catch (_error) {
       return false
     }
     return true
@@ -293,7 +293,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
       // Try to open the document
       try {
         // When a dir is clicked do nothing
-        if (item.type == 'dir') {
+        if (item.type === 'dir') {
           return
         }
         // When a file is clicked
@@ -309,7 +309,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             editor.revealRange(new vscode.Range(pos, pos))
           })
         })
-      } catch (error) {
+      } catch (_error) {
         // Catch errors trying to open a document and refresh tree
         vscode.window.showErrorMessage('Error, document might be deleted. Refreshing...')
         this.refreshTree()
@@ -349,7 +349,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
       const fileCheck = item.isCourseDirOrFile()
 
       if (fileCheck) {
-        if (item.type == 'file') {
+        if (item.type === 'file') {
           const taskTimData = ExtensionStateManager.getTimDataByFilepath(item.path)
           if (taskTimData) {
             // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!

@@ -11,7 +11,6 @@
  * @date 2.5.2024
  */
 
-import { profile } from 'console'
 import * as vscode from 'vscode'
 
 /**

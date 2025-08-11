@@ -9,7 +9,7 @@ exports
  */
 import * as vscode from 'vscode'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
-import { LoginData, MessageType, WebviewMessage } from '../../common/types'
+import { LoginData, WebviewMessage } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import UiController from '../UiController'
 

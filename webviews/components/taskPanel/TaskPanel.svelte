@@ -157,7 +157,7 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
-      {#if timData.max_points == undefined && taskPoints.current_points == 0}
+      {#if timData.max_points === undefined && taskPoints.current_points === 0}
         <p>Points data was not found for this task. Check TIM for more information.</p>
       {:else if timData.max_points}
         <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />

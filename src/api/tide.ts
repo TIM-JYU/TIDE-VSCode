@@ -14,12 +14,10 @@ import {
   Course,
   LoginData,
   Task,
-  TaskCreationFeedback,
   TaskPoints,
   TimData,
   UserData,
 } from '../common/types'
-import Formatting from '../common/formatting'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
@@ -266,7 +264,7 @@ export default class Tide {
    * @param ideTaskId ide_task_id of the task that the points are fetched for
    * @param callback unused at the moment. TODO: Remove?
    */
-  public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
+  public static async getTaskPoints(taskSetPath: string, ideTaskId: string, _callback: any) {
     try {
       vscode.commands.executeCommand('tide.setPointsUpdating')
       await this.runAndHandle(

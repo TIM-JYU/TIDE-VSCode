@@ -7,7 +7,6 @@
  * @date 22.3.2024
  */
 import * as vscode from 'vscode'
-import * as fs from 'fs'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
 import Logger from '../../utilities/logger'
 import { getDefaultHtmlForWebview, getWebviewOptions } from '../utils'
@@ -200,9 +199,9 @@ export default class CoursePanel {
             await Promise.all(
               dataPromise.map(async (dataObject) => {
                 // Only fetch points for new tasks
-                if (dataObject.path == taskSetPath && dataObject.max_points) {
+                if (dataObject.path === taskSetPath && dataObject.max_points) {
                   await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, null)
-                } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
+                } else if (dataObject.path === taskSetPath && dataObject.max_points === null) {
                   // Set the current points of pointsless tasks to 0 in order to avoid errors
                   ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {
                     current_points: 0,
@@ -258,7 +257,7 @@ export default class CoursePanel {
                   )
                 } else if (
                   dataObject.path.includes(baseCoursePath) &&
-                  dataObject.max_points == null
+                  dataObject.max_points === null
                 ) {
                   // Set the current points of pointsless tasks to 0 in order to avoid errors
                   ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {

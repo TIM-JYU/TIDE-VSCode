@@ -1,8 +1,6 @@
 import * as vscode from 'vscode'
-import { Course, TimData } from '../common/types'
-import path from 'path'
+import { TimData } from '../common/types'
 import ExtensionStateManager from '../api/ExtensionStateManager'
-import Formatting from '../common/formatting'
 
 /**
  * Class for Status Bar item displaying answer limit related information

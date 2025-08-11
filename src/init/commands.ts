@@ -134,7 +134,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
               return
             }
             Tide.submitTask(taskPath, callback)
-          } catch (error) {
+          } catch (_error) {
             vscode.window.showErrorMessage('Error occurred during the submit: ${error}')
           }
         }

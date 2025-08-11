@@ -10,7 +10,7 @@
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
 
-export function registerEventListeners(ctx: vscode.ExtensionContext) {
+export function registerEventListeners(_ctx: vscode.ExtensionContext) {
   /**
    * Listens to changes in configuration.
    */

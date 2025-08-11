@@ -56,7 +56,7 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
               result = true
             }
           })
-          if (result == false) {
+          if (result === false) {
             itemTimData.supplementary_files.forEach((supFile) => {
               if (this.label && supFile.file_name.includes(this.label.toString())) {
                 result = true
@@ -66,13 +66,13 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
         }
         // Java tehtävä tiedostojen tunnistus!
         // C# tehtävien csproj tiedostojen tunnistus!
-        if (result == false) {
+        if (result === false) {
         }
       } catch (error) {
         Logger.debug(error)
         return result
       }
-    } else if (this.type == 'dir') {
+    } else if (this.type === 'dir') {
       // Search TimData for the directory name in ide_task_id or path
       const timData = ExtensionStateManager.getTimData()
       const labelString = this.label?.toString()
@@ -82,7 +82,7 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
       }
       timData.some((element) => {
         Logger.debug(element)
-        if (result == true) {
+        if (result === true) {
           return
         }
         if (element.ide_task_id === labelString) {
@@ -99,7 +99,7 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
           result = true
         }
       })
-      if (result == false) {
+      if (result === false) {
         const courseData = ExtensionStateManager.getCourses()
         courseData.forEach((element) => {
           if (element.name === labelString) {
@@ -108,9 +108,9 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
         })
       }
       // C# tehtävien kansioiden tunnistus?
-      if (result == false) {
+      if (result === false) {
         timData.some((data) => {
-          if (result == true) {
+          if (result === true) {
             return
           }
           if (data.supplementary_files.some((file) => file.file_name.includes(labelString))) {
@@ -137,7 +137,7 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
         maxPointsSum += child.maxPoints
       })
     } else {
-      if (this.type == 'file') {
+      if (this.type === 'file') {
         const taskTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
         if (taskTimData) {
           // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
@@ -155,7 +155,7 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
               taskTimData.ide_task_id,
             )
             const parsedPoints = savedPoints?.current_points
-            if (parsedPoints == null || parsedPoints == undefined) {
+            if (parsedPoints === null || parsedPoints === undefined) {
               currentPointsSum = 0
             } else {
               currentPointsSum = parsedPoints
