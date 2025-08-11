@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from 'svelte/legacy'
 
   /**
    * @author Hannes Koivusipilä
@@ -16,7 +16,7 @@
   let isLoggingIn: boolean = $state(false)
   let isLoggingOut: boolean = $state(false)
   let loginData: LoginData = $state({
-    isLogged: false
+    isLogged: false,
   })
 
   // This might not be doing anything
@@ -60,7 +60,7 @@
 
   run(() => {
     isLoggedIn = loginData ? loginData.isLogged : false
-  });
+  })
 </script>
 
 <!--
@@ -74,12 +74,12 @@ It listens for messages from the extension to handle login and logout functional
     {#if !isLoggedIn}
       <li>
         <LoaderButton
-        class="loader-button-plain"
-        text="Login"
-        textWhileLoading="Login"
-        loading={isLoggingIn}
-        onClick={handleLogin}
-        title="Log in using TIM to access TIDE tasks"
+          class="loader-button-plain"
+          text="Login"
+          textWhileLoading="Login"
+          loading={isLoggingIn}
+          onClick={handleLogin}
+          title="Log in using TIM to access TIDE tasks"
         />
       </li>
     {:else}
@@ -91,7 +91,8 @@ It listens for messages from the extension to handle login and logout functional
               value: '',
             })
           }}
-            title="View and download tasks from your TIDE courses">
+          title="View and download tasks from your TIDE courses"
+        >
           My Courses
         </button>
       </li>
@@ -110,10 +111,12 @@ It listens for messages from the extension to handle login and logout functional
       <button
         onclick={() => {
           tsvscode.postMessage({
-        type: 'OpenSettings',
-        value: '',
+            type: 'OpenSettings',
+            value: '',
           })
-        }} title="Open extension settings">
+        }}
+        title="Open extension settings"
+      >
         Settings
       </button>
     </li>

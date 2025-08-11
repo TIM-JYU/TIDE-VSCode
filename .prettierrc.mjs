@@ -1,21 +1,21 @@
 /** @type {import("prettier").Config} */
 const config = {
   semi: false,
-  trailingComma: "all",
+  trailingComma: 'all',
   singleQuote: true,
   tabWidth: 2,
   printWidth: 100,
   jsxSingleQuote: false,
   bracketSpacing: true,
-  plugins: ["prettier-plugin-svelte"],
+  plugins: ['prettier-plugin-svelte'],
   overrides: [
     {
-      files: "*.svelte",
+      files: '*.svelte',
       options: {
-        parser: "svelte",
+        parser: 'svelte',
       },
     },
   ],
-};
+}
 
-export default config;
+export default config

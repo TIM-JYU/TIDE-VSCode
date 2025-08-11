@@ -9,20 +9,14 @@
   import CourseListItem from './CourseListItem.svelte'
 
   interface Props {
-    statusOfCourses: CourseStatus;
-    courses: Array<Course>;
-    defaultExpandedState: boolean;
-    isLoggedIn: boolean;
-    customUrl: string;
+    statusOfCourses: CourseStatus
+    courses: Array<Course>
+    defaultExpandedState: boolean
+    isLoggedIn: boolean
+    customUrl: string
   }
 
-  let {
-    statusOfCourses,
-    courses,
-    defaultExpandedState,
-    isLoggedIn,
-    customUrl
-  }: Props = $props();
+  let { statusOfCourses, courses, defaultExpandedState, isLoggedIn, customUrl }: Props = $props()
 
   let isExpanded = $state(defaultExpandedState)
 
@@ -38,12 +32,16 @@ expand or collapse course details, and perform actions like downloading task set
 or opening workspaces.
 -->
 
-<button class="button-header" onclick={toggleExpandedState} title={isExpanded ? `Hide ${statusOfCourses} Courses` : `Show ${statusOfCourses} Courses`}>
+<button
+  class="button-header"
+  onclick={toggleExpandedState}
+  title={isExpanded ? `Hide ${statusOfCourses} Courses` : `Show ${statusOfCourses} Courses`}
+>
   {#if statusOfCourses === 'active'}
-  <span class="button-header-span">My Courses</span>
+    <span class="button-header-span">My Courses</span>
   {/if}
   {#if statusOfCourses === 'hidden'}
-  <span class="button-header-span">{statusOfCourses} Courses</span>
+    <span class="button-header-span">{statusOfCourses} Courses</span>
   {/if}
   <span class="arrow {isExpanded ? 'left-arrow' : 'down-arrow'}">&#8250;</span>
 </button>
@@ -56,7 +54,6 @@ or opening workspaces.
     <CourseListItem {course} {isLoggedIn} {customUrl} />
   {/each}
 {/if}
-
 
 <style>
   :global(body) {
@@ -76,7 +73,7 @@ or opening workspaces.
     color: rgb(197, 197, 197);
   }
 
-  .button-header-span::first-letter{
+  .button-header-span::first-letter {
     text-transform: capitalize;
   }
 

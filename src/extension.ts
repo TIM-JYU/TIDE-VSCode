@@ -35,15 +35,12 @@ export async function activate(ctx: vscode.ExtensionContext) {
   // Initialize Login and User Data
   const userData = await Tide.checkLogin()
   if (userData.logged_in) {
-    ExtensionStateManager.setLoginData({isLogged: true})
+    ExtensionStateManager.setLoginData({ isLogged: true })
     ExtensionStateManager.setUserData(userData)
   } else {
-    ExtensionStateManager.setLoginData({isLogged: false})
+    ExtensionStateManager.setLoginData({ isLogged: false })
     ExtensionStateManager.setUserData(userData)
   }
-  
-
-
 
   // Creates and registers the side menu on the left
   const sidebarProvider = new SidebarProvider(ctx.extensionUri)
@@ -51,7 +48,9 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
   // Creates ans registers the treeview for course tasks
   const courseTasksTreeview = new CourseTaskProvider()
-  ctx.subscriptions.push(vscode.window.registerTreeDataProvider('tide-tasks-treeview', courseTasksTreeview))
+  ctx.subscriptions.push(
+    vscode.window.registerTreeDataProvider('tide-tasks-treeview', courseTasksTreeview),
+  )
   if (ExtensionStateManager.getLoginData().isLogged) {
     vscode.commands.executeCommand('tide.refreshTree')
   }
@@ -60,28 +59,34 @@ export async function activate(ctx: vscode.ExtensionContext) {
   const taskPanelProvider = new TaskPanelProvider(ctx.extensionUri)
   const webviewViewopts = {
     webviewOptions: {
-      retainContextWhenHidden : true
-    }
+      retainContextWhenHidden: true,
+    },
   }
-  ctx.subscriptions.push(vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider, webviewViewopts))
+  ctx.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('tide-taskpanel', taskPanelProvider, webviewViewopts),
+  )
 
   // Creates and registers taskbar item for displaying answer_limit warnings
-  const answerLimitStatusBarItem = new AnswerLimitStatusBarItem(vscode.StatusBarAlignment.Right, 500)
+  const answerLimitStatusBarItem = new AnswerLimitStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    500,
+  )
   ctx.subscriptions.push(answerLimitStatusBarItem)
 
-
-  vscode.window.onDidChangeActiveTextEditor(editor => {
+  vscode.window.onDidChangeActiveTextEditor((editor) => {
     const fileName = editor?.document?.fileName || ''
     const TimData = ExtensionStateManager.getTimDataByFilepath(fileName)
     if (TimData) {
       // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
       let suplementaryFiles = TimData.supplementary_files
-      if (suplementaryFiles.some(suplementaryFile => fileName.includes(suplementaryFile.file_name))) {
+      if (
+        suplementaryFiles.some((suplementaryFile) => fileName.includes(suplementaryFile.file_name))
+      ) {
         vscode.commands.executeCommand('setContext', 'tide.exerciseActive', false)
-      }else {
+      } else {
         vscode.commands.executeCommand('setContext', 'tide.exerciseActive', true)
       }
-    }else {
+    } else {
       vscode.commands.executeCommand('setContext', 'tide.exerciseActive', false)
     }
   })

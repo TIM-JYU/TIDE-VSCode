@@ -16,7 +16,6 @@ import Tide from '../../api/tide'
 import UiController from '../UiController'
 import path from 'path'
 
-
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
 
@@ -84,7 +83,7 @@ export default class CoursePanel {
    * Sends user defined url for the tim instance address from the settings.
    * Use default address "https://tim.jyu.fi/", if customUrl is empty
    * The intended recepient is Courses.svelte.
-   * @param customUrl 
+   * @param customUrl
    */
   private sendCustomUrl() {
     let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl')
@@ -92,7 +91,7 @@ export default class CoursePanel {
       customUrl = 'https://tim.jyu.fi/'
     }
     if (typeof customUrl === 'string' && !customUrl.match(/^https?:\/\//)) {
-        customUrl = `https://${customUrl}`
+      customUrl = `https://${customUrl}`
     }
     const msg: WebviewMessage = {
       type: 'CustomUrl',
@@ -148,7 +147,6 @@ export default class CoursePanel {
           break
         }
         case 'SetDownloadPath': {
-          
           let newPath: vscode.Uri[] | undefined = await vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
@@ -157,7 +155,9 @@ export default class CoursePanel {
           })
           // If newPath is undefined or user cancels, get the previous path from global state
           if (!newPath) {
-           const previousPath = vscode.workspace.getConfiguration().get<string>('TIM-IDE.fileDownloadPath', '')
+            const previousPath = vscode.workspace
+              .getConfiguration()
+              .get<string>('TIM-IDE.fileDownloadPath', '')
             if (previousPath) {
               newPath = [vscode.Uri.file(previousPath)]
             }
@@ -177,7 +177,7 @@ export default class CoursePanel {
         case 'DownloadTaskSet': {
           try {
             const taskSetPath = msg.value
-            const course: Course =  ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
+            const course: Course = ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
 
             // taskSet = Demo
             const taskSet = course.taskSets.find((taskSet) => {
@@ -185,7 +185,7 @@ export default class CoursePanel {
               if (taskPath === taskSetPath) {
                 return true
               }
-          })
+            })
             const taskDir = taskSet?.tasks.at(0)?.task_directory ?? ''
             // Download a new Task Set
             await Tide.downloadTaskSet(course.name, taskDir, taskSetPath)
@@ -197,15 +197,19 @@ export default class CoursePanel {
             const dataPromise = ExtensionStateManager.getTimData()
 
             // Fetch Task Points for the newly downloaded tasks from TIM
-            await Promise.all(dataPromise.map(async (dataObject) => {
-              // Only fetch points for new tasks
-              if (dataObject.path == taskSetPath && dataObject.max_points) {
-                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, null)
-              } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
-                // Set the current points of pointsless tasks to 0 in order to avoid errors
-                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
-              }
-            }))
+            await Promise.all(
+              dataPromise.map(async (dataObject) => {
+                // Only fetch points for new tasks
+                if (dataObject.path == taskSetPath && dataObject.max_points) {
+                  await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, null)
+                } else if (dataObject.path == taskSetPath && dataObject.max_points == null) {
+                  // Set the current points of pointsless tasks to 0 in order to avoid errors
+                  ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {
+                    current_points: 0,
+                  })
+                }
+              }),
+            )
 
             // Refresh TreeView with the new data
             vscode.commands.executeCommand('tide.refreshTree')
@@ -213,8 +217,6 @@ export default class CoursePanel {
               type: 'DownloadTaskSetComplete',
               value: taskSetPath,
             })
-
-
           } catch (error) {
             this.panel.webview.postMessage({
               type: 'DownloadTaskSetFailed',
@@ -242,25 +244,35 @@ export default class CoursePanel {
             const dataPromise = ExtensionStateManager.getTimData()
 
             // Fetch Task Points for the newly downloaded tasks from TIM
-            await Promise.all(dataPromise.map(async (dataObject) => {
-              // Only fetch points for new tasks
-              const baseCoursePath = path.dirname(coursePath)
-              if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points) {
-                await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, (data: string) => {
-                  console.log(data)
-                })
-              } else if ((dataObject.path.includes(baseCoursePath)) && dataObject.max_points == null) {
-                // Set the current points of pointsless tasks to 0 in order to avoid errors
-                ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {current_points: 0})
-              }
-            }))
+            await Promise.all(
+              dataPromise.map(async (dataObject) => {
+                // Only fetch points for new tasks
+                const baseCoursePath = path.dirname(coursePath)
+                if (dataObject.path.includes(baseCoursePath) && dataObject.max_points) {
+                  await Tide.getTaskPoints(
+                    dataObject.path,
+                    dataObject.ide_task_id,
+                    (data: string) => {
+                      console.log(data)
+                    },
+                  )
+                } else if (
+                  dataObject.path.includes(baseCoursePath) &&
+                  dataObject.max_points == null
+                ) {
+                  // Set the current points of pointsless tasks to 0 in order to avoid errors
+                  ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {
+                    current_points: 0,
+                  })
+                }
+              }),
+            )
 
             // Refresh TreeView with the new data
             vscode.commands.executeCommand('tide.treeviewShowCourses')
             this.panel.webview.postMessage({
               type: 'DownloadCourseTasksComplete',
             })
-
           } catch (error) {
             this.panel.webview.postMessage({
               type: 'DownloadCourseTasksFailed',

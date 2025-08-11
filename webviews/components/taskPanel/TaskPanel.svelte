@@ -30,10 +30,10 @@
     deadline: null,
     answer_limit: null,
     supplementary_files: [],
-    task_directory: null
+    task_directory: null,
   })
   let loginData: LoginData = $state({
-    isLogged: false
+    isLogged: false,
   })
   let isLoggedIn = $state(false)
   let taskPoints: TaskPoints = $state({ current_points: null })
@@ -100,27 +100,27 @@
   // This function is used to format the date string received from TIM
   // to a more readable format for the user.
   function formatDate(dateString: string): string {
-    const date = new Date(dateString);
+    const date = new Date(dateString)
 
     const options: Intl.DateTimeFormatOptions = {
-        timeZone: "Europe/Helsinki",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false // Use 24-hour format
-    };
+      timeZone: 'Europe/Helsinki',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false, // Use 24-hour format
+    }
 
-    const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(date);
+    const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date)
 
-    return formattedDate.replace(/(\d{2})\.(\d{2})\.(\d{4}),/, "$1/$2/$3,"); 
+    return formattedDate.replace(/(\d{2})\.(\d{2})\.(\d{4}),/, '$1/$2/$3,')
   }
 
   run(() => {
     isLoggedIn = loginData?.isLogged ?? false
-  });
+  })
 </script>
 
 <!--
@@ -149,14 +149,16 @@ This component manages the display of task information and interaction with task
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-        <a href={ customUrl + "view/" + timData.path} title="Open the exercise in TIM">Open exercise in TIM</a>
+      <a href={customUrl + 'view/' + timData.path} title="Open the exercise in TIM"
+        >Open exercise in TIM</a
+      >
     </div>
 
     <hr />
 
     <div class="points-section">
       {#if timData.max_points == undefined && taskPoints.current_points == 0}
-      <p>Points data was not found for this task. Check TIM for more information. </p>
+        <p>Points data was not found for this task. Check TIM for more information.</p>
       {:else if timData.max_points}
         <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
         <LoaderButton
@@ -182,11 +184,14 @@ This component manages the display of task information and interaction with task
 
     <div>
       {#if timData.answer_limit !== null}
-      <p>This task has an <strong>answer limit</strong> of {timData.answer_limit} {timData.answer_limit > 1 ? 'submissions' : 'submission'}. Any submissions made after the limit will be saved
-        in TIM, but won't be considered for points or grading.</p>
+        <p>
+          This task has an <strong>answer limit</strong> of {timData.answer_limit}
+          {timData.answer_limit > 1 ? 'submissions' : 'submission'}. Any submissions made after the
+          limit will be saved in TIM, but won't be considered for points or grading.
+        </p>
       {/if}
       {#if timData.deadline !== null}
-      <p>The deadline for this task is {formatDate(timData.deadline)}.</p>
+        <p>The deadline for this task is {formatDate(timData.deadline)}.</p>
       {/if}
     </div>
   </div>
@@ -200,7 +205,7 @@ This component manages the display of task information and interaction with task
   .task-panel h3 {
     margin: 0;
     font-weight: bold;
-    color:#bcbcbcbc;
+    color: #bcbcbcbc;
   }
 
   .task-panel p {

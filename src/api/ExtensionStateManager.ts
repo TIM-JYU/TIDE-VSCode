@@ -13,13 +13,20 @@
 
 import * as vscode from 'vscode'
 import Logger from '../utilities/logger'
-import { Course, CourseStatus, FileStatus, LoginData, TaskPoints, TimData, UserData } from '../common/types'
+import {
+  Course,
+  CourseStatus,
+  FileStatus,
+  LoginData,
+  TaskPoints,
+  TimData,
+  UserData,
+} from '../common/types'
 import Formatting from '../common/formatting'
 import path from 'path'
 import * as fs from 'fs'
 
 export default class ExtensionStateManager {
-  
   private static globalState: vscode.Memento & {
     setKeysForSync(keys: readonly string[]): void
   }
@@ -79,12 +86,16 @@ export default class ExtensionStateManager {
   }
 
   /**
-   * Set the downloadpath for Tasks inside TaskSets inside Courses. Currently saves a normalized path (tide.ts) 
+   * Set the downloadpath for Tasks inside TaskSets inside Courses. Currently saves a normalized path (tide.ts)
    * @param localCoursePath Local path to course folder. This is set as the downloadPath of the course
    * @param taskSetPath TIM path for the course
    * @param tasks Data of the tasks for which the download_paths are set
    */
-  static setTaskSetPaths(localCoursePath:string, taskSetPath: string, tasks: Array<Array<FileStatus>>) {
+  static setTaskSetPaths(
+    localCoursePath: string,
+    taskSetPath: string,
+    tasks: Array<Array<FileStatus>>,
+  ) {
     const courses: Array<Course> = this.getCourses()
     courses.forEach((course) => {
       course.taskSets.forEach((taskSet) => {
@@ -92,7 +103,13 @@ export default class ExtensionStateManager {
           taskSet.downloadPath = localCoursePath
           for (const group of tasks) {
             for (const file of group) {
-              const task = taskSet.tasks.find((task) => task.task_files?.some((taskFile) => taskFile.task_id_ext === file.task_id_ext && taskFile.file_name === file.file_name))
+              const task = taskSet.tasks.find((task) =>
+                task.task_files?.some(
+                  (taskFile) =>
+                    taskFile.task_id_ext === file.task_id_ext &&
+                    taskFile.file_name === file.file_name,
+                ),
+              )
               if (task) {
                 // TODO: Do we want to save actual or normalized paths?
                 task.download_path = Formatting.normalizePath(file.path)
@@ -141,30 +158,29 @@ export default class ExtensionStateManager {
    * Get task points for a task
    * @param taskSetPath of the task
    * @param ideTaskId of the task
-   * @returns a TaskPoints object with the tasks points. A TaskPoints object with current_points: 0 is returned if no points is stored with for the given information 
+   * @returns a TaskPoints object with the tasks points. A TaskPoints object with current_points: 0 is returned if no points is stored with for the given information
    */
   static getTaskPoints(taskSetPath: string, ideTaskId: string): TaskPoints | undefined {
-    try  {
+    try {
       const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
       if (taskPoints === undefined) {
         return undefined
       }
-      if(taskPoints[taskSetPath][ideTaskId]){
+      if (taskPoints[taskSetPath][ideTaskId]) {
         return taskPoints[taskSetPath][ideTaskId]
-      }else{
-        return {current_points : 0}
+      } else {
+        return { current_points: 0 }
       }
     } catch (error) {
       Logger.error(String(error))
-    } 
+    }
   }
 
   // This is for learning purposes only
-  static getAllTaskPoints(): TaskPoints |undefined {
+  static getAllTaskPoints(): TaskPoints | undefined {
     const taskPoints = this.readFromGlobalState(StateKey.TaskPoints)
     return taskPoints
   }
-
 
   /**
    * Updates the timdata of a course, this should be called after downloading a new task set from tim, since it will modify the old .timdata file
@@ -172,41 +188,41 @@ export default class ExtensionStateManager {
    */
   static updateTimData(taskSetPath: string) {
     const course: Course = this.getCourseByTasksetPath(taskSetPath)
-    const taskset = course.taskSets.find(taskSet => taskSet.path === taskSetPath)
+    const taskset = course.taskSets.find((taskSet) => taskSet.path === taskSetPath)
     if (taskset) {
-        // Find the path to the new .timdata file
-        if (!taskset.downloadPath) {
-            throw new Error('Download path is undefined for the task set.')
-        }else {
-          const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
-          ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
-        }
+      // Find the path to the new .timdata file
+      if (!taskset.downloadPath) {
+        throw new Error('Download path is undefined for the task set.')
+      } else {
+        const pathToTimDataFile = path.join(path.dirname(taskset.downloadPath), '.timdata')
+        ExtensionStateManager.readAndSaveTimData(pathToTimDataFile)
+      }
     }
   }
 
   /**
    * Read a .timdata file and save a TimData object for each task (demo) found in the file
    * @param filePath Actual path to a .timdata file
-   */ 
+   */
   static readAndSaveTimData(filePath: string) {
     try {
-        // Read the timdata object from the file
-        const timDataRaw = fs.readFileSync(filePath)
-        const timData = JSON.parse(timDataRaw.toString())
-      
-        // course_parts includes all task sets (demos)
-        let courseParts = Object.keys(timData.course_parts)
-        courseParts.forEach(demo => {
-          let taskData = timData.course_parts[demo].tasks
-          let keys = Object.keys(taskData)
-          keys.forEach(element => {
-              // Save each task as separate objects into TimData
-              const newTimData : TimData = timData.course_parts[demo].tasks[element]
-              ExtensionStateManager.addTimData(newTimData)
-          })
-        })          
+      // Read the timdata object from the file
+      const timDataRaw = fs.readFileSync(filePath)
+      const timData = JSON.parse(timDataRaw.toString())
+
+      // course_parts includes all task sets (demos)
+      let courseParts = Object.keys(timData.course_parts)
+      courseParts.forEach((demo) => {
+        let taskData = timData.course_parts[demo].tasks
+        let keys = Object.keys(taskData)
+        keys.forEach((element) => {
+          // Save each task as separate objects into TimData
+          const newTimData: TimData = timData.course_parts[demo].tasks[element]
+          ExtensionStateManager.addTimData(newTimData)
+        })
+      })
     } catch (err) {
-        Logger.error(String(err))
+      Logger.error(String(err))
     }
   }
 
@@ -220,14 +236,13 @@ export default class ExtensionStateManager {
    * @param timData a TimData object (a task in a .timdata file) to be added
    */
   static addTimData(timData: TimData) {
-
-    let allTimData : Array<TimData> = this.readFromGlobalState(StateKey.TimData)
+    let allTimData: Array<TimData> = this.readFromGlobalState(StateKey.TimData)
     let save = true
     if (allTimData === undefined) {
       allTimData = []
     }
 
-    allTimData.forEach(element => {
+    allTimData.forEach((element) => {
       // If an element has the same ide_task_id and path it is the same unique timdata object -> dont save a duplicate
       if (element.ide_task_id === timData.ide_task_id && element.path === timData.path) {
         save = false
@@ -236,9 +251,9 @@ export default class ExtensionStateManager {
 
     // Only save timdata if it's not a dublicate
     if (save) {
-      allTimData.push(timData)      
+      allTimData.push(timData)
       this.writeToGlobalState(StateKey.TimData, allTimData)
-    }    
+    }
   }
 
   /**
@@ -259,7 +274,7 @@ export default class ExtensionStateManager {
    * @param taskfilePath Actual path to a task file
    * @returns a TimData object that contains the given file as either a task or a supplementary file, undefined if a fitting TimData object isn't found
    */
-  static getTimDataByFilepath(taskfilePath: string): TimData | undefined{
+  static getTimDataByFilepath(taskfilePath: string): TimData | undefined {
     const courses: Array<Course> = this.getCourses()
     const normalizedPath = Formatting.normalizePath(taskfilePath)
     let id: number = -1
@@ -267,9 +282,16 @@ export default class ExtensionStateManager {
       course.taskSets.some((taskSet) => {
         taskSet.tasks.some((task) => {
           // Return if a taskSet(demo) was found
-          if (!task.download_path) {return}
-          if (id > -1) {return}
-          if (task.download_path && normalizedPath === Formatting.normalizePath(task.download_path)) {
+          if (!task.download_path) {
+            return
+          }
+          if (id > -1) {
+            return
+          }
+          if (
+            task.download_path &&
+            normalizedPath === Formatting.normalizePath(task.download_path)
+          ) {
             id = taskSet.doc_id
           } else {
             // If it turns out there is a possibility of more than 1 task_file in a task
@@ -288,39 +310,62 @@ export default class ExtensionStateManager {
 
     if (id !== -1) {
       const allTimData: Array<TimData> = this.getTimData()
-      let timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some((taskFile) => {
-        const parsedTaskDir = taskFile.task_directory ?? ''
-        if (parsedTaskDir.length > 0) {
-          return normalizedPath.includes(Formatting.normalizeSeparator(parsedTaskDir+path.sep+taskFile.file_name))
-        } else {
-          const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
-          const pathParts = timData.path.split('/')
-          const demo = pathParts.at(-1)
-          if (demo) {
-            return normalizedPath.includes(Formatting.normalizeSeparator(path.join(demo, timData.ide_task_id, taskFile.file_name)))
-          } else {
-            // This should never be reached
-            return normalizedPath.includes(Formatting.normalizeSeparator(path.join(timData.ide_task_id, taskFile.file_name)))
-          }
-        }
-      }))
+      let timData = allTimData.find(
+        (timData) =>
+          timData.doc_id === id &&
+          timData.task_files.some((taskFile) => {
+            const parsedTaskDir = taskFile.task_directory ?? ''
+            if (parsedTaskDir.length > 0) {
+              return normalizedPath.includes(
+                Formatting.normalizeSeparator(parsedTaskDir + path.sep + taskFile.file_name),
+              )
+            } else {
+              const fileNameToOsPath = Formatting.normalizePath(taskFile.file_name)
+              const pathParts = timData.path.split('/')
+              const demo = pathParts.at(-1)
+              if (demo) {
+                return normalizedPath.includes(
+                  Formatting.normalizeSeparator(
+                    path.join(demo, timData.ide_task_id, taskFile.file_name),
+                  ),
+                )
+              } else {
+                // This should never be reached
+                return normalizedPath.includes(
+                  Formatting.normalizeSeparator(path.join(timData.ide_task_id, taskFile.file_name)),
+                )
+              }
+            }
+          }),
+      )
       // Added for Java course additional extra files
       if (!timData) {
-        timData = allTimData.find((timData) => timData.doc_id === id && timData.task_files.some(taskFile => taskfilePath.includes(taskFile.file_name)))
+        timData = allTimData.find(
+          (timData) =>
+            timData.doc_id === id &&
+            timData.task_files.some((taskFile) => taskfilePath.includes(taskFile.file_name)),
+        )
       }
       if (!timData) {
         // Search for supplementary files!
-        timData = allTimData.find((timData) => timData.doc_id === id && timData.supplementary_files.some((supFile) => {
-        const parsedSupFileTaskDir = supFile.task_directory ?? ''
-        const supFileNameToOsPath = supFile.file_name
-        return normalizedPath.includes(Formatting.normalizeSeparator(parsedSupFileTaskDir+path.sep+supFileNameToOsPath))
-        }))
+        timData = allTimData.find(
+          (timData) =>
+            timData.doc_id === id &&
+            timData.supplementary_files.some((supFile) => {
+              const parsedSupFileTaskDir = supFile.task_directory ?? ''
+              const supFileNameToOsPath = supFile.file_name
+              return normalizedPath.includes(
+                Formatting.normalizeSeparator(
+                  parsedSupFileTaskDir + path.sep + supFileNameToOsPath,
+                ),
+              )
+            }),
+        )
       }
       return timData
     }
     return undefined
   }
-
 
   static reset() {
     // let key: keyof typeof StateKey
@@ -423,7 +468,6 @@ export default class ExtensionStateManager {
       .forEach((subscriber) => subscriber.onValueChange(value))
   }
 
- 
   /**
    * Retrieves a course by its task set path.
    * @param taskSetPath The path of the task set in TIM.
@@ -431,7 +475,9 @@ export default class ExtensionStateManager {
    */
   public static getCourseByTasksetPath(taskSetPath: string): Course {
     const courses = this.getCourses()
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.path === taskSetPath))
+    const course = courses.find((course) =>
+      course.taskSets.some((taskSet) => taskSet.path === taskSetPath),
+    )
     if (!course) {
       throw new Error(`Course not found for task set path: ${taskSetPath}`)
     }
@@ -446,7 +492,11 @@ export default class ExtensionStateManager {
   public static getCourseByFilePath(filePath: string): Course {
     const courses = this.getCourses()
     const normPath = Formatting.normalizePath(filePath)
-    const course = courses.find((course) => course.taskSets.some((taskSet) => taskSet.tasks.some((task) => task.download_path === normPath)))
+    const course = courses.find((course) =>
+      course.taskSets.some((taskSet) =>
+        taskSet.tasks.some((task) => task.download_path === normPath),
+      ),
+    )
     if (!course) {
       throw new Error(`This file doesn't seem to be part of the TIDE task: ${filePath}`)
     }
@@ -484,12 +534,11 @@ interface NotifyFunction {
   (newValue: any): void
 }
 
-
 // type StateKey = 'courses' | 'loginData' | 'taskPoints'
 export enum StateKey {
   Courses = 'courses',
   LoginData = 'loginData',
   UserData = 'userData',
   TaskPoints = 'taskPoints',
-  TimData = 'timData'
+  TimData = 'timData',
 }

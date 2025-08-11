@@ -11,7 +11,20 @@
  * @date 2.5.2024
  */
 
+import { profile } from 'console'
 import * as vscode from 'vscode'
+
+/**
+ * prepend https:// to a given url if it does not already start with http:// or https://
+ * @param url - The URL to be checked and potentially modified.
+ * @returns The modified URL with https:// prepended if necessary.
+ */
+export function prependHttps(url: string): string {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`
+  }
+  return url
+}
 
 /**
  * From https://github.com/microsoft/vscode-extension-samples/blob/main/webview-view-sample/src/extension.ts

@@ -5,38 +5,32 @@
   import LoaderButton from '../common/LoaderButton.svelte'
 
   interface Props {
-    taskset: TaskSet;
-    isLoggedIn: boolean;
+    taskset: TaskSet
+    isLoggedIn: boolean
   }
 
-  let { taskset, isLoggedIn }: Props = $props();
-  let showDetails: boolean = $state(false);
+  let { taskset, isLoggedIn }: Props = $props()
+  let showDetails: boolean = $state(false)
   let downloadingTasks: boolean = $state(false)
-  
-  /* 
+
+  /*
    * Listens for messages from CoursePanel.ts.
    */
-  onMount(() => 
-  {
-    window.addEventListener('message', (event) => 
-    {
+  onMount(() => {
+    window.addEventListener('message', (event) => {
       const message: WebviewMessage = event.data
-      switch (message.type) 
-      {
-        case 'DownloadTaskSetComplete': 
-        {
-            downloadingTasks = false
-            break
+      switch (message.type) {
+        case 'DownloadTaskSetComplete': {
+          downloadingTasks = false
+          break
         }
-        case 'DownloadTaskSetFailed':
-        {
-            downloadingTasks = false
-            break
+        case 'DownloadTaskSetFailed': {
+          downloadingTasks = false
+          break
         }
       }
     })
   })
-
 
   /**
    * Initiates the download of a task set identified by its path.
@@ -52,7 +46,6 @@
   function toggleDetails() {
     showDetails = !showDetails
   }
-
 </script>
 
 <!--
@@ -72,21 +65,21 @@ Enables downloading task set.
     <td>{taskset.tasks.length}</td>
     <td>
       {#if taskset.downloadPath === undefined}
-        <LoaderButton 
-          class="loader-button-grey" 
-          loading={downloadingTasks} 
-          text="Download task set" 
-          textWhileLoading="Downloading..." 
-          onClick={downloadTaskSet} 
+        <LoaderButton
+          class="loader-button-grey"
+          loading={downloadingTasks}
+          text="Download task set"
+          textWhileLoading="Downloading..."
+          onClick={downloadTaskSet}
           title="Download {taskset.name} tasks"
         />
       {:else}
-        <LoaderButton 
-          class="reload-button" 
-          loading={downloadingTasks} 
-          text="{String.fromCharCode(0x2705)} Reload task set" 
-          textWhileLoading="Downloading..." 
-          onClick={downloadTaskSet} 
+        <LoaderButton
+          class="reload-button"
+          loading={downloadingTasks}
+          text="{String.fromCharCode(0x2705)} Reload task set"
+          textWhileLoading="Downloading..."
+          onClick={downloadTaskSet}
           title="Reload {taskset.name} tasks"
         />
       {/if}
@@ -97,14 +90,13 @@ Enables downloading task set.
 </tr>
 
 {#if showDetails}
-  <TasksetDetails {taskset} {isLoggedIn}/>
+  <TasksetDetails {taskset} {isLoggedIn} />
 {/if}
 
 <style>
-
-  tr{
-   background:rgb(27, 27, 27);
-   border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
+  tr {
+    background: rgb(27, 27, 27);
+    border-top: 1px solid rgb(21, 21, 21); /* same as .course_box background in CourseListItem*/
   }
 
   td {
@@ -117,7 +109,7 @@ Enables downloading task set.
   }
 
   button {
-    background-color:rgb(0, 111, 185);
+    background-color: rgb(0, 111, 185);
     color: white;
     border: none;
     padding: 5px;
@@ -127,7 +119,7 @@ Enables downloading task set.
   }
 
   button:hover {
-    background-color:rgb(0, 83, 138);
+    background-color: rgb(0, 83, 138);
   }
 
   .button-taskname {
@@ -139,11 +131,11 @@ Enables downloading task set.
     color: rgb(197, 197, 197);
   }
 
-  .button-taskname-span{
+  .button-taskname-span {
     font-size: 14px;
   }
 
-  .button-taskname:hover{
+  .button-taskname:hover {
     background-color: transparent;
   }
 
@@ -160,5 +152,4 @@ Enables downloading task set.
   .down-arrow {
     transform: rotate(0deg);
   }
-
 </style>

@@ -1,12 +1,13 @@
 <script lang="ts">
   interface Props {
-    toggle?: import('svelte').Snippet;
-    menucontent?: import('svelte').Snippet;
+    toggle?: import('svelte').Snippet
+    menucontent?: import('svelte').Snippet
   }
 
-  let { toggle, menucontent }: Props = $props();
+  let { toggle, menucontent }: Props = $props()
   // without these (empty) tags, svelte language server shows errors else where
 </script>
+
 <!-- 
 @component
 This component creates a on hover menu with a toggle button and menu content.

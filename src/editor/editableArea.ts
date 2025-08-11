@@ -87,7 +87,8 @@ const generateOnSelectionChange = (document: vscode.TextDocument) => {
             new vscode.Position(selectionEndLine, 0),
           ),
           // TODO: wording
-          hoverMessage: 'This line is not included when submitting an answer. Please, only edit the code in the designated area',
+          hoverMessage:
+            'This line is not included when submitting an answer. Please, only edit the code in the designated area',
         },
       ])
     }

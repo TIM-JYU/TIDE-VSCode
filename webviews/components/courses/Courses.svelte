@@ -90,14 +90,14 @@ updates the courses' status, and handles downloading task sets and opening works
 {#if isLoggedIn}
   <div>
     <div class="refresh-button">
-        <LoaderButton
+      <LoaderButton
         class="loader-button-blue"
         text="Refresh"
         textWhileLoading="Refreshing"
         loading={coursesRefreshing}
         onClick={refreshCourses}
         title="Refresh the list of courses from TIM"
-        />
+      />
     </div>
   </div>
 
@@ -115,7 +115,7 @@ updates the courses' status, and handles downloading task sets and opening works
   {#if courses.length === 0}
     <p>No IDE courses were found.</p>
     <p>Add a course to "My courses" bookmark folder in TIM to begin.</p>
-    <p>Click 'Refresh' button to load course list. </p>
+    <p>Click 'Refresh' button to load course list.</p>
   {:else}
     <CourseList
       defaultExpandedState={true}

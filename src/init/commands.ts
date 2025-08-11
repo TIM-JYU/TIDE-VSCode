@@ -48,13 +48,12 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       // TODO: This might cause issues with c | C drive letter in windows paths
       const filePath = editor.document.uri.fsPath
       // Need to format here?
-      const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
+      const timData: TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
       if (timData) {
         Tide.resetTask(filePath)
       }
     }),
   )
-
 
   /**
    * Restore last submission of active task file.
@@ -73,21 +72,23 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       const course = ExtensionStateManager.getCourseByFilePath(filePath)
       if (!course) {
         return
-
       }
-      const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
+      const timData: TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
       if (timData) {
-        const pathToTimData = path.join(vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? '', course.name)
+        const pathToTimData = path.join(
+          vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? '',
+          course.name,
+        )
         Tide.overwriteTask(timData.path, timData.ide_task_id, pathToTimData.toLowerCase())
         Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
-        if (points !== undefined && points !== null) {
-          ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points)
-        } else {
-          vscode.window.showErrorMessage('TimData is undefined or invalid.')
-        }
-      })
-    }
-  }),
+          if (points !== undefined && points !== null) {
+            ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points)
+          } else {
+            vscode.window.showErrorMessage('TimData is undefined or invalid.')
+          }
+        })
+      }
+    }),
   )
 
   /**
@@ -106,29 +107,26 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       if (!course) {
         return
       }
-      
+
       const taskPath = editor.document.uri.fsPath
       const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM')
-      
+
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
         const messageOpts: vscode.MessageOptions = {
-          'detail': 'Do you wish to save the changes before submitting the task to TIM?',
-          'modal': true
+          detail: 'Do you wish to save the changes before submitting the task to TIM?',
+          modal: true,
         }
-        const modalOpts: string[] = [
-          'Save and Submit',
-        ]
+        const modalOpts: string[] = ['Save and Submit']
         const selection = await vscode.window.showInformationMessage(
           'There are Unsaved Changes in the Current File',
           messageOpts,
-          ...modalOpts
+          ...modalOpts,
         )
         // Cancel
         if (!selection) {
           return
-        }
-        else {
+        } else {
           try {
             const saved = await vscode.workspace.save(editor.document.uri)
             if (!saved) {
@@ -140,8 +138,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
             vscode.window.showErrorMessage('Error occurred during the submit: ${error}')
           }
         }
-      }
-      else {
+      } else {
         Tide.submitTask(taskPath, callback)
       }
     }),
@@ -162,7 +159,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
       Tide.getCourseList().then((freshCourses) => {
-          ExtensionStateManager.setCourses(freshCourses)
+        ExtensionStateManager.setCourses(freshCourses)
       })
     }),
   )
@@ -232,6 +229,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.timIcon', () => {
       vscode.commands.executeCommand('workbench.action.quickOpen', '>TIDE: ')
-    })
+    }),
   )
 }

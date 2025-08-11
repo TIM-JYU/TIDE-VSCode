@@ -1,38 +1,33 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import type { Course, CourseStatus, WebviewMessage} from '../../../src/common/types'
+  import type { Course, CourseStatus, WebviewMessage } from '../../../src/common/types'
   import Menu from './Menu.svelte'
   import MenuItem from './MenuItem.svelte'
   import TasksetTableRow from './TasksetTableRow.svelte'
   import LoaderButton from '../common/LoaderButton.svelte'
 
   interface Props {
-    course: Course;
-    isLoggedIn: boolean;
-    customUrl: String;
+    course: Course
+    isLoggedIn: boolean
+    customUrl: String
   }
 
-  let { course, isLoggedIn, customUrl }: Props = $props();
+  let { course, isLoggedIn, customUrl }: Props = $props()
   let isExpanded: boolean = $state(false)
   let downloadingTasks: boolean = $state(false)
   let oppositeStatus: CourseStatus = $derived(course.status === 'active' ? 'hidden' : 'active')
 
-   onMount(() => 
-  {
-    window.addEventListener('message', (event) => 
-    {
+  onMount(() => {
+    window.addEventListener('message', (event) => {
       const message: WebviewMessage = event.data
-      switch (message.type) 
-      {
-        case 'DownloadCourseTasksComplete': 
-        {
-            downloadingTasks = false
-            break
+      switch (message.type) {
+        case 'DownloadCourseTasksComplete': {
+          downloadingTasks = false
+          break
         }
-        case 'DownloadCourseTasksFailed':
-        {
-            downloadingTasks = false
-            break
+        case 'DownloadCourseTasksFailed': {
+          downloadingTasks = false
+          break
         }
       }
     })
@@ -69,7 +64,6 @@
       value: course.path,
     })
   }
-  
 </script>
 
 <!--
@@ -82,18 +76,22 @@ This component creates displays for individual courses.
     <p class="course-title">{course.name}</p>
     <Menu>
       {#snippet toggle()}
-            <span class="menu-toggle">&#8942;</span>
-          {/snippet}
+        <span class="menu-toggle">&#8942;</span>
+      {/snippet}
       {#snippet menucontent()}
-            <MenuItem >
+        <MenuItem>
           <a href="#?" onclick={() => moveCourse(oppositeStatus)}>
             Move to {oppositeStatus} courses
           </a>
         </MenuItem>
-          {/snippet}
+      {/snippet}
     </Menu>
   </header>
-    <a class="link" href={`${customUrl}view/${course.path}`} title={"Open the course in TIM " + `(${customUrl}view/${course.path}})`}>Open material page</a>
+  <a
+    class="link"
+    href={`${customUrl}view/${course.path}`}
+    title={'Open the course in TIM ' + `(${customUrl}view/${course.path}})`}>Open material page</a
+  >
   <button
     class="expand-collapse-button"
     aria-expanded={isExpanded}
@@ -110,11 +108,11 @@ This component creates displays for individual courses.
             <th>Task set</th>
             <th>Number of tasks</th>
             <th>
-              <LoaderButton 
-                class="loader-button-blue" 
-                loading={downloadingTasks} 
-                text="Download all tasks" 
-                textWhileLoading="Downloading..." 
+              <LoaderButton
+                class="loader-button-blue"
+                loading={downloadingTasks}
+                text="Download all tasks"
+                textWhileLoading="Downloading..."
                 onClick={downloadAllCourseTasks}
                 title="Download all tasks for this course"
               />
@@ -134,7 +132,7 @@ This component creates displays for individual courses.
 <style>
   .course-box {
     position: relative;
-    background-color:rgb(21, 21, 21);
+    background-color: rgb(21, 21, 21);
     padding-bottom: 3.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -152,14 +150,14 @@ This component creates displays for individual courses.
     margin-top: 1.5rem;
   }
 
-  .menu-toggle{
+  .menu-toggle {
     padding-right: 5px;
   }
 
   .link {
     margin-left: 1.5rem;
     font-size: 0.9rem;
-    color:rgb(0, 127, 211);
+    color: rgb(0, 127, 211);
   }
 
   .link:hover {
@@ -217,7 +215,6 @@ This component creates displays for individual courses.
     box-sizing: content-box;
   }
 
-
   table {
     width: 100%;
     border-collapse: collapse;
@@ -233,5 +230,4 @@ This component creates displays for individual courses.
     font-weight: normal;
     font-size: smaller;
   }
-
 </style>

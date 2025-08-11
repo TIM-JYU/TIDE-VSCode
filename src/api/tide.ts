@@ -10,13 +10,20 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import { Course, LoginData, Task, TaskCreationFeedback, TaskPoints, TimData, UserData } from '../common/types'
+import {
+  Course,
+  LoginData,
+  Task,
+  TaskCreationFeedback,
+  TaskPoints,
+  TimData,
+  UserData,
+} from '../common/types'
 import Formatting from '../common/formatting'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
-
 
 export default class Tide {
   public static async debug() {
@@ -70,14 +77,13 @@ export default class Tide {
    * @returns Logged in user data as JSON
    */
   public static async checkLogin(): Promise<UserData> {
-    let loggedInUserData: UserData = { logged_in: null}
+    let loggedInUserData: UserData = { logged_in: null }
     try {
       await this.runAndHandle(['check-login', '--json'], (data: string) => {
-      Logger.info(`Login data: ${data}`)
-      loggedInUserData = JSON.parse(data)
+        Logger.info(`Login data: ${data}`)
+        loggedInUserData = JSON.parse(data)
       })
-    }
-    catch (error) {
+    } catch (error) {
       Logger.error('Error while checking login: ' + error)
       UiController.showError('Login check failed.')
     }
@@ -94,8 +100,7 @@ export default class Tide {
       await this.runAndHandle(['courses', '--json'], async (data: string) => {
         courses = await parseCoursesFromJson(data)
       })
-    }
-    catch (error) {
+    } catch (error) {
       Logger.error('Error while fetching courses: ' + error)
       UiController.showError('Failed to fetch courses.')
     }
@@ -120,8 +125,7 @@ export default class Tide {
         },
         ignoreErrors,
       )
-    }
-    catch (error) {
+    } catch (error) {
       Logger.error('Error while fetching tasks: ' + error)
       UiController.showError('Failed to fetch tasks.')
     }
@@ -149,7 +153,7 @@ export default class Tide {
         UiController.showError('Download path not set!')
         return
       }
-      
+
       const taskSetName = path.basename(taskSetPath)
       const localCoursePath = path.join(path.normalize(downloadPathBase), courseName)
       let localTaskPath = ''
@@ -158,18 +162,20 @@ export default class Tide {
       } else {
         localTaskPath = path.join(localCoursePath, taskSetName)
       }
-      await this.runAndHandle(['task', 'create', taskSetPath, '-a', '-d', localCoursePath, '-j'], (data: string) => {
-        Logger.debug(data)
-        let cleanData = data.trimStart()
-        if (cleanData.startsWith('Task metadata updated')) {
-          Logger.info('Task metadata has been updated.')
-          cleanData = cleanData.substring(cleanData.indexOf('['))
-        }
-        const tasks = JSON.parse(cleanData)
-        ExtensionStateManager.setTaskSetPaths(localTaskPath, taskSetPath, tasks)
-      })
-    }
-    catch (error) {
+      await this.runAndHandle(
+        ['task', 'create', taskSetPath, '-a', '-d', localCoursePath, '-j'],
+        (data: string) => {
+          Logger.debug(data)
+          let cleanData = data.trimStart()
+          if (cleanData.startsWith('Task metadata updated')) {
+            Logger.info('Task metadata has been updated.')
+            cleanData = cleanData.substring(cleanData.indexOf('['))
+          }
+          const tasks = JSON.parse(cleanData)
+          ExtensionStateManager.setTaskSetPaths(localTaskPath, taskSetPath, tasks)
+        },
+      )
+    } catch (error) {
       Logger.error('Error while downloading task set: ' + error)
       UiController.showError('Failed to download task set.')
     }
@@ -185,8 +191,7 @@ export default class Tide {
       await this.runAndHandle(['task', 'create', '-a', '-f', taskSetPath], (data: string) => {
         Logger.debug(data)
       })
-    }
-    catch (error) {
+    } catch (error) {
       Logger.error('Error while overwriting task set: ' + error)
       UiController.showError('Failed to overwrite task set.')
     }
@@ -207,8 +212,7 @@ export default class Tide {
         },
       )
       Logger.info('Current task now matches to the latest submission in TIM.')
-    }
-    catch (error) {
+    } catch (error) {
       Logger.error('Error while overwriting task: ' + error)
       UiController.showError('Failed to overwrite task.')
     }
@@ -226,8 +230,7 @@ export default class Tide {
         Logger.debug(data)
         Logger.info('Current task has been reset.')
       })
-    }
-    catch (error) {
+    } catch (error) {
       Logger.error('Error while resetting task: ' + error)
       UiController.showError('Failed to reset task.')
     }
@@ -244,14 +247,14 @@ export default class Tide {
       await this.runAndHandle(['submit', taskPath], (data: string) => {
         Logger.info(data)
         callback()
-        const timData : TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
-          if (timData) {
-            this.getTaskPoints(timData.path, timData.ide_task_id, callback)
-          } else {
-            vscode.window.showErrorMessage('TimData is undefined or invalid.')
-          }
+        const timData: TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
+        if (timData) {
+          this.getTaskPoints(timData.path, timData.ide_task_id, callback)
+        } else {
+          vscode.window.showErrorMessage('TimData is undefined or invalid.')
+        }
       })
-    }catch (error) {
+    } catch (error) {
       Logger.error('Error while submitting task: ' + error)
       UiController.showError('Failed to submit task.')
     }
@@ -266,12 +269,15 @@ export default class Tide {
   public static async getTaskPoints(taskSetPath: string, ideTaskId: string, callback: any) {
     try {
       vscode.commands.executeCommand('tide.setPointsUpdating')
-      await this.runAndHandle(['task', 'points', taskSetPath, ideTaskId, '--json'], (data: string) => {
-        Logger.debug(data)
-        const points: TaskPoints = JSON.parse(data)
-        ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
-        vscode.commands.executeCommand('tide.refreshTree')
-      })
+      await this.runAndHandle(
+        ['task', 'points', taskSetPath, ideTaskId, '--json'],
+        (data: string) => {
+          Logger.debug(data)
+          const points: TaskPoints = JSON.parse(data)
+          ExtensionStateManager.setTaskPoints(taskSetPath, ideTaskId, points)
+          vscode.commands.executeCommand('tide.refreshTree')
+        },
+      )
     } catch (error) {
       Logger.error('Error while fetching task points: ' + error)
       UiController.showError('Failed to fetch task points.')
@@ -296,7 +302,7 @@ export default class Tide {
       }
     } catch (err) {
       if (!ignoreErrors) {
-        throw err 
+        throw err
       }
     }
   }
@@ -312,16 +318,17 @@ export default class Tide {
     let buffer = ''
     let errorBuffer = ''
 
-    // Use a copy of process.env to pass custom url to the child process 
-    const env_modified = {...process.env}
-    
+    // Use a copy of process.env to pass custom url to the child process
+    const env_modified = { ...process.env }
+
     let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl') as string
     if (customUrl && customUrl.trim() !== '') {
       // Ensure that the custom url ends with a slash
-      const formattedUrl = customUrl.trim().endsWith('/') ? customUrl.trim() : customUrl.trim() + '/'
+      const formattedUrl = customUrl.trim().endsWith('/')
+        ? customUrl.trim()
+        : customUrl.trim() + '/'
       env_modified.TIM_URL = formattedUrl
-    }
-    else {
+    } else {
       env_modified.TIM_URL = 'https://tim.jyu.fi/'
     }
 
@@ -334,7 +341,7 @@ export default class Tide {
     const childProcess = cp.spawn(
       vscode.workspace.getConfiguration().get('TIM-IDE.cliPath') as string,
       args,
-      {'env' : env_modified}
+      { env: env_modified },
     )
 
     childProcess.stdout.on('data', (data) => {

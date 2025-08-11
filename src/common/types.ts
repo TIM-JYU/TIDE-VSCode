@@ -128,10 +128,10 @@ export interface TaskFile {
 }
 
 export interface SupplementaryFile {
-  file_name: string,
-  content : string | null,
-  source : string | null,
-  task_directory : string | null
+  file_name: string
+  content: string | null
+  source: string | null
+  task_directory: string | null
 }
 
 export interface FileStatus {
@@ -198,7 +198,7 @@ export type MessageType =
   | 'SetDownloadPath'
   | 'SetDownloadPathResult'
   | 'ShowCourses'
-  | 'SubmitResult' 
+  | 'SubmitResult'
   | 'ShowOutput'
   | 'SubmitTask'
   | 'TaskPoints'

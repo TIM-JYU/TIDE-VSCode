@@ -1,9 +1,9 @@
 <script lang="ts">
   interface Props {
-    children?: import('svelte').Snippet;
+    children?: import('svelte').Snippet
   }
 
-  let { children }: Props = $props();
+  let { children }: Props = $props()
   // without these (empty) tags, svelte language server shows errors else where
 </script>
 
