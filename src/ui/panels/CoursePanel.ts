@@ -91,6 +91,9 @@ export default class CoursePanel {
     if (!customUrl) {
       customUrl = 'https://tim.jyu.fi/'
     }
+    if (typeof customUrl === 'string' && !customUrl.match(/^https?:\/\//)) {
+        customUrl = `https://${customUrl}`
+    }
     const msg: WebviewMessage = {
       type: 'CustomUrl',
       value: customUrl,
