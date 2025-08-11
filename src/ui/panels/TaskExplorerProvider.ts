@@ -3,7 +3,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { Course } from '../../common/types'
-import Logger from '../../utilities/logger'
+import CourseTaskTreeItem from './CourseTaskTreeItem'
+import { getProgressSvgRectangle } from '../utils'
 
 
 // Class for handling TreeView data
@@ -21,13 +22,25 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     readonly onDidChangeTreeData ? : vscode.Event<CourseTaskTreeItem | undefined> = this.m_onDidChangeTreeData.event
 
     // Initialize icon paths for treeItems
-    private iconGreenStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-green.svg')
-    private iconYellowStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-yellow.svg')
-    private iconRedStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-red.svg')
-    private iconGreyStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-grey.svg')
     private iconWarningStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-warning.svg')
     private iconTimCourse = path.join(__filename, '..', '..', '..', '..', 'media', 'timlogovscode.png')
     private iconSupplementaryStatus = path.join(__filename, '..', '..', '..', '..', 'media', 'status-sup-file.svg')
+
+    private iconPathByProgress(currentPoints: number, maxPoints: number): string | undefined {
+        if (!maxPoints) {
+            return
+        } else {
+            const progress = Math.max(0, Math.min(Math.floor(100 * currentPoints / maxPoints), 100))
+            const iconSvg = getProgressSvgRectangle(progress, 100)
+            const tmpIconPath = path.join(__filename, '..', '..', '..', '..', 'media', `progress-rectangle-${progress}.svg`)
+            // TODO: check if this works in prod and can be done without temporary files
+            // For debugging, comment out the file exists check
+            if (!fs.existsSync(tmpIconPath)) {
+                fs.writeFileSync(tmpIconPath, iconSvg)
+            }
+            return tmpIconPath
+        }
+    }
 
     // Register commands required to handle the treeview
     constructor() {
@@ -137,39 +150,26 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     // shows only active courses, ignores hidden courses
     private readRootDirectory() {
         const rootDir: string | undefined = vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath')
-        const extensionCourseData = ExtensionStateManager.getCourses()
+        if (!rootDir) {
+            vscode.window.showErrorMessage('File Download Path is not set! Please set it in the settings.')
+            return
+        }
 
-        // Check if the user has fetched course data from TIM
+        const extensionCourseData = ExtensionStateManager.getCourses()
         if (!extensionCourseData) {
-            // Inform user if course data isn't found
             vscode.window.showInformationMessage('Course data was not found. Make sure you have TIDE courses added in TIM, and refresh course data from the My Courses- page!')
             return
         }
 
-        // Check that the user has set a download path
-        if (rootDir == undefined) {
-            vscode.window.showErrorMessage('Error while reading fileDownloadPath. Edit fileDownloadPath in Settings!')
-        } else {
-            // Check that the path exists
-            if (this.pathExists(rootDir)) {
-                // Find all files and directories in the File Download Path set by the user
-                fs.readdirSync(rootDir).forEach(element => {
-                    let current = path.join(rootDir,element)
-                    // Only seek for course Directories
-                    if (fs.statSync(current).isDirectory()) {
-                        // Try to find an active course matching the directory name
-                        const courseFound = this.isCourse(element)
-                        // If a course was found, create a root node
-                        if (courseFound && courseFound.status == 'active') {
-                            this.courseData.push(new CourseTaskTreeItem('Course: ' + element, current, 'root'))
-                            // this.readCourseDirectory(current, this.courseData.at(-1))
-                        }
-                    }
-                })
-            } else {
-                vscode.window.showErrorMessage('Download path doesn\'t exist!')
+        extensionCourseData.filter(course => course.status === 'active').forEach(course => {
+            // Find all files and directories in the File Download Path set by the user
+            const coursePath = path.join(rootDir, course.name)
+            if (!coursePath || !fs.existsSync(coursePath)) {
+                return
             }
-        }
+            // If a course was found, create a root node
+            this.courseData.push(new CourseTaskTreeItem('Course: ' + course.name, coursePath, 'root'))
+        })
     }
 
     /**
@@ -289,14 +289,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
 
         let title = item.label? item.label.toString() : ''
         let result = new vscode.TreeItem(title, item.collapsibleState)
-        let iconPath = ''
 
         // If TreeView Mode is Courses, give all TIDE Courses the tim logo icon
-
         if (this.treeViewMode === 'Courses') {
             // Set the tim icon for all courses
-            iconPath = this.iconTimCourse
-            const itemCourse = ExtensionStateManager.getCourses().find(course => item.label?.toString().toLocaleLowerCase().includes(course.name.toLocaleLowerCase()))
+            result.iconPath = this.iconTimCourse
+            const itemCourse = ExtensionStateManager
+                .getCourses()
+                .find(course => course.name === item.label?.toString().replace(/^Course:\s+/, ''))
             if (itemCourse) {
                 const taskSetAmount = itemCourse.taskSets.length
                 let downloadedTaskSetsAmount = 0
@@ -322,35 +322,21 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         
                             // Only give points icons to the task_file files!
                             if (taskFiles.some(taskFile => taskFile.file_name.includes(labelString))) {
-                                if (item.maxPoints === 0) {
-                                    iconPath = this.iconGreyStatus
-                                } else if (item.currentPoints === 0) {
-                                    iconPath = this.iconRedStatus
-                                } else if (item.currentPoints === item.maxPoints) {
-                                    iconPath = this.iconGreenStatus
-                                } else {
-                                    iconPath = this.iconYellowStatus
-                                }
+                                result.tooltip = (item.currentPoints !== undefined && item.maxPoints) ? `${item.currentPoints} / ${item.maxPoints} points received` : 'No points available'
+                                result.iconPath = this.iconPathByProgress(item.currentPoints, item.maxPoints)
                             } else {
                                 // Give supplementary file icon to supplementary files
-                                iconPath = this.iconSupplementaryStatus
+                                result.iconPath = this.iconSupplementaryStatus
                             }
                         }
                     } else {
-                        if (item.maxPoints === 0) {
-                            iconPath = this.iconGreyStatus
-                        } else if (item.currentPoints === 0) {
-                            iconPath = this.iconRedStatus
-                        } else if (item.currentPoints === item.maxPoints) {
-                            iconPath = this.iconGreenStatus
-                        } else {
-                            iconPath = this.iconYellowStatus
-                        }
+                        result.tooltip = (item.currentPoints !== undefined && item.maxPoints) ? `${item.currentPoints} / ${item.maxPoints} points received for TIM-IDE tasks` : 'No points available'
+                        result.iconPath = this.iconPathByProgress(item.currentPoints, item.maxPoints)
                     }
                 } else {
                     // No icon and a warning for directories that aren't a part of a Tide-Course
-                    iconPath = this.iconWarningStatus
-                    result.description = 'Not a Tide-Course directory!'
+                    result.iconPath = this.iconWarningStatus
+                    result.description = 'Not in a Tide-Course directory!'
                 }
         }
 
@@ -361,7 +347,6 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
             arguments: [item],
         }
         result.contextValue = item.contextValue
-        result.iconPath = iconPath
         return result
     }
 
@@ -387,169 +372,3 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     }
 }
 
-// Class for handling the treeview items
-class CourseTaskTreeItem extends vscode.TreeItem {
-
-    readonly path: string
-    readonly type: string | undefined
-    currentPoints: number
-    maxPoints: number
-
-    // children represent branches, which are also items 
-    public children: CourseTaskTreeItem[] = []
-    
-    // the label represent the text which is displayed in the tree
-    // and is passed to the base class
-    // path = path to file or dir
-    // type = type of item (file or dir)
-    // TODO: label: vscode.TreeItemLabel
-    constructor(label: string, itemPath: string, type: 'file' | 'dir' | 'root') {
-        super(label)
-        this.label
-        this.path = itemPath
-        this.type = type
-        this.currentPoints = 0
-        this.maxPoints = 0
-        if (this.type === 'file' || this.type === 'root') {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.None
-            this.contextValue = ''
-        } else {
-            this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
-            this.contextValue = 'folder'
-        }
-    }
-
-    // a public method to add childs, and with additional branches
-    // we want to make the item collabsible
-    public addChild (child : CourseTaskTreeItem) {
-        // this.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed
-        this.children.push(child)
-    }
-
-    /**
-     * Checks if the CourseTaskTreeItem is a file or a directory that is a part of a Tide-Course
-     * @returns true if the item is a part of a Tide-Course, false otherwise
-     */
-    public isCourseDirOrFile() : boolean {
-        let result = false
-        if (this.type === 'file') {
-            try {
-                const itemTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
-                if (itemTimData) {
-                    itemTimData.task_files.forEach(taskFile => {
-                        if (this.label && taskFile.file_name.includes(this.label.toString())) {
-                            result = true
-                        }
-                    })
-                    if (result == false) {
-                        itemTimData.supplementary_files.forEach(supFile => {
-                            if (this.label && supFile.file_name.includes(this.label.toString())) {
-                                result = true
-                            }
-                        })
-                    }
-
-                }
-                // Java tehtävä tiedostojen tunnistus!
-                // C# tehtävien csproj tiedostojen tunnistus!
-                if (result == false) {
-
-                }
-            } catch (error) {
-                Logger.debug(error)
-                return result
-            }
-        } else if (this.type == 'dir') {
-            // Search TimData for the directory name in ide_task_id or path
-            const timData = ExtensionStateManager.getTimData()
-            const labelString = this.label?.toString()
-            if (!labelString) {
-                return result
-            }
-            timData.some(element => {
-                if (result == true) {return}
-                if (element.ide_task_id === labelString) {
-                    result = true
-                }
-                if (element.task_directory === labelString) {
-                    result = true
-                }
-                if (element.task_files.some(taskFile => taskFile.file_name.includes(labelString))) {
-                    result = true
-                }
-                const pathParts = element.path.split(path.posix.sep)
-                if (pathParts.includes(labelString)) {
-                    result = true
-                }
-            })
-            if (result == false) {
-                const courseData = ExtensionStateManager.getCourses()
-                courseData.forEach(element => {
-                    if (element.name.toLocaleLowerCase() === labelString) {
-                        result = true
-                    }
-                })
-            }
-            // C# tehtävien kansioiden tunnistus?
-            if (result == false) {
-                timData.some(data => {
-                    if (result == true) {return}
-                    if (data.supplementary_files.some(file => file.file_name.includes(labelString))) {
-                        result = true
-                    }
-                })
-            }
-        }
-        return result
-    }
-
-    /**
-     * Updates current and max points to the called treeItem and ALL ITS CHILDRENS treeItems recursively
-     * Make sure this is never called recursively outside of here!
-     * It is recommended to call this with the TreeViews root item/items, so the entire tree updates at once
-     */
-    public updatePoints() {
-        let currentPointsSum = 0
-        let maxPointsSum = 0
-        if (this.children.length > 0) {
-            this.children.forEach(child => {
-                child.updatePoints()
-                currentPointsSum += child.currentPoints
-                maxPointsSum += child.maxPoints
-            })
-        } else {
-            if (this.type == 'file') {
-                const taskTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
-                if (taskTimData) {
-                    // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
-                    let taskFiles = taskTimData.task_files
-                    let labelString = this.label?.toString() ?? ''
-
-                    // Only give points to the task_file file!
-                    if (taskFiles.some(taskFile => taskFile.file_name.includes(labelString))) {
-                        if (taskTimData.max_points) {
-                            maxPointsSum = taskTimData.max_points
-                        }
-                        
-                        const savedPoints = ExtensionStateManager.getTaskPoints(taskTimData.path, taskTimData.ide_task_id)
-                        const parsedPoints = savedPoints?.current_points
-                        if (parsedPoints == null || parsedPoints == undefined) {
-                            currentPointsSum = 0
-                        } else {
-                            currentPointsSum = parsedPoints
-                        }
-                    } else {
-                        currentPointsSum = 0
-                        maxPointsSum = 0
-                    }
-                    
-                }                
-            } else {
-                currentPointsSum = 0
-            }
-            
-        }
-        this.maxPoints = maxPointsSum
-        this.currentPoints = currentPointsSum
-    }
-}

@@ -92,3 +92,15 @@ export function getDefaultHtmlForWebview(
         </body>
         </html>`
 }
+
+export function getProgressSvgRectangle(progressPercentage: number, steps: number): string {
+  const progress = Math.min(Math.max(progressPercentage, 0), 100)
+  const stepWidth = 100 / steps
+  const filledSteps = Math.floor(progress / stepWidth)
+  const emptySteps = steps - filledSteps
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <rect width="${filledSteps * stepWidth}%" y="40%" height="20%" fill="#4CAF50"/>
+    <rect x="${filledSteps * stepWidth}%" y="40%" width="${emptySteps * stepWidth}%" height="20%" fill="#5f5f60"/>
+  </svg>`
+}
