@@ -15,10 +15,8 @@ import Logger from '../utilities/logger'
 import Tide from '../api/tide'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
-import { mergeCoursesWithNewData } from '../utilities/mergeCourses'
 import path from 'path'
 import { TimData } from '../common/types'
-import Formatting from '../common/formatting'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -163,22 +161,9 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
-      const existingCourses = ExtensionStateManager.getCourses()
       Tide.getCourseList().then((freshCourses) => {
-        if (existingCourses === undefined || existingCourses.length === 0) {
           ExtensionStateManager.setCourses(freshCourses)
-        } else {
-          const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
-          ExtensionStateManager.setCourses(mergedCourses)
-        }
       })
-      // const freshCourses = await Tide.getCourseList()
-      // if (existingCourses === undefined || existingCourses.length === 0) {
-      //   ExtensionStateManager.setCourses(freshCourses)
-      // } else {
-      //   const mergedCourses = mergeCoursesWithNewData(existingCourses, freshCourses)
-      //   ExtensionStateManager.setCourses(mergedCourses)
-      // }
     }),
   )
 
