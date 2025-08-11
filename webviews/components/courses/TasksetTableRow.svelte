@@ -28,6 +28,11 @@
             downloadingTasks = false
             break
         }
+        case 'DownloadTaskSetFailed':
+        {
+            downloadingTasks = false
+            break
+        }
       }
     })
   })

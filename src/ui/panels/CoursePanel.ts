@@ -185,7 +185,7 @@ export default class CoursePanel {
           })
             const taskDir = taskSet?.tasks.at(0)?.task_directory ?? ''
             // Download a new Task Set
-            await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskSetPath)
+            await Tide.downloadTaskSet(course.name, taskDir, taskSetPath)
 
             // Update TimData with the newly written data
             ExtensionStateManager.updateTimData(taskSetPath)
@@ -213,6 +213,9 @@ export default class CoursePanel {
 
 
           } catch (error) {
+            this.panel.webview.postMessage({
+              type: 'DownloadTaskSetFailed',
+            })
             Logger.error('Downloading a new taskset had an error: ' + error)
           }
           break
@@ -226,7 +229,7 @@ export default class CoursePanel {
             // Download all tasks and update TimData
             for (let taskset of course.taskSets) {
               const taskDir = taskset?.tasks.at(0)?.task_directory ?? ''
-              await Tide.downloadTaskSet(course.name.toLowerCase(), taskDir, taskset.path)
+              await Tide.downloadTaskSet(course.name, taskDir, taskset.path)
               // TODO: The entire .timData file is stored on update, so this propably could be only called once after downloading everything
               // Unfortunately there is no time to confirm this
               ExtensionStateManager.updateTimData(taskset.path)
@@ -253,10 +256,12 @@ export default class CoursePanel {
             vscode.commands.executeCommand('tide.treeviewShowCourses')
             this.panel.webview.postMessage({
               type: 'DownloadCourseTasksComplete',
-              value: coursePath,
             })
 
           } catch (error) {
+            this.panel.webview.postMessage({
+              type: 'DownloadCourseTasksFailed',
+            })
             console.log('Downloading a new taskset had an error: ' + error)
           }
           break

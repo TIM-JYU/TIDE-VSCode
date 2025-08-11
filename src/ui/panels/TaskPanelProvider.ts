@@ -126,6 +126,9 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
         if (!customUrl) {
             customUrl = 'https://tim.jyu.fi/'
         }
+        if (typeof customUrl === 'string' && !customUrl.match(/^https?:\/\//)) {
+            customUrl = `https://${customUrl}`
+        }
         this._view?.webview.postMessage({ type: 'CustomUrl', value: customUrl})
     }
 

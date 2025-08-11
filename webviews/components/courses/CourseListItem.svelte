@@ -29,6 +29,11 @@
             downloadingTasks = false
             break
         }
+        case 'DownloadCourseTasksFailed':
+        {
+            downloadingTasks = false
+            break
+        }
       }
     })
   })
