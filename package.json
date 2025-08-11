@@ -135,7 +135,7 @@
 				"title": "Submit task to TIM",
 				"category": "TIM-IDE",
 				"description": "Submit exercise from the active editor to TIM",
-				"icon": "media/submit-arrow_dark4.svg"
+				"icon": "media/fluent-icons/arrow-curve-up-right-20-filled.svg"
 			},
 			{
 				"command": "tide.clearLocalExtensionData",
@@ -174,14 +174,14 @@
 				"title": "Reset the current task to its initial state",
 				"category": "TIM-IDE",
 				"description": "Resets exercise of active editor to initial state",
-				"icon": "media/reset_dark3.svg"
+				"icon": "media/fluent-icons/arrow-counterclockwise-20-filled.svg"
 			},
 			{
 				"command": "tide.synchronizeSubmission",
 				"title": "Synchronize task to the last submission in TIM",
 				"category": "TIM-IDE",
 				"description": "Synchronize active editor with last submission of task in TIM",
-				"icon": "media/restore-arrow_dark2.svg"
+				"icon": "media/fluent-icons/arrow-sync-20-filled.svg"
 			},
 			{
 				"command": "tide.timIcon",
@@ -196,7 +196,7 @@
 				{
 					"id": "tide-extension",
 					"title": "TIM-IDE",
-					"icon": "./media/timlogovscode.png"
+					"icon": "./media/tim-logo.svg"
 				}
 			]
 		},
@@ -206,7 +206,7 @@
 					"type": "webview",
 					"id": "tide-sidebar",
 					"name": "TIM-IDE: Menu",
-					"icon": "./media/timlogovscode.png",
+					"icon": "./media/tim-logo.svg",
 					"contextualTitle": "TIM-IDE"
 				},
 				{
