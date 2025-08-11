@@ -61,6 +61,7 @@ export default class Tide {
       Logger.error('Error while logging out: ' + error)
       UiController.showError('Logout failed.')
     }
+    ExtensionStateManager.reset()
     return { isLogged: false }
   }
 
