@@ -93,7 +93,7 @@ This component creates displays for individual courses.
           {/snippet}
     </Menu>
   </header>
-    <a class="link" href={ customUrl + 'view/' + course.path} title="Open the course in TIM">Open material page</a>
+    <a class="link" href={`${customUrl}view/${course.path}`} title={"Open the course in TIM " + `(${customUrl}view/${course.path}})`}>Open material page</a>
   <button
     class="expand-collapse-button"
     aria-expanded={isExpanded}
@@ -188,8 +188,8 @@ This component creates displays for individual courses.
     height: 36px;
     position: absolute;
     bottom: 0rem;
-    left: 50%;
-    transform: translateX(-50%);
+    /* left: 50%; */
+    width: 100%;
   }
 
   .up-arrow {

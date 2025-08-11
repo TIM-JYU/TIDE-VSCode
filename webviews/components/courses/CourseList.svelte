@@ -49,6 +49,9 @@ or opening workspaces.
 </button>
 
 {#if isExpanded}
+  {#if courses.length === 0}
+    <p class="no-courses">{statusOfCourses} courses will be listed here.</p>
+  {/if}
   {#each courses as course}
     <CourseListItem {course} {isLoggedIn} {customUrl} />
   {/each}

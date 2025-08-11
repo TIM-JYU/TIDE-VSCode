@@ -44,7 +44,7 @@ UTC is therefore not shown.
         <thead>
             <tr>
                 <th>Task</th>
-                <th>Limit of submissions</th>
+                <th>Submission limit</th>
                 <th>Deadline</th>
             </tr>
         </thead>
