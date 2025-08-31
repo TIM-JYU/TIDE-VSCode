@@ -107,7 +107,6 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       }
 
       const taskPath = editor.document.uri.fsPath
-      const callback = () => vscode.window.showInformationMessage('Task was submitted to TIM')
 
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
@@ -131,13 +130,15 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
               vscode.window.showErrorMessage('Save failed - Current task has not been submitted!')
               return
             }
-            Tide.submitTask(taskPath, callback)
+            Logger.show()
+            Tide.submitTask(taskPath, () => {}) // TODO: implement a proper view, currently we only show logs
           } catch (_error) {
             vscode.window.showErrorMessage('Error occurred during the submit: ${error}')
           }
         }
       } else {
-        Tide.submitTask(taskPath, callback)
+        Logger.show()
+        Tide.submitTask(taskPath, () => {})
       }
     }),
   )

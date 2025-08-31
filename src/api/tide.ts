@@ -249,15 +249,15 @@ export default class Tide {
    *
    * @param {string} taskPath - path to the task file to be submitted
    */
-  public static async submitTask(taskPath: string, callback: () => any) {
+  public static async submitTask(taskPath: string, callback: (string: any) => any) {
     try {
       Logger.info('The current task is being submitted to TIM. Please wait for the TIM response.')
       await this.runAndHandle(['submit', taskPath], async (data: string) => {
         Logger.info(data)
-        callback()
+        callback(data)
         const taskInfo: TaskInfo | undefined = await this.getTaskInfo(taskPath)
         if (taskInfo) {
-          this.getTaskPoints(taskInfo.path, taskInfo.ide_task_id, callback)
+          this.getTaskPoints(taskInfo.path, taskInfo.ide_task_id)
         } else {
           vscode.window.showErrorMessage('Task data is undefined or invalid.')
         }
@@ -272,9 +272,8 @@ export default class Tide {
    * Fetch current points for a task from TIM
    * @param taskSetPath TIM path of the taskSet
    * @param ideTaskId ide_task_id of the task that the points are fetched for
-   * @param callback unused at the moment. TODO: Remove?
    */
-  public static async getTaskPoints(taskSetPath: string, ideTaskId: string, _callback: any) {
+  public static async getTaskPoints(taskSetPath: string, ideTaskId: string, _callback: any = undefined) {
     try {
       vscode.commands.executeCommand('tide.setPointsUpdating')
       await this.runAndHandle(
