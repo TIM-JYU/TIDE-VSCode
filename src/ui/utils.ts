@@ -79,6 +79,10 @@ export function getDefaultHtmlForWebview(
     vscode.Uri.joinPath(extensionUri, 'out', `compiled/${fileNamePrefix}.css`),
   )
 
+  const codiconsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'),
+  )
+
   // Use a nonce to only allow a specific script to be run.
   const nonce = getNonce()
 
@@ -94,6 +98,7 @@ export function getDefaultHtmlForWebview(
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <link href="${styleResetUri}" rel="stylesheet">
             <link href="${styleVSCodeUri}" rel="stylesheet">
+            <link href="${codiconsUri}" rel="stylesheet">
     <link href="${styleMainUri}" rel="stylesheet">
     <script nonce="${nonce}">
     const tsvscode = acquireVsCodeApi();

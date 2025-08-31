@@ -13,7 +13,7 @@
 @component
 A component for showing task points data.
 -->
-<div>
+<div id="points-display">
   {#if taskPoints && taskPoints.current_points !== null && taskMaxPoints !== null}
     <div id="points">
       <span>Task points</span>
@@ -30,6 +30,13 @@ A component for showing task points data.
 </div>
 
 <style>
+  #points-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    flex-grow: 1;
+  }
   #points {
     display: flex;
     justify-content: space-between;

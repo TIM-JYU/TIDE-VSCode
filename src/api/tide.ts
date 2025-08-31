@@ -257,7 +257,7 @@ export default class Tide {
         callback(data)
         const taskInfo: TaskInfo | undefined = await this.getTaskInfo(taskPath)
         if (taskInfo) {
-          this.getTaskPoints(taskInfo.path, taskInfo.ide_task_id)
+          await this.getTaskPoints(taskInfo.path, taskInfo.ide_task_id)
         } else {
           vscode.window.showErrorMessage('Task data is undefined or invalid.')
         }
@@ -273,7 +273,11 @@ export default class Tide {
    * @param taskSetPath TIM path of the taskSet
    * @param ideTaskId ide_task_id of the task that the points are fetched for
    */
-  public static async getTaskPoints(taskSetPath: string, ideTaskId: string, _callback: any = undefined) {
+  public static async getTaskPoints(
+    taskSetPath: string,
+    ideTaskId: string,
+    _callback: any = undefined,
+  ) {
     try {
       vscode.commands.executeCommand('tide.setPointsUpdating')
       await this.runAndHandle(

@@ -4,9 +4,10 @@
   interface Props {
     onClick: () => void
     loading: boolean
-    text: string
+    text?: string
+    icon?: string
     title?: string
-    textWhileLoading: any
+    textWhileLoading?: string
     class?: string // Accept class as a prop
   }
 
@@ -14,6 +15,7 @@
     onClick,
     loading,
     text,
+    icon,
     textWhileLoading,
     class: className = '',
     title = '',
@@ -25,7 +27,12 @@
     {textWhileLoading ?? text}
     <Spinner />
   {:else}
-    {text}
+    {#if icon}
+      <i class={icon} style="margin-right: 0.5em;"></i>
+    {/if}
+    {#if text}
+      {text}
+    {/if}
   {/if}
 </button>
 
@@ -67,6 +74,10 @@
   .loader-button-grey:hover,
   .loader-button-grey.loading {
     background-color: rgb(44, 44, 44);
+  }
+
+  .fit-content {
+    width: fit-content;
   }
 
   .reload-button {

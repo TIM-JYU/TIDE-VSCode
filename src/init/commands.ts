@@ -108,6 +108,10 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
 
       const taskPath = editor.document.uri.fsPath
 
+      const taskSubmitCallback = () => {
+        vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup')
+      }
+
       // If changes, check if user wants to save and submit task to TIM
       if (editor.document.isDirty) {
         const messageOpts: vscode.MessageOptions = {
@@ -131,14 +135,14 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
               return
             }
             Logger.show()
-            Tide.submitTask(taskPath, () => {}) // TODO: implement a proper view, currently we only show logs
+            await Tide.submitTask(taskPath, taskSubmitCallback) // TODO: implement a proper view, currently we only show logs
           } catch (_error) {
             vscode.window.showErrorMessage('Error occurred during the submit: ${error}')
           }
         }
       } else {
         Logger.show()
-        Tide.submitTask(taskPath, () => {})
+        await Tide.submitTask(taskPath, taskSubmitCallback) // TODO: implement a proper view, currently we only show logs
       }
     }),
   )

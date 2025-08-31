@@ -18,21 +18,7 @@
   import PointsDisplay from './PointsDisplay.svelte'
   import LoaderButton from '../common/LoaderButton.svelte'
 
-  let taskInfo: TaskInfo = $state({
-    doc_id: 0,
-    header: undefined,
-    ide_task_id: '',
-    max_points: null,
-    path: '',
-    stem: undefined,
-    task_files: [],
-    type: '',
-    deadline: null,
-    answer_limit: null,
-    supplementary_files: [],
-    task_directory: null,
-    metadata_path: '',
-  })
+  let taskInfo: TaskInfo | undefined = $state()
   let loginData: LoginData = $state({
     isLogged: false,
   })
@@ -40,6 +26,14 @@
   let taskPoints: TaskPoints = $state({ current_points: null })
   let customUrl: string = $state('')
   let pointsUpdating: boolean = $state(false)
+  let showTaskIframe: boolean = $state(true)
+  let iframeColorInversion: boolean = $state(true)
+  let iFrameClass: string = $derived(iframeColorInversion ? 'color-invert' : '')
+
+  let taskAnchor = $derived(
+    taskInfo?.header?.replace(/\s+/g, '-').replace(/[*]/g, '').toLowerCase(),
+  )
+  let taskUrl = $derived(customUrl + 'view/' + taskInfo?.path + '#' + taskAnchor)
 
   /**
    * Listens for messages from CoursePanel.ts.
@@ -92,8 +86,8 @@
     tsvscode.postMessage({
       type: 'UpdateTaskPoints',
       value: {
-        taskSetPath: taskInfo.path,
-        ideTaskId: taskInfo.ide_task_id,
+        taskSetPath: taskInfo?.path,
+        ideTaskId: taskInfo?.ide_task_id,
       },
     })
   }
@@ -150,9 +144,7 @@ This component manages the display of task information and interaction with task
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-      <a href={customUrl + 'view/' + taskInfo.path} title="Open the exercise in TIM"
-        >Open exercise in TIM</a
-      >
+      <a href={taskUrl} title={`Open the exercise in TIM (${taskUrl})`}> Open exercise in TIM </a>
     </div>
 
     <hr />
@@ -163,9 +155,8 @@ This component manages the display of task information and interaction with task
       {:else if taskInfo.max_points}
         <PointsDisplay {taskPoints} taskMaxPoints={taskInfo.max_points} />
         <LoaderButton
-          class="loader-button-blue"
-          text="Update points"
-          textWhileLoading="Updating"
+          class="loader-button-plain fit-content"
+          icon="codicon codicon-sync"
           loading={pointsUpdating}
           onClick={updateTaskPoints}
           title="Click to fetch the latest points from TIM"
@@ -173,9 +164,8 @@ This component manages the display of task information and interaction with task
       {:else}
         <PointsDisplay {taskPoints} taskMaxPoints={null} />
         <LoaderButton
-          class="loader-button-blue"
-          text="Update points"
-          textWhileLoading="Updating"
+          class="loader-button-plain fit-content"
+          icon="codicon codicon-sync"
           loading={pointsUpdating}
           onClick={updateTaskPoints}
           title="Click to fetch the latest points from TIM"
@@ -195,12 +185,45 @@ This component manages the display of task information and interaction with task
         <p>The deadline for this task is {formatDate(taskInfo.deadline)}.</p>
       {/if}
     </div>
+    <div class="task-iframe-container">
+      <div class="task-iframe__header">
+        {#if showTaskIframe}
+          <button
+            aria-label="Toggle color inversion for TIM exercise page view"
+            class="task-iframe__action-button"
+            onclick={() => (iframeColorInversion = !iframeColorInversion)}
+            title="Toggle TIM exercise page view color inversion"
+          >
+            <i class="codicon codicon-color-mode" style="margin-right: 0.5em;"></i>
+          </button>
+        {/if}
+        <button
+          aria-label="Toggle TIM exercise page view"
+          class="task-iframe__action-button"
+          onclick={() => (showTaskIframe = !showTaskIframe)}
+          title="Toggle TIM exercise page view"
+        >
+          <i
+            class="codicon {showTaskIframe ? 'codicon-eye' : 'codicon-eye-closed'}"
+            style="margin-right: 0.5em;"
+          ></i>
+        </button>
+      </div>
+      {#if showTaskIframe}
+        <iframe title="TIM task view" width="100%" src={taskUrl} class={iFrameClass}> </iframe>
+      {/if}
+    </div>
   </div>
 {/if}
 
 <style>
   .task-panel {
+    display: flex;
+    flex-direction: column;
     border: none;
+    width: 100%;
+    max-height: 100vh;
+    height: 95vh;
   }
 
   .task-panel h3 {
@@ -227,6 +250,36 @@ This component manages the display of task information and interaction with task
     width: 100%;
   }
 
+  .task-iframe-container {
+    margin-top: 10px;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .task-iframe-container iframe {
+    flex: 1 1 auto;
+  }
+
+  .task-iframe__header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .task-iframe__action-button {
+    color: #ccc;
+    background-color: transparent;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .loader {
     width: 48px;
     height: 48px;
@@ -236,6 +289,16 @@ This component manages the display of task information and interaction with task
     display: inline-block;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
+  }
+
+  .points-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .color-invert {
+    filter: invert(90%);
   }
 
   @keyframes rotation {
