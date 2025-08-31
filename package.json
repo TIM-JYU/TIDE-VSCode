@@ -49,7 +49,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "tide.timIcon",
+          "command": "tide.showAllTimIdeCommands",
           "group": "navigation@0"
         }
       ],
@@ -184,7 +184,7 @@
         "icon": "media/fluent-icons/arrow-sync-20-filled.svg"
       },
       {
-        "command": "tide.timIcon",
+        "command": "tide.showAllTimIdeCommands",
         "title": "Show all TIM-IDE related commands",
         "category": "TIM-IDE",
         "description": "Open selection for the TIM-IDE extension commands",
