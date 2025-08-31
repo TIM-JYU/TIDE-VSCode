@@ -5,6 +5,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { Course } from '../../common/types'
 import CourseTaskTreeItem from './CourseTaskTreeItem'
 import { getProgressSvgRectangle } from '../utils'
+import Tide from '../../api/tide'
 
 // Class for handling TreeView data
 export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTreeItem> {
@@ -40,6 +41,16 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     'media',
     'timlogovscode.png',
   )
+  private iconTaskFile = path.join(
+    __filename,
+    '..',
+    '..',
+    '..',
+    '..',
+    'media',
+    'ph-icons',
+    'file-text-light.svg',
+  )
   private iconSupplementaryStatus = path.join(
     __filename,
     '..',
@@ -47,7 +58,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
     '..',
     '..',
     'media',
-    'status-sup-file.svg',
+    'ph-icons',
+    'file-plus-thin.svg',
   )
 
   private iconPathByProgress(currentPoints: number, maxPoints: number): string | undefined {
@@ -90,7 +102,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
   }
 
   // Refresh the current treeview items
-  private refreshTree() {
+  private async refreshTree() {
     // When the treeView is in Course browsing mode
     let loginData = ExtensionStateManager.getLoginData()
 
@@ -102,7 +114,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         if (treeRootItem) {
           treeRootItem.children = []
           this.readCourseDirectory(treeRootItem.path, this.courseData.at(0))
-          treeRootItem.updatePoints()
+          await treeRootItem.updatePoints()
         }
         this.m_onDidChangeTreeData.fire(undefined)
       }
@@ -266,7 +278,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
   }
 
   // Handles clicks on treeview items
-  public itemClicked(item: CourseTaskTreeItem) {
+  public async itemClicked(item: CourseTaskTreeItem) {
     // When the treeView is in Course browsing mode:
     // Show the taskSets and their statuses for the clicked course
     if (this.treeViewMode === 'Courses') {
@@ -283,9 +295,14 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
       this.readCourseDirectory(item.path, this.courseData.at(0))
       const treeRootItem = this.courseData.at(0)
       if (treeRootItem) {
-        treeRootItem.updatePoints()
+        await treeRootItem.updatePoints()
       }
       this.m_onDidChangeTreeData.fire(undefined)
+
+      vscode.workspace.updateWorkspaceFolders(0, 0, {
+        uri: vscode.Uri.file(item.path),
+        name: item.label?.toString().replace('Course: ', '') ?? '',
+      })
     } else {
       // When the treeView is in TaskSet browsing mode:
       // Open the clicked task file, ignore clicks on directories
@@ -324,7 +341,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
    * @param item The item that is going to be shown
    * @returns a vscode.TreeItem that can be shown in a treeview component
    */
-  public getTreeItem(item: CourseTaskTreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
+  public async getTreeItem(item: CourseTaskTreeItem): Promise<vscode.TreeItem> {
     let title = item.label ? item.label.toString() : ''
     let result = new vscode.TreeItem(title, item.collapsibleState)
 
@@ -346,25 +363,22 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
         result.description = downloadedTaskSetsAmount + '/' + taskSetAmount + ' TaskSets Downloaded'
       }
     } else {
-      const fileCheck = item.isCourseDirOrFile()
+      const fileCheck = await item.isCourseDirOrFile()
 
       if (fileCheck) {
         if (item.type === 'file') {
-          const taskTimData = ExtensionStateManager.getTimDataByFilepath(item.path)
-          if (taskTimData) {
-            // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
-            let taskFiles = taskTimData.task_files
+          const taskInfo = await Tide.getTaskInfo(item.path, true)
+          if (taskInfo) {
+            let taskFiles = taskInfo.task_files
             let labelString = item.label?.toString() ?? ''
 
             // Only give points icons to the task_file files!
             if (taskFiles.some((taskFile) => taskFile.file_name.includes(labelString))) {
-              result.tooltip =
-                item.currentPoints !== undefined && item.maxPoints
-                  ? `${item.currentPoints} / ${item.maxPoints} points received`
-                  : 'No points available'
-              result.iconPath = this.iconPathByProgress(item.currentPoints, item.maxPoints)
+              result.tooltip = 'Submittable file'
+              result.iconPath = this.iconTaskFile
             } else {
               // Give supplementary file icon to supplementary files
+              result.tooltip = 'Supplementary file'
               result.iconPath = this.iconSupplementaryStatus
             }
           }
@@ -376,9 +390,8 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
           result.iconPath = this.iconPathByProgress(item.currentPoints, item.maxPoints)
         }
       } else {
-        // No icon and a warning for directories that aren't a part of a Tide-Course
-        result.iconPath = this.iconWarningStatus
-        result.description = 'Not in a Tide-Course directory!'
+        const itemType = item.type === 'dir' ? 'directory' : item.type
+        result.tooltip = `Not a Tide ${itemType}`
       }
     }
 

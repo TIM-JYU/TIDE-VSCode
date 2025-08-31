@@ -20,6 +20,7 @@ import { CourseTaskProvider } from './ui/panels/TaskExplorerProvider'
 import { TaskPanelProvider } from './ui/panels/TaskPanelProvider'
 import Tide from './api/tide'
 import AnswerLimitStatusBarItem from './ui/AnswerLimitStatusBarItem'
+import { updateStateFromCourseTimDataFiles } from './utilities/timData'
 
 // This method is called when your extension is activated
 export async function activate(ctx: vscode.ExtensionContext) {
@@ -31,13 +32,15 @@ export async function activate(ctx: vscode.ExtensionContext) {
   init.registerEventListeners(ctx)
 
   // vscode.commands.executeCommand('tide.updateCoursesFromTim')
-
   // Initialize Login and User Data
   const userData = await Tide.checkLogin()
   if (userData.logged_in) {
     ExtensionStateManager.setLoginData({ isLogged: true })
     ExtensionStateManager.setUserData(userData)
+    await vscode.commands.executeCommand('tide.updateCoursesFromTim')
+    updateStateFromCourseTimDataFiles()
   } else {
+    ExtensionStateManager.reset()
     ExtensionStateManager.setLoginData({ isLogged: false })
     ExtensionStateManager.setUserData(userData)
   }
@@ -73,14 +76,14 @@ export async function activate(ctx: vscode.ExtensionContext) {
   )
   ctx.subscriptions.push(answerLimitStatusBarItem)
 
-  vscode.window.onDidChangeActiveTextEditor((editor) => {
+  vscode.window.onDidChangeActiveTextEditor(async (editor) => {
     const fileName = editor?.document?.fileName || ''
-    const TimData = ExtensionStateManager.getTimDataByFilepath(fileName)
-    if (TimData) {
+    const taskData = await Tide.getTaskInfo(fileName)
+    if (taskData) {
       // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
-      let suplementaryFiles = TimData.supplementary_files
+      let suplementaryFiles = taskData.supplementary_files
       if (
-        suplementaryFiles.some((suplementaryFile) => fileName.includes(suplementaryFile.file_name))
+        suplementaryFiles.some((supplementaryFile) => fileName.includes(supplementaryFile.file_name))
       ) {
         vscode.commands.executeCommand('setContext', 'tide.exerciseActive', false)
       } else {

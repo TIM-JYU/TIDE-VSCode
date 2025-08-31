@@ -10,19 +10,13 @@
 import * as cp from 'child_process'
 import Logger from '../utilities/logger'
 import * as vscode from 'vscode'
-import {
-  Course,
-  LoginData,
-  Task,
-  TaskPoints,
-  TimData,
-  UserData,
-} from '../common/types'
+import { Course, LoginData, Task, TaskPoints, TaskInfo, UserData } from '../common/types'
 import { parseCoursesFromJson } from '../utilities/parsers'
 import ExtensionStateManager from './ExtensionStateManager'
 import path from 'path'
 import UiController from '../ui/UiController'
 
+const taskDataCache: Map<string, TaskInfo> = new Map()
 export default class Tide {
   public static async debug() {
     this.runAndHandle([], (data: string) => {
@@ -242,14 +236,14 @@ export default class Tide {
   public static async submitTask(taskPath: string, callback: () => any) {
     try {
       Logger.info('The current task is being submitted to TIM. Please wait for the TIM response.')
-      await this.runAndHandle(['submit', taskPath], (data: string) => {
+      await this.runAndHandle(['submit', taskPath], async (data: string) => {
         Logger.info(data)
         callback()
-        const timData: TimData | undefined = ExtensionStateManager.getTimDataByFilepath(taskPath)
-        if (timData) {
-          this.getTaskPoints(timData.path, timData.ide_task_id, callback)
+        const taskInfo: TaskInfo | undefined = await this.getTaskInfo(taskPath)
+        if (taskInfo) {
+          this.getTaskPoints(taskInfo.path, taskInfo.ide_task_id, callback)
         } else {
-          vscode.window.showErrorMessage('TimData is undefined or invalid.')
+          vscode.window.showErrorMessage('Task data is undefined or invalid.')
         }
       })
     } catch (error) {
@@ -280,6 +274,32 @@ export default class Tide {
       Logger.error('Error while fetching task points: ' + error)
       UiController.showError('Failed to fetch task points.')
     }
+  }
+
+  public static async getTaskInfo(
+    taskPath: string,
+    cached: boolean = false,
+  ): Promise<TaskInfo | undefined> {
+    if (cached && taskDataCache.has(taskPath)) {
+      return taskDataCache.get(taskPath)
+    }
+
+    let taskData: TaskInfo | undefined = undefined
+    try {
+      await this.runAndHandle(
+        ['task', 'info', path.resolve(taskPath), '--json'],
+        (data: string) => {
+          Logger.debug(data)
+          taskData = JSON.parse(data)
+        },
+      )
+    } catch (error) {
+      Logger.debug('Error while fetching task data: ' + error)
+    }
+    if (taskData) {
+      taskDataCache.set(taskPath, taskData)
+    }
+    return taskData
   }
 
   /**

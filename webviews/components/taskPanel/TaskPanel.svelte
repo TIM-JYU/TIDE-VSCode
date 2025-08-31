@@ -12,13 +12,13 @@
   import {
     type LoginData,
     type TaskPoints,
-    type TimData,
+    type TaskInfo,
     type WebviewMessage,
   } from '../../../src/common/types'
   import PointsDisplay from './PointsDisplay.svelte'
   import LoaderButton from '../common/LoaderButton.svelte'
 
-  let timData: TimData = $state({
+  let taskInfo: TaskInfo = $state({
     doc_id: 0,
     header: undefined,
     ide_task_id: '',
@@ -31,6 +31,7 @@
     answer_limit: null,
     supplementary_files: [],
     task_directory: null,
+    metadata_path: '',
   })
   let loginData: LoginData = $state({
     isLogged: false,
@@ -47,8 +48,8 @@
     window.addEventListener('message', (event) => {
       const message: WebviewMessage = event.data
       switch (message.type) {
-        case 'UpdateTimData': {
-          timData = message.value
+        case 'UpdateTaskInfo': {
+          taskInfo = message.value
           break
         }
         case 'LoginData': {
@@ -91,8 +92,8 @@
     tsvscode.postMessage({
       type: 'UpdateTaskPoints',
       value: {
-        taskSetPath: timData.path,
-        ideTaskId: timData.ide_task_id,
+        taskSetPath: taskInfo.path,
+        ideTaskId: taskInfo.ide_task_id,
       },
     })
   }
@@ -128,28 +129,28 @@
 This component manages the display of task information and interaction with tasks, such as submitting exercises and resetting tasks.
 -->
 
-{#if timData === undefined}
+{#if taskInfo === undefined}
   <p>
     Task Panel only shows information when you have a TIM task document open in the text editor. If
     you are sure you have a TIM task open, try clicking on the text editor to activate the document.
   </p>
-{:else if !timData}
+{:else if !taskInfo}
   <p>Loading...</p>
   <span class="loader"></span>
 {:else}
   <div class="task-panel">
-    {#if timData.header !== null}
-      <h3>{timData.header}</h3>
+    {#if taskInfo.header !== null}
+      <h3>{taskInfo.header}</h3>
     {:else}
-      <h3>{timData.task_files[0].file_name}</h3>
+      <h3>{taskInfo.task_files[0].file_name}</h3>
     {/if}
     <div class="instructions">
-      {#if timData.stem !== null}
-        <p>{timData.stem}</p>
+      {#if taskInfo.stem !== null}
+        <p>{taskInfo.stem}</p>
       {:else}
         <p>To see the more instructions, please open the exercise in TIM.</p>
       {/if}
-      <a href={customUrl + 'view/' + timData.path} title="Open the exercise in TIM"
+      <a href={customUrl + 'view/' + taskInfo.path} title="Open the exercise in TIM"
         >Open exercise in TIM</a
       >
     </div>
@@ -157,10 +158,10 @@ This component manages the display of task information and interaction with task
     <hr />
 
     <div class="points-section">
-      {#if timData.max_points === undefined && taskPoints.current_points === 0}
+      {#if taskInfo.max_points === undefined && taskPoints.current_points === 0}
         <p>Points data was not found for this task. Check TIM for more information.</p>
-      {:else if timData.max_points}
-        <PointsDisplay {taskPoints} taskMaxPoints={timData.max_points} />
+      {:else if taskInfo.max_points}
+        <PointsDisplay {taskPoints} taskMaxPoints={taskInfo.max_points} />
         <LoaderButton
           class="loader-button-blue"
           text="Update points"
@@ -183,15 +184,15 @@ This component manages the display of task information and interaction with task
     </div>
 
     <div>
-      {#if timData.answer_limit !== null}
+      {#if taskInfo.answer_limit !== null}
         <p>
-          This task has an <strong>answer limit</strong> of {timData.answer_limit}
-          {timData.answer_limit > 1 ? 'submissions' : 'submission'}. Any submissions made after the
+          This task has an <strong>answer limit</strong> of {taskInfo.answer_limit}
+          {taskInfo.answer_limit > 1 ? 'submissions' : 'submission'}. Any submissions made after the
           limit will be saved in TIM, but won't be considered for points or grading.
         </p>
       {/if}
-      {#if timData.deadline !== null}
-        <p>The deadline for this task is {formatDate(timData.deadline)}.</p>
+      {#if taskInfo.deadline !== null}
+        <p>The deadline for this task is {formatDate(taskInfo.deadline)}.</p>
       {/if}
     </div>
   </div>

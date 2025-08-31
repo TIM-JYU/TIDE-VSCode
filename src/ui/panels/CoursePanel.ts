@@ -14,6 +14,8 @@ import { Course, LoginData, WebviewMessage } from '../../common/types'
 import Tide from '../../api/tide'
 import UiController from '../UiController'
 import path from 'path'
+import { updateStateFromCourseTimDataFiles } from '../../utilities/timData'
+import { updateTaskSetPoints } from '../../utilities/points'
 
 export default class CoursePanel {
   public static currentPanel: CoursePanel | undefined
@@ -88,9 +90,6 @@ export default class CoursePanel {
     let customUrl = vscode.workspace.getConfiguration().get('TIM-IDE.customUrl')
     if (!customUrl) {
       customUrl = 'https://tim.jyu.fi/'
-    }
-    if (typeof customUrl === 'string' && !customUrl.match(/^https?:\/\//)) {
-      customUrl = `https://${customUrl}`
     }
     const msg: WebviewMessage = {
       type: 'CustomUrl',
@@ -176,7 +175,7 @@ export default class CoursePanel {
         case 'DownloadTaskSet': {
           try {
             const taskSetPath = msg.value
-            const course: Course = ExtensionStateManager.getCourseByTasksetPath(taskSetPath)
+            const course: Course = ExtensionStateManager.getCourseByTaskSetPath(taskSetPath)
 
             // taskSet = Demo
             const taskSet = course.taskSets.find((taskSet) => {
@@ -189,26 +188,9 @@ export default class CoursePanel {
             // Download a new Task Set
             await Tide.downloadTaskSet(course.name, taskDir, taskSetPath)
 
-            // Update TimData with the newly written data
+            // Update TaskInfo with the newly written data
             ExtensionStateManager.updateTimData(taskSetPath)
-
-            // Get TimData for reading
-            const dataPromise = ExtensionStateManager.getTimData()
-
-            // Fetch Task Points for the newly downloaded tasks from TIM
-            await Promise.all(
-              dataPromise.map(async (dataObject) => {
-                // Only fetch points for new tasks
-                if (dataObject.path === taskSetPath && dataObject.max_points) {
-                  await Tide.getTaskPoints(dataObject.path, dataObject.ide_task_id, null)
-                } else if (dataObject.path === taskSetPath && dataObject.max_points === null) {
-                  // Set the current points of pointsless tasks to 0 in order to avoid errors
-                  ExtensionStateManager.setTaskPoints(dataObject.path, dataObject.ide_task_id, {
-                    current_points: 0,
-                  })
-                }
-              }),
-            )
+            await updateTaskSetPoints(taskSetPath)
 
             // Refresh TreeView with the new data
             vscode.commands.executeCommand('tide.refreshTree')
@@ -239,8 +221,8 @@ export default class CoursePanel {
               ExtensionStateManager.updateTimData(taskset.path)
             }
 
-            // Get TimData for reading
-            const dataPromise = ExtensionStateManager.getTimData()
+            // Get TaskInfo for reading
+            const dataPromise = ExtensionStateManager.getTaskInfo()
 
             // Fetch Task Points for the newly downloaded tasks from TIM
             await Promise.all(
@@ -291,7 +273,8 @@ export default class CoursePanel {
           break
         }
         case 'RefreshCourseData': {
-          vscode.commands.executeCommand('tide.updateCoursesFromTim')
+          await vscode.commands.executeCommand('tide.updateCoursesFromTim')
+          updateStateFromCourseTimDataFiles()
           break
         }
       }

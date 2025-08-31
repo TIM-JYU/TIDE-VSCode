@@ -16,7 +16,9 @@ import Tide from '../api/tide'
 import ExtensionStateManager from '../api/ExtensionStateManager'
 import UiController from '../ui/UiController'
 import path from 'path'
-import { TimData } from '../common/types'
+import { TaskInfo } from '../common/types'
+import { updateStateFromCourseTimDataFiles as updateTimDataStateFromCourseTimDataFiles } from '../utilities/timData'
+import { updateTaskSetPoints } from '../utilities/points'
 
 export function registerCommands(ctx: vscode.ExtensionContext) {
   Logger.info('Registering commands.')
@@ -48,8 +50,8 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       // TODO: This might cause issues with c | C drive letter in windows paths
       const filePath = editor.document.uri.fsPath
       // Need to format here?
-      const timData: TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
-      if (timData) {
+      const taskInfo: TaskInfo | undefined = await Tide.getTaskInfo(filePath)
+      if (taskInfo) {
         Tide.resetTask(filePath)
       }
     }),
@@ -69,22 +71,18 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       Logger.info('Synchronizing the current task to the last submission in TIM...')
       // TODO: need to format here?
       const filePath = editor.document.uri.fsPath
-      const course = ExtensionStateManager.getCourseByFilePath(filePath)
-      if (!course) {
+      const task = await Tide.getTaskInfo(filePath)
+      if (!task) {
         return
       }
-      const timData: TimData | undefined = ExtensionStateManager.getTimDataByFilepath(filePath)
-      if (timData) {
-        const pathToTimData = path.join(
-          vscode.workspace.getConfiguration().get('TIM-IDE.fileDownloadPath') ?? '',
-          course.name,
-        )
-        Tide.overwriteTask(timData.path, timData.ide_task_id, pathToTimData.toLowerCase())
-        Tide.getTaskPoints(timData.path, timData.ide_task_id, (points: any) => {
+      const taskInfo: TaskInfo | undefined = await Tide.getTaskInfo(filePath)
+      if (taskInfo) {
+        Tide.overwriteTask(taskInfo.path, taskInfo.ide_task_id, taskInfo.metadata_path)
+        Tide.getTaskPoints(taskInfo.path, taskInfo.ide_task_id, (points: any) => {
           if (points !== undefined && points !== null) {
-            ExtensionStateManager.setTaskPoints(timData.path, timData.ide_task_id, points)
+            ExtensionStateManager.setTaskPoints(taskInfo.path, taskInfo.ide_task_id, points)
           } else {
-            vscode.window.showErrorMessage('TimData is undefined or invalid.')
+            vscode.window.showErrorMessage('TaskInfo is undefined or invalid.')
           }
         })
       }
@@ -103,8 +101,8 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       }
       // TODO: Need to format here?
       const filePath = editor.document.uri.fsPath
-      const course = ExtensionStateManager.getCourseByFilePath(filePath)
-      if (!course) {
+      const taskInfo = Tide.getTaskInfo(filePath)
+      if (!taskInfo) {
         return
       }
 
@@ -158,9 +156,23 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
    */
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.updateCoursesFromTim', async () => {
-      Tide.getCourseList().then((freshCourses) => {
-        ExtensionStateManager.setCourses(freshCourses)
-      })
+      const freshCourses = await Tide.getCourseList()
+      ExtensionStateManager.setCourses(freshCourses)
+      await Promise.all(
+        freshCourses.map(async (course) => {
+          await Promise.all(
+            course.taskSets.map(async (taskSet) => {
+              await updateTaskSetPoints(taskSet.path)
+            }),
+          )
+        }),
+      )
+
+      // freshCourses.forEach((course) => {
+      //   course.taskSets.forEach((taskSet) => {
+      //     updateTaskSetPoints(taskSet.path)
+      //   })
+      // })
     }),
   )
 
@@ -173,6 +185,11 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
       ExtensionStateManager.setLoginData(loginData)
       let userData = await Tide.checkLogin()
       ExtensionStateManager.setUserData(userData)
+      if (userData.logged_in) {
+        await vscode.commands.executeCommand('tide.updateCoursesFromTim')
+        updateTimDataStateFromCourseTimDataFiles() // Todo: should this be a registered command?
+        vscode.commands.executeCommand('tide.refreshTree')
+      }
     }),
   )
 
@@ -182,6 +199,7 @@ export function registerCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
     vscode.commands.registerCommand('tide.logout', async () => {
       let data = await Tide.logout()
+      ExtensionStateManager.reset()
       ExtensionStateManager.setLoginData(data)
       let userData = await Tide.checkLogin()
       ExtensionStateManager.setUserData(userData)

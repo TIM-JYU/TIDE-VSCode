@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
 import ExtensionStateManager, { StateKey } from '../../api/ExtensionStateManager'
-import { TaskPoints, WebviewMessage, TimData } from '../../common/types'
+import { TaskPoints, WebviewMessage, TaskInfo } from '../../common/types'
 import { getDefaultHtmlForWebview } from '../utils'
 import Tide from '../../api/tide'
 import UiController from '../UiController'
@@ -19,15 +19,15 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     vscode.window.onDidChangeActiveTextEditor(async (editor) => {
       TaskPanelProvider.activeTextEditor = editor
       if (editor) {
-        const timData = await this.getTimData()
-        this.sendTimData(timData)
-        if (timData?.path && timData?.ide_task_id) {
+        const taskInfo = await this.getTaskInfo()
+        this.sendTaskInfo(taskInfo)
+        if (taskInfo?.path && taskInfo?.ide_task_id) {
           this.sendTaskPoints(
-            ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id),
+            ExtensionStateManager.getTaskPoints(taskInfo.path, taskInfo.ide_task_id),
           )
         }
       } else {
-        this.sendTimData(undefined)
+        this.sendTaskInfo(undefined)
       }
     })
 
@@ -104,9 +104,9 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
   }
 
   private async getTaskPoints() {
-    const timData = await this.getTimData()
-    if (timData?.path && timData?.ide_task_id) {
-      this.sendTaskPoints(ExtensionStateManager.getTaskPoints(timData.path, timData.ide_task_id))
+    const taskInfo = await this.getTaskInfo()
+    if (taskInfo?.path && taskInfo?.ide_task_id) {
+      this.sendTaskPoints(ExtensionStateManager.getTaskPoints(taskInfo.path, taskInfo.ide_task_id))
     }
   }
 
@@ -130,23 +130,20 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
     if (!customUrl) {
       customUrl = 'https://tim.jyu.fi/'
     }
-    if (typeof customUrl === 'string' && !customUrl.match(/^https?:\/\//)) {
-      customUrl = `https://${customUrl}`
-    }
     this._view?.webview.postMessage({ type: 'CustomUrl', value: customUrl })
   }
 
   /**
    * Retrieves TIM data for the active text editor.
    */
-  private async getTimData(): Promise<TimData | undefined> {
+  private async getTaskInfo(): Promise<TaskInfo | undefined> {
     if (!TaskPanelProvider.activeTextEditor) {
       return undefined
     }
 
     try {
       const doc = TaskPanelProvider.activeTextEditor.document
-      return ExtensionStateManager.getTimDataByFilepath(doc.fileName)
+      return await Tide.getTaskInfo(doc.fileName)
     } catch {
       return undefined
     }
@@ -155,8 +152,8 @@ export class TaskPanelProvider implements vscode.WebviewViewProvider {
   /**
    * Sends TIM data to the webview.
    */
-  private async sendTimData(timData: TimData | undefined) {
-    await this._view?.webview.postMessage({ type: 'UpdateTimData', value: timData })
+  private async sendTaskInfo(taskInfo: TaskInfo | undefined) {
+    await this._view?.webview.postMessage({ type: 'UpdateTaskInfo', value: taskInfo })
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {

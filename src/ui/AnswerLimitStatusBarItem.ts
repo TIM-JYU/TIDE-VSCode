@@ -1,6 +1,6 @@
 import * as vscode from 'vscode'
-import { TimData } from '../common/types'
-import ExtensionStateManager from '../api/ExtensionStateManager'
+import { TaskInfo } from '../common/types'
+import Tide from '../api/tide'
 
 /**
  * Class for Status Bar item displaying answer limit related information
@@ -29,9 +29,9 @@ export default class AnswerLimitStatusBarItem {
     vscode.window.onDidChangeActiveTextEditor(async (editor) => {
       AnswerLimitStatusBarItem.activeEditor = editor
       if (editor) {
-        const timData = await this.getTimData()
-        timData?.answer_limit ? this.statusBarItem.show() : this.statusBarItem.hide()
-        this.answerLimit = timData?.answer_limit
+        const taskInfo = await this.getTaskInfo()
+        taskInfo?.answer_limit ? this.statusBarItem.show() : this.statusBarItem.hide()
+        this.answerLimit = taskInfo?.answer_limit
         this.statusBarItem.tooltip =
           this.tooltip + `\nThis exercise has limit of ${this.answerLimit} submissions.`
       } else {
@@ -54,14 +54,14 @@ export default class AnswerLimitStatusBarItem {
   /**
    * Retrieves TIM data for the active text editor.
    */
-  private async getTimData(): Promise<TimData | undefined> {
+  private async getTaskInfo(): Promise<TaskInfo | undefined> {
     if (!AnswerLimitStatusBarItem.activeEditor) {
       return undefined
     }
 
     try {
       const doc = AnswerLimitStatusBarItem.activeEditor.document
-      return ExtensionStateManager.getTimDataByFilepath(doc.fileName)
+      return Tide.getTaskInfo(doc.fileName)
     } catch {
       return undefined
     }

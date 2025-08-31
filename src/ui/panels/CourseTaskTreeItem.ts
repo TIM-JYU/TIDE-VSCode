@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import ExtensionStateManager from '../../api/ExtensionStateManager'
 import Logger from '../../utilities/logger'
 import path from 'path'
+import Tide from '../../api/tide'
 
 // Class for handling the treeview items
 export default class CourseTaskTreeItem extends vscode.TreeItem {
@@ -45,19 +46,19 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
    * Checks if the CourseTaskTreeItem is a file or a directory that is a part of a Tide-Course
    * @returns true if the item is a part of a Tide-Course, false otherwise
    */
-  public isCourseDirOrFile(): boolean {
+  public async isCourseDirOrFile(): Promise<boolean> {
     let result = false
     if (this.type === 'file') {
       try {
-        const itemTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
-        if (itemTimData) {
-          itemTimData.task_files.forEach((taskFile) => {
+        const itemTaskInfo = await Tide.getTaskInfo(this.path, true)
+        if (itemTaskInfo) {
+          itemTaskInfo.task_files.forEach((taskFile) => {
             if (this.label && taskFile.file_name.includes(this.label.toString())) {
               result = true
             }
           })
           if (result === false) {
-            itemTimData.supplementary_files.forEach((supFile) => {
+            itemTaskInfo.supplementary_files.forEach((supFile) => {
               if (this.label && supFile.file_name.includes(this.label.toString())) {
                 result = true
               }
@@ -73,15 +74,14 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
         return result
       }
     } else if (this.type === 'dir') {
-      // Search TimData for the directory name in ide_task_id or path
-      const timData = ExtensionStateManager.getTimData()
+      // Search TaskInfo for the directory name in ide_task_id or path
+      const taskInfo = ExtensionStateManager.getTaskInfo()
       const labelString = this.label?.toString()
 
       if (!labelString) {
         return result
       }
-      timData.some((element) => {
-        Logger.debug(element)
+      taskInfo.some((element) => {
         if (result === true) {
           return
         }
@@ -109,7 +109,7 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
       }
       // C# tehtävien kansioiden tunnistus?
       if (result === false) {
-        timData.some((data) => {
+        taskInfo.some((data) => {
           if (result === true) {
             return
           }
@@ -127,48 +127,34 @@ export default class CourseTaskTreeItem extends vscode.TreeItem {
    * Make sure this is never called recursively outside of here!
    * It is recommended to call this with the TreeViews root item/items, so the entire tree updates at once
    */
-  public updatePoints() {
+  public async updatePoints() {
+    if (this.type !== 'dir' || !(await this.isCourseDirOrFile())) {
+      this.currentPoints = 0
+      this.maxPoints = 0
+      return
+    }
+
     let currentPointsSum = 0
     let maxPointsSum = 0
-    if (this.children.length > 0) {
-      this.children.forEach((child) => {
-        child.updatePoints()
+
+    const taskInfo = await Tide.getTaskInfo(this.path, true)
+    if (taskInfo) {
+      const savedPoints = ExtensionStateManager.getTaskPoints(
+        taskInfo.path,
+        taskInfo.ide_task_id,
+      )
+      currentPointsSum = savedPoints?.current_points ?? 0
+      maxPointsSum = taskInfo.max_points ?? 0
+    }
+
+    await Promise.all(
+      this.children.filter(child => child.type === 'dir').map(async (child) => {
+        await child.updatePoints()
         currentPointsSum += child.currentPoints
         maxPointsSum += child.maxPoints
-      })
-    } else {
-      if (this.type === 'file') {
-        const taskTimData = ExtensionStateManager.getTimDataByFilepath(this.path)
-        if (taskTimData) {
-          // If it turns out there is a possibility of more than 1 task_file, refactor this to take it into account!
-          let taskFiles = taskTimData.task_files
-          let labelString = this.label?.toString() ?? ''
+      }),
+    )
 
-          // Only give points to the task_file file!
-          if (taskFiles.some((taskFile) => taskFile.file_name.includes(labelString))) {
-            if (taskTimData.max_points) {
-              maxPointsSum = taskTimData.max_points
-            }
-
-            const savedPoints = ExtensionStateManager.getTaskPoints(
-              taskTimData.path,
-              taskTimData.ide_task_id,
-            )
-            const parsedPoints = savedPoints?.current_points
-            if (parsedPoints === null || parsedPoints === undefined) {
-              currentPointsSum = 0
-            } else {
-              currentPointsSum = parsedPoints
-            }
-          } else {
-            currentPointsSum = 0
-            maxPointsSum = 0
-          }
-        }
-      } else {
-        currentPointsSum = 0
-      }
-    }
     this.maxPoints = maxPointsSum
     this.currentPoints = currentPointsSum
   }

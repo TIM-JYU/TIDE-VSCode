@@ -99,9 +99,9 @@ export interface Task {
 }
 
 /**
- * Data included in .timdata
+ * Data from CLI task info command
  */
-export interface TimData {
+export interface TaskInfo {
   supplementary_files: SupplementaryFile[]
   task_directory: string | null
   doc_id: number
@@ -114,6 +114,7 @@ export interface TimData {
   type: string
   deadline: string | null
   answer_limit: number | null
+  metadata_path: string
 }
 
 export interface TaskFile {
@@ -203,5 +204,5 @@ export type MessageType =
   | 'SubmitTask'
   | 'TaskPoints'
   | 'UpdateTaskPoints'
-  | 'UpdateTimData'
+  | 'UpdateTaskInfo'
   | 'SetPointsUpdating'
