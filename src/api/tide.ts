@@ -174,6 +174,22 @@ export default class Tide {
   }
 
   /**
+   * Creates dotnet solution file if one does not exist and adds all tasks with .csproj files to it as projects.
+   * @param course - Course to which the solution file is added
+   */
+  public static async initDotnetProjects(courseDir: string) {
+    try {
+      Logger.debug('Creating dotnet solution for course: ' + courseDir)
+      await this.runAndHandle(['course', 'init-dotnet-projects', courseDir], (data: string) => {
+        Logger.debug(data)
+      })
+    } catch (error) {
+      Logger.error('Error while creating dotnet solution: ' + error)
+      UiController.showError('Failed to create dotnet solution.')
+    }
+  }
+
+  /**
    * Overwrites a local task set
    *
    * @param {string} taskSetPath - TIM path of the task set

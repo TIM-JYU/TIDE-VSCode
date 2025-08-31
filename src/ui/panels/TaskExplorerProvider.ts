@@ -5,6 +5,7 @@ import ExtensionStateManager from '../../api/ExtensionStateManager'
 import { Course } from '../../common/types'
 import CourseTaskTreeItem from './CourseTaskTreeItem'
 import { getProgressSvgRectangle } from '../utils'
+import { initCsharpProjects } from '../../utilities/csharp'
 import Tide from '../../api/tide'
 
 // Class for handling TreeView data
@@ -232,6 +233,7 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
    * @param parent TreeItem to be given new nodes as children
    */
   private readCourseDirectory(dir: string, parent: CourseTaskTreeItem | undefined) {
+    let containsCsproj = false
     if (dir === undefined) {
       vscode.window.showErrorMessage('Error while reading course path!')
     } else if (parent === undefined) {
@@ -250,6 +252,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
               // Create a new node and add it to its parents children
               let newNode = new CourseTaskTreeItem(element, current, 'file')
               parent.addChild(newNode)
+
+              if (current.endsWith('.csproj')) {
+                containsCsproj = true
+              }
             }
             // If the current element is a directory, add it to the parents children and continue the recursion
           } else {
@@ -263,6 +269,10 @@ export class CourseTaskProvider implements vscode.TreeDataProvider<CourseTaskTre
       } else {
         vscode.window.showErrorMessage("Directory path doesn't exist!")
       }
+    }
+
+    if (containsCsproj) {
+      initCsharpProjects(dir)
     }
   }
 
