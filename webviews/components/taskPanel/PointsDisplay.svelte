@@ -14,10 +14,10 @@
 A component for showing task points data.
 -->
 <div id="points-display">
-  {#if taskPoints && taskPoints.current_points !== null && taskMaxPoints !== null}
+  {#if taskPoints && taskMaxPoints !== null}
     <div id="points">
       <span>Task points</span>
-      <span>{taskPoints.current_points} / {taskMaxPoints}</span>
+      <span>{taskPoints.current_points ?? 0} / {taskMaxPoints}</span>
     </div>
     <progress value={taskPoints.current_points} max={taskMaxPoints} aria-label="Task progress"
     ></progress>
@@ -44,6 +44,10 @@ A component for showing task points data.
   }
   progress {
     width: 100%;
-    height: 2rem;
+    height: 1rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: #5f5f60;
+    color: #4CAF50;
   }
 </style>
