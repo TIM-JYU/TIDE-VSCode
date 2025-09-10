@@ -26,12 +26,12 @@
   let taskPoints: TaskPoints = $state({ current_points: null })
   let customUrl: string = $state('')
   let pointsUpdating: boolean = $state(false)
-  let showTaskIframe: boolean = $state(true)
+  let showTaskIframe: boolean = $state(false)
   let iframeColorInversion: boolean = $state(true)
   let iFrameClass: string = $derived(iframeColorInversion ? 'color-invert' : '')
 
   let taskAnchor = $derived(
-    taskInfo?.header?.replace(/\s+/g, '-').replace(/[*]/g, '').toLowerCase(),
+    taskInfo?.header?.replace(/\s+/g, '-').replace(/[*()]/g, '').toLowerCase(),
   )
   let taskUrl = $derived(customUrl + 'view/' + taskInfo?.path + '#' + taskAnchor)
 
@@ -140,11 +140,14 @@ This component manages the display of task information and interaction with task
     {/if}
     <div class="instructions">
       {#if taskInfo.stem !== null}
-        <p>{taskInfo.stem}</p>
+        {@html taskInfo.stem}
       {:else}
-        <p>To see the more instructions, please open the exercise in TIM.</p>
+        <p>
+          {!showTaskIframe &&
+            'To see the more instructions, please open the exercise in TIM, either through the link or the iframe toggle button below.'}
+        </p>
       {/if}
-      <a href={taskUrl} title={`Open the exercise in TIM (${taskUrl})`}> Open exercise in TIM </a>
+      <a href={taskUrl} title={`${taskUrl}`}> Open the exercise TIM page in a browser</a>
     </div>
 
     <hr />
@@ -295,6 +298,7 @@ This component manages the display of task information and interaction with task
     display: flex;
     justify-content: space-between;
     gap: 10px;
+    margin-bottom: 2rem;
   }
 
   .color-invert {
